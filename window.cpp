@@ -2,7 +2,8 @@
 #include "window.h"
 
 Window Window::s_wnd;
-void Window::init(const char* title, int w, int h)
+void
+Window::init(const char* title, int w, int h)
 {
     wnd = SDL_CreateWindow(
             title,

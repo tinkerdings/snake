@@ -1,22 +1,21 @@
 #include "inputHandler.h"
 
 InputHandler InputHandler::s_InputHandler;
-void InputHandler::handle()
+void
+InputHandler::setHandlePtr()
+{
+    STATE currentState = state.current();
+    switch(currentState)
+    {
+    case(STATE_MENU_MAIN):
+    {
+        internalHandle = &handleMenu;
+    }
+    }
+}
+void
+InputHandler::handle()
 {
     SDL_PollEvent(&e);
-    switch(e.type)
-    {
-    case(SDL_KEYDOWN):
-    {
-        switch(e.key.keysym.sym)
-        {
-        case(SDLK_ESCAPE):
-        {
-            wnd.quit();
-            break;
-        }
-        }
-        break;
-    }
-    }
+    internalHandle();
 }

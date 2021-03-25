@@ -3,7 +3,8 @@
 #include "render.h"
 
 Render Render::s_Render;
-void Render::init()
+void
+Render::init()
 {
     rend = SDL_CreateRenderer(wnd.getWindow(), -1, SDL_RENDERER_ACCELERATED);
     if(!rend)
@@ -13,17 +14,20 @@ void Render::init()
     }
 }
 
-void Render::setBG(unsigned char r, unsigned char g, unsigned char b)
+void
+Render::setBG(unsigned char r, unsigned char g, unsigned char b)
 {
     SDL_SetRenderDrawColor(rend, r, g, b, 255);
 }
 
-void Render::clear()
+void
+Render::clear()
 {
     SDL_RenderClear(rend);
 }
 
-void Render::show()
+void
+Render::show()
 {
     SDL_RenderPresent(rend);
 }

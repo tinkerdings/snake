@@ -7,7 +7,8 @@
 #include "render.h"
 #include "inputHandler.h"
 
-int main()
+int
+main()
 {
     if(SDL_Init(SDL_INIT_EVERYTHING))
     {
