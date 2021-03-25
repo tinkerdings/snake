@@ -33,7 +33,7 @@ main()
         input.handle();
 
         rend.clear();
-//         rend.renderQueue();
+        rend.renderQueue();
         rend.show();
     }
     

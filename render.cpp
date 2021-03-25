@@ -31,3 +31,9 @@ Render::show()
 {
     SDL_RenderPresent(rend);
 }
+
+void
+Render::renderQueue()
+{
+
+}

@@ -16,6 +16,7 @@ public:
     void setBG(unsigned char r, unsigned char g, unsigned char b);
     void clear();
     void show();
+    void renderQueue();
 
 private:
     Render(){}

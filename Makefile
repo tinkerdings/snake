@@ -14,7 +14,7 @@ OBJDIR = ./obj
 _DEPS = # header files
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 
-_OBJS = $(OUT).o window.o render.o inputHandler.o# obj files
+_OBJS = $(OUT).o window.o render.o inputHandler.o stateHandler.o# obj files
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.cpp $(DEPS)

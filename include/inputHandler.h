@@ -3,6 +3,7 @@
 
 #include <SDL2/SDL.h>
 #include "window.h"
+#include "render.h"
 #include "stateHandler.h"
 
 class InputHandler
@@ -22,10 +23,13 @@ private:
     static InputHandler s_InputHandler;
 
     Window& wnd = Window::getSingleton();
+    Render& rend = Render::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
     SDL_Event e;
-    void (*internalHandle)() = NULL; // Function ptr to current state input handle function.
+    void (InputHandler:: *internalHandle)() = NULL; // Function ptr to current state input handle function.
     void setHandlePtr();
+    void handleMenu();
+    void handlePlay();
 };
 
 #endif // INPUTHANDLER_H

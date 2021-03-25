@@ -21,7 +21,7 @@ public:
         return s_StateHandler;
     }
 
-    STATE current(){return state};
+    STATE current(){return state;};
     void init(STATE setTo){state &= 0; state |= setTo;};
     void add(STATE add){state |= add;};
     void remove(STATE remove){state &= ~remove;};
@@ -30,7 +30,7 @@ private:
     StateHandler(){}
     static StateHandler s_StateHandler;
 
-    STATE state;
+    STATE state = 0;
 };
 
 #endif // STATEHANDLER_H
