@@ -1,4 +1,5 @@
 #include "inputHandler.h"
+#include <iostream>
 
 InputHandler InputHandler::s_InputHandler;
 void
@@ -11,69 +12,60 @@ InputHandler::setHandlePtr()
         internalHandle = &InputHandler::handlePlay;
 }
 
+// Calls one of the state input handlers, depending on the function pointer
+// internalHandle.
 void
 InputHandler::handle()
 {
-    setHandlePtr();
-    if(internalHandle == NULL)
-        internalHandle = &InputHandler::handleMenu;
-
-    SDL_PollEvent(&e);
-    if(e.type == SDL_QUIT)
+    if(SDL_PollEvent(&e))
     {
-        wnd.quit();
-    }
-
-    (this->*internalHandle)();
-}
-
-void
-InputHandler::handleMenu()
-{
-    rend.setBG(128, 32, 32);
-    switch(e.type)
-    {
-    case(SDL_KEYDOWN):
-    {
-        switch(e.key.keysym.sym)
+        switch(e.type)
         {
-        case(SDLK_ESCAPE):
+        case(SDL_QUIT):
         {
             wnd.quit();
             break;
         }
-        case(SDLK_s):
-        {
-            state.init(STATE_GAME_PLAY);
-            break;
         }
-        }
+        setHandlePtr();
+        if(internalHandle == NULL)
+            internalHandle = &InputHandler::handleMenu;
+
+        (this->*internalHandle)();
     }
+
+}
+
+// [ STATE INPUT HANDLERS ]
+void
+InputHandler::handleMenu()
+{
+    if(keyRelease(SDLK_ESCAPE))
+    {
+        wnd.quit();
     }
 }
 
 void
 InputHandler::handlePlay()
 {
-    rend.setBG(32, 32, 128);
+}
 
-    switch(e.type)
-    {
-    case(SDL_KEYDOWN):
-    {
-        switch(e.key.keysym.sym)
-        {
-        case(SDLK_ESCAPE):
-        {
-            wnd.quit();
-            break;
-        }
-        case(SDLK_s):
-        {
-            state.init(STATE_MENU_MAIN);
-            break;
-        }
-        }
-    }
-    }
+// [ INPUT CHECKING METHODS ]
+bool
+InputHandler::keyPress(int sdlKeycode)
+{
+    return (e.type == SDL_KEYDOWN) && ((!e.key.repeat) && (sdlKeycode == e.key.keysym.sym));
+}
+
+bool
+InputHandler::keyHold(int sdlKeycode)
+{
+    SDL_PumpEvents();
+    return keyboardState[SDL_GetScancodeFromKey(sdlKeycode)];
+}
+
+bool InputHandler::keyRelease(int sdlKeycode)
+{
+    return (e.type == SDL_KEYUP) && (sdlKeycode == e.key.keysym.sym);
 }

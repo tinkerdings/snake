@@ -1,6 +1,7 @@
 #ifndef RENDER_H
 #define RENDER_H
 #include "window.h"
+#include "stateHandler.h"
 
 class Render
 {
@@ -15,14 +16,23 @@ public:
     void init();
     void setBG(unsigned char r, unsigned char g, unsigned char b);
     void clear();
+    void render();
     void show();
-    void renderQueue();
 
 private:
     Render(){}
-    Window& wnd = Window::getSingleton();
     SDL_Renderer *rend;
     static Render s_Render;
+
+    Window& wnd = Window::getSingleton();
+    StateHandler& state = StateHandler::getSingleton();
+
+    void (Render:: *internalRender)() = NULL; // Func ptr to current staate render func.
+    void setRenderPtr();
+    void renderMenuMain();
+    void renderMenuLvl();
+    void renderMenuSettings();
+    void renderPlay();
 };
 
 #endif // RENDER_H
