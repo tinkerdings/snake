@@ -2,10 +2,11 @@
 #define SNAKE_H
 
 #include <vector>
+#include "SDL2/SDL.h"
 
 struct SnakeSegment
 {
-    int posX, posY;
+    SDL_Rect rect;
 };
 
 enum SnakeKeyIndex
@@ -17,9 +18,15 @@ class Snake
 {
 public:
     bool isPlayer;
-    void snakeSetKey(snakeKeyIndex, int sdlKeyCode);
-private:
+    SDL_Color color = {32, 128, 32, 255};
     std::vector<SnakeSegment> segments;
+
+    Snake(bool isPlayer, int w, int h, int x, int y);
+    void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
+    void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
+    SDL_Color getColor(){return color;}
+
+private:
     int snakeKeyMap[_PKI_N];
 };
 

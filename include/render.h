@@ -2,6 +2,7 @@
 #define RENDER_H
 #include "window.h"
 #include "stateHandler.h"
+#include "game.h"
 
 class Render
 {
@@ -14,7 +15,7 @@ public:
     }
 
     void init();
-    void setBG(unsigned char r, unsigned char g, unsigned char b);
+    void setBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void clear();
     void render();
     void show();
@@ -26,6 +27,7 @@ private:
 
     Window& wnd = Window::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
+    Game& game = Game::getSingleton();
 
     void (Render:: *internalRender)() = NULL; // Func ptr to current staate render func.
     void setRenderPtr();
@@ -33,6 +35,7 @@ private:
     void renderMenuLvl();
     void renderMenuSettings();
     void renderPlay();
+    void renderSnakes();
 };
 
 #endif // RENDER_H

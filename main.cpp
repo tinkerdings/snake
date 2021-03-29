@@ -26,7 +26,7 @@ main()
     // Create Rendering context.
     Render& rend = Render::getSingleton();
     rend.init();
-    rend.setBG(128, 32, 32);
+    rend.setBG(128, 32, 32, 255);
 
     // Input handler.
     InputHandler& input = InputHandler::getSingleton();

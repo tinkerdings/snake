@@ -27,6 +27,12 @@ InputHandler::handle()
             break;
         }
         }
+
+        if(keyRelease(SDLK_ESCAPE))
+        {
+            wnd.quit();
+        }
+
         setHandlePtr();
         if(internalHandle == NULL)
             internalHandle = &InputHandler::handleMenu;
@@ -40,10 +46,6 @@ InputHandler::handle()
 void
 InputHandler::handleMenu()
 {
-    if(keyRelease(SDLK_ESCAPE))
-    {
-        wnd.quit();
-    }
 }
 
 void

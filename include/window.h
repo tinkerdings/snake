@@ -8,6 +8,7 @@ class Window
 {
 public:
     Window(const Window&) = delete;
+    int windowWidth, windowHeight;
 
     static Window& getSingleton()
     {
@@ -18,6 +19,7 @@ public:
     bool shouldQuit(){return quitting;}
     void quit(){quitting = true;}
     SDL_Window *getWindow(){return wnd;}
+    void getDimentions(int &w, int &h);
 
 private:
     Window(){}

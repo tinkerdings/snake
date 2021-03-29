@@ -1,6 +1,7 @@
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "render.h"
+#include "snake.h"
 
 Render Render::s_Render;
 
@@ -30,15 +31,27 @@ Render::init()
 }
 
 void
-Render::setBG(unsigned char r, unsigned char g, unsigned char b)
+Render::setBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-    SDL_SetRenderDrawColor(rend, r, g, b, 255);
+    SDL_SetRenderDrawColor(rend, r, g, b, a);
 }
 
 void
 Render::clear()
 {
     SDL_RenderClear(rend);
+}
+
+void Render::renderSnakes()
+{
+    for(auto snake : game.snakes)
+    {
+        setBG(snake.color.r, snake.color.g, snake.color.b, snake.color.a);
+        for(auto segment : snake.segments)
+        {
+            SDL_RenderFillRect(rend, &segment.rect);
+        }
+    }
 }
 
 void Render::render()

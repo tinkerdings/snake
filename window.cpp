@@ -17,3 +17,10 @@ Window::init(const char* title, int w, int h)
 
     quitting = false;
 }
+
+void
+Window::getDimentions(int &w, int &h)
+{
+    w = windowWidth;
+    h = windowHeight;
+}
