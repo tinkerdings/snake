@@ -6,6 +6,7 @@
 #include "window.h"
 #include "render.h"
 #include "inputHandler.h"
+#include "stateHandler.h"
 #include "game.h"
 
 #define WINW 800
@@ -24,6 +25,7 @@ main()
     Window& wnd = Window::getSingleton();
     wnd.init("Snake!", WINW, WINH);
 
+    // Setup game, snakes and so forth.
     Game& game = Game::getSingleton();
     game.init();
     InputHandler& input = InputHandler::getSingleton();
@@ -31,16 +33,13 @@ main()
     // Create Rendering context.
     Render& rend = Render::getSingleton();
     rend.init();
-    rend.setBG(128, 32, 32, 255);
 
+    StateHandler& state = StateHandler::getSingleton();
 
+    state.setState(PLAY);
     while(!wnd.shouldQuit())
     {
-        input.handle();
-
-        game.update();
-
-        rend.render();
+        state.run();
     }
     
     return 0;

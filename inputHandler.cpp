@@ -1,56 +1,32 @@
 #include "inputHandler.h"
 #include <iostream>
+#include <cstdio>
 
 InputHandler InputHandler::s_InputHandler;
-void
-InputHandler::setHandlePtr()
-{
-    STATE currentState = state.current();
-    if(currentState & (STATE_MENU_MAIN | STATE_MENU_LVL | STATE_MENU_SETTINGS))
-        internalHandle = &InputHandler::handleMenu;
-    if(currentState & STATE_GAME_PLAY)
-        internalHandle = &InputHandler::handlePlay;
-}
 
-// Calls one of the state input handlers, depending on the function pointer
-// internalHandle.
 void
-InputHandler::handle()
+InputHandler::inputPlay()
 {
-    if(SDL_PollEvent(&e))
+    SDL_PollEvent(&e);
+    if(keyRelease(SDLK_ESCAPE))
+        wnd.quit();
+
+    if(keyPress(SDLK_UP))
     {
-        switch(e.type)
-        {
-        case(SDL_QUIT):
-        {
-            wnd.quit();
-            break;
-        }
-        }
-
-        if(keyRelease(SDLK_ESCAPE))
-        {
-            wnd.quit();
-        }
-
-        setHandlePtr();
-        if(internalHandle == NULL)
-            internalHandle = &InputHandler::handleMenu;
-
-        (this->*internalHandle)();
+        game.snakes[0].setDirection(DIR_UP);
     }
-
-}
-
-// [ STATE INPUT HANDLERS ]
-void
-InputHandler::handleMenu()
-{
-}
-
-void
-InputHandler::handlePlay()
-{
+    if(keyPress(SDLK_DOWN))
+    {
+        game.snakes[0].setDirection(DIR_DOWN);
+    }
+    if(keyPress(SDLK_LEFT))
+    {
+        game.snakes[0].setDirection(DIR_LEFT);
+    }
+    if(keyPress(SDLK_RIGHT))
+    {
+        game.snakes[0].setDirection(DIR_RIGHT);
+    }
 }
 
 // [ INPUT CHECKING METHODS ]

@@ -1,23 +1,10 @@
+#include <cstdio>
 #include <iostream>
 #include <SDL2/SDL.h>
 #include "render.h"
 #include "snake.h"
 
 Render Render::s_Render;
-
-void
-Render::setRenderPtr()
-{
-    STATE currentState = state.current();
-    if(currentState & (STATE_MENU_MAIN))
-        internalRender = &Render::renderMenuMain;
-    if(currentState & STATE_MENU_LVL)
-        internalRender = &Render::renderMenuLvl;
-    if(currentState & STATE_MENU_SETTINGS)
-        internalRender = &Render::renderMenuSettings;
-    if(currentState & STATE_GAME_PLAY)
-        internalRender = &Render::renderPlay;
-}
 
 void
 Render::init()
@@ -42,7 +29,8 @@ Render::clear()
     SDL_RenderClear(rend);
 }
 
-void Render::renderSnakes()
+void
+Render::renderSnakes()
 {
     for(auto snake : game.snakes)
     {
@@ -50,43 +38,20 @@ void Render::renderSnakes()
         for(auto segment : snake.segments)
         {
             SDL_RenderFillRect(rend, &segment.rect);
-            std::cout << segment.rect.y << std::endl;
         }
     }
 }
 
-void Render::render()
-{
-    setBG(32, 32, 32, 255);
-    clear();
-
-    setRenderPtr();
-    if(internalRender == NULL)
-        internalRender = &Render::renderPlay;
-
-    (this->*internalRender)();
-
-    show();
-}
-
-void Render::renderMenuMain()
+void
+Render::renderPickups()
 {
 
 }
 
-void Render::renderMenuLvl()
+void
+Render::renderUI()
 {
-    
-}
 
-void Render::renderMenuSettings()
-{
-    
-}
-
-void Render::renderPlay()
-{
-    renderSnakes();
 }
 
 void

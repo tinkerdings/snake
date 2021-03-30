@@ -1,6 +1,7 @@
 #include "game.h"
 #include <iostream>
 
+
 Game Game::s_Game;
 void
 Game::init()
@@ -14,8 +15,13 @@ Game::init()
 void
 Game::update()
 {
-    for(auto snake : snakes)
+    currentTime = SDL_GetTicks();
+    if(currentTime > lastTime + 100)
     {
-        snake.update();
+        for(auto iter = snakes.begin(); iter != snakes.end(); iter++)
+        {
+            iter->update();
+        }
+        lastTime = currentTime;
     }
 }

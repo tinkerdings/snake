@@ -21,6 +21,7 @@ public:
 private:
     static Game s_Game;
     Window& wnd = Window::getSingleton();
+    Uint32 lastTime = 0, currentTime;
 
     Game(){}
 };

@@ -4,8 +4,7 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include "window.h"
-#include "render.h"
-#include "stateHandler.h"
+#include "game.h"
 
 class InputHandler
 {
@@ -17,22 +16,14 @@ public:
         return s_InputHandler;
     }
 
-    void handle();
-
+    void inputPlay();
 private:
     InputHandler(){}
     static InputHandler s_InputHandler;
-
+    Window& wnd = Window::getSingleton();
+    Game& game = Game::getSingleton();
     SDL_Event e;
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
-    Window& wnd = Window::getSingleton();
-    Render& rend = Render::getSingleton();
-    StateHandler& state = StateHandler::getSingleton();
-
-    void (InputHandler:: *internalHandle)() = NULL; // Function ptr to current state input handle function.
-    void setHandlePtr();
-    void handleMenu();
-    void handlePlay();
 
     // Key input
     bool keyPress(int sdlKeycode);
