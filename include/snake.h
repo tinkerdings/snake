@@ -20,8 +20,9 @@ public:
     bool isPlayer;
     SDL_Color color = {32, 128, 32, 255};
     std::vector<SnakeSegment> segments;
+    int segmentSize = 10;
 
-    Snake(bool isPlayer, int w, int h, int x, int y);
+    Snake(bool isPlayer, int x, int y);
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
     void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     SDL_Color getColor(){return color;}

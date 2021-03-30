@@ -6,6 +6,7 @@
 #include "window.h"
 #include "render.h"
 #include "inputHandler.h"
+#include "game.h"
 
 #define WINW 800
 #define WINH 600
@@ -23,21 +24,21 @@ main()
     Window& wnd = Window::getSingleton();
     wnd.init("Snake!", WINW, WINH);
 
+    Game& game = Game::getSingleton();
+    game.init();
+    InputHandler& input = InputHandler::getSingleton();
+
     // Create Rendering context.
     Render& rend = Render::getSingleton();
     rend.init();
     rend.setBG(128, 32, 32, 255);
 
-    // Input handler.
-    InputHandler& input = InputHandler::getSingleton();
 
     while(!wnd.shouldQuit())
     {
         input.handle();
 
-        rend.clear();
         rend.render();
-        rend.show();
     }
     
     return 0;

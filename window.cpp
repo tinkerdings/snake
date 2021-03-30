@@ -5,10 +5,12 @@ Window Window::s_wnd;
 void
 Window::init(const char* title, int w, int h)
 {
+    winW = w;
+    winH = h;
     wnd = SDL_CreateWindow(
             title,
             SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-            w, h, SDL_WINDOW_OPENGL);
+            winW, winH, SDL_WINDOW_OPENGL);
     if(!wnd)
     {
         std::cerr << "SDL_CreateWindow: " << SDL_GetError() << std::endl;
@@ -19,8 +21,8 @@ Window::init(const char* title, int w, int h)
 }
 
 void
-Window::getDimentions(int &w, int &h)
+Window::getSize(int &w, int &h)
 {
-    w = windowWidth;
-    h = windowHeight;
+    w = winW;
+    h = winH;
 }

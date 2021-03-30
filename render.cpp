@@ -56,11 +56,16 @@ void Render::renderSnakes()
 
 void Render::render()
 {
+    setBG(32, 32, 32, 255);
+    clear();
+
     setRenderPtr();
     if(internalRender == NULL)
-        internalRender = &Render::renderMenuMain;
+        internalRender = &Render::renderPlay;
 
     (this->*internalRender)();
+
+    show();
 }
 
 void Render::renderMenuMain()
@@ -80,7 +85,7 @@ void Render::renderMenuSettings()
 
 void Render::renderPlay()
 {
-
+    renderSnakes();
 }
 
 void

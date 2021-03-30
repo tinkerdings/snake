@@ -1,5 +1,6 @@
 #ifndef RENDER_H
 #define RENDER_H
+
 #include "window.h"
 #include "stateHandler.h"
 #include "game.h"
@@ -20,16 +21,16 @@ public:
     void render();
     void show();
 
+    SDL_Renderer *rend;
 private:
     Render(){}
-    SDL_Renderer *rend;
     static Render s_Render;
 
     Window& wnd = Window::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
     Game& game = Game::getSingleton();
 
-    void (Render:: *internalRender)() = NULL; // Func ptr to current staate render func.
+    void (Render:: *internalRender)() = NULL; // Func ptr to current state render func.
     void setRenderPtr();
     void renderMenuMain();
     void renderMenuLvl();

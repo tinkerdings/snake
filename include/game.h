@@ -8,20 +8,20 @@
 class Game
 {
 public:
-    Game(const Game&) = delete;
+    std::vector<Snake> snakes;
 
+    Game(const Game&) = delete;
     static Game& getSingleton()
     {
         return s_Game;
     }
 
-    std::vector<Snake> snakes;
-
+    void init();
 private:
     static Game s_Game;
     Window& wnd = Window::getSingleton();
 
-    Game();
+    Game(){}
 };
 
 #endif // GAME_H
