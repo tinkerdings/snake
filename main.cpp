@@ -38,6 +38,8 @@ main()
     {
         input.handle();
 
+        game.update();
+
         rend.render();
     }
     

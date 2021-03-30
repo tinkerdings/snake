@@ -50,6 +50,7 @@ void Render::renderSnakes()
         for(auto segment : snake.segments)
         {
             SDL_RenderFillRect(rend, &segment.rect);
+            std::cout << segment.rect.y << std::endl;
         }
     }
 }

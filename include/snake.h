@@ -26,6 +26,7 @@ public:
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
     void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     SDL_Color getColor(){return color;}
+    void update();
 
 private:
     int snakeKeyMap[_PKI_N];

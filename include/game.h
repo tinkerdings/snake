@@ -17,6 +17,7 @@ public:
     }
 
     void init();
+    void update();
 private:
     static Game s_Game;
     Window& wnd = Window::getSingleton();
