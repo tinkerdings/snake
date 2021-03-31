@@ -11,19 +11,19 @@ InputHandler::inputPlay()
     if(keyRelease(SDLK_ESCAPE))
         wnd.quit();
 
-    if(keyPress(SDLK_UP))
+    if(keyPress(SDLK_UP) || keyPress(SDLK_w))
     {
         game.snakes[0].setDirection(DIR_UP);
     }
-    if(keyPress(SDLK_DOWN))
+    if(keyPress(SDLK_DOWN) || keyPress(SDLK_s))
     {
         game.snakes[0].setDirection(DIR_DOWN);
     }
-    if(keyPress(SDLK_LEFT))
+    if(keyPress(SDLK_LEFT) || keyPress(SDLK_a))
     {
         game.snakes[0].setDirection(DIR_LEFT);
     }
-    if(keyPress(SDLK_RIGHT))
+    if(keyPress(SDLK_RIGHT) || keyPress(SDLK_d))
     {
         game.snakes[0].setDirection(DIR_RIGHT);
     }

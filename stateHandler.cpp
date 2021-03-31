@@ -28,7 +28,7 @@ StateHandler::statePlay()
 
     game.update();
 
-    rend.setBG(128, 32, 32, 255);
+    rend.setBG(64, 64, 128, 255);
     rend.clear();
 
     rend.renderSnakes();

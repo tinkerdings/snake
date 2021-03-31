@@ -1,4 +1,5 @@
 #include <iostream>
+#include <cstdio>
 #include <iterator>
 #include "snake.h"
 #include "util.h"
@@ -20,7 +21,7 @@ Snake::addSegment()
     {
         SnakeSegment head = {
             .rect={startX, startY, map.gridSize, map.gridSize},
-            .color={32, (unsigned char)iRandRange(128, 255), 32}
+            .color={255, 192, 96}
         };
         segments.push_back(head);
         return;
@@ -105,10 +106,42 @@ Snake::checkPickup()
     {
         if((pickup->rect.x == segments[0].rect.x) && (pickup->rect.y == segments[0].rect.y))
         {
-            int x = iRandRange(0, ww/map.gridSize) * map.gridSize;
-            int y = iRandRange(0, wh/map.gridSize) * map.gridSize;
+            int x = iRandRange(0, ww/map.gridSize - 1) * map.gridSize;
+            int y = iRandRange(0, wh/map.gridSize - 1) * map.gridSize;
             pickup->setPosition(x, y);
             addSegment();
+            if(stepDelay <= 70)
+            {
+                speedup = 5;
+                intervals = 2;
+            }
+            if(stepDelay <= 50)
+            {
+                speedup = 4;
+                intervals = 3;
+            }
+            if(stepDelay <= 40)
+            {
+                speedup = 2;
+                intervals = 4;
+            }
+            if(stepDelay <= 30)
+            {
+                speedup = 1;
+                intervals = 5;
+            }
+            if(stepDelay <= 20)
+            {
+                speedup = 0;
+            }
+
+            if(!(score % intervals))
+            {
+                stepDelay -= speedup;
+                printf("%d\nintervals: %d\n", stepDelay, intervals);
+            }
+
+            score++;
         }
     }
 }

@@ -15,12 +15,12 @@ void
 Game::update()
 {
     currentTime = SDL_GetTicks();
-    if(currentTime > lastTime + 100)
+    for(auto iter = snakes.begin(); iter != snakes.end(); iter++)
     {
-        for(auto iter = snakes.begin(); iter != snakes.end(); iter++)
+        if(currentTime > lastTime + iter->stepDelay)
         {
             iter->update();
+            lastTime = currentTime;
         }
-        lastTime = currentTime;
     }
 }

@@ -26,6 +26,8 @@ class Snake
 public:
     bool isPlayer;
     std::vector<SnakeSegment> segments;
+    int score = 0;
+    int stepDelay = 100;
 
     Snake(bool isPlayer, int x, int y);
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
@@ -38,6 +40,8 @@ public:
 private:
     int snakeKeyMap[_PKI_N];
     int startX, startY;
+    int intervals = 1;
+    int speedup = 10;
     Map& map = Map::getSingleton();
     Window& wnd = Window::getSingleton();
 
