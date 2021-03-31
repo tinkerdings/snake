@@ -34,9 +34,9 @@ Render::renderSnakes()
 {
     for(auto snake : game.snakes)
     {
-        setBG(snake.color.r, snake.color.g, snake.color.b, snake.color.a);
         for(auto segment : snake.segments)
         {
+            setBG(segment.color.r, segment.color.g, segment.color.b, segment.color.a);
             SDL_RenderFillRect(rend, &segment.rect);
         }
     }
@@ -45,7 +45,11 @@ Render::renderSnakes()
 void
 Render::renderPickups()
 {
-
+    for(auto pickup : map.pickups)
+    {
+        setBG(pickup.color.r, pickup.color.g, pickup.color.b, pickup.color.a);
+        SDL_RenderFillRect(rend, &pickup.rect);
+    }
 }
 
 void

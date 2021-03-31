@@ -3,6 +3,8 @@
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL_ttf.h>
 #include <SDL2/SDL_mixer.h>
+#include <cstdlib>
+#include <ctime>
 #include "window.h"
 #include "render.h"
 #include "inputHandler.h"
@@ -15,28 +17,31 @@
 int
 main()
 {
+    std::srand(std::time(nullptr));
     if(SDL_Init(SDL_INIT_EVERYTHING))
     {
         std::cerr << "SDL_Init: " << SDL_GetError() << std::endl;
         return 1;
     }
 
-    // Create window.
     Window& wnd = Window::getSingleton();
-    wnd.init("Snake!", WINW, WINH);
-
-    // Setup game, snakes and so forth.
     Game& game = Game::getSingleton();
-    game.init();
     InputHandler& input = InputHandler::getSingleton();
-
-    // Create Rendering context.
     Render& rend = Render::getSingleton();
-    rend.init();
-
     StateHandler& state = StateHandler::getSingleton();
+    Map& map = Map::getSingleton();
 
+    // Create window.
+    wnd.init("Snake!", WINW, WINH);
+    // Setup game, snakes and so forth.
+    game.init();
+    // Create Rendering context.
+    rend.init();
+    // Set initial state.
     state.setState(PLAY);
+    // Load Map.
+    map.loadMap();
+
     while(!wnd.shouldQuit())
     {
         state.run();

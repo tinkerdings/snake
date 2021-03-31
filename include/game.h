@@ -4,6 +4,8 @@
 #include <vector>
 #include "snake.h"
 #include "window.h"
+#include "pickup.h"
+
 
 class Game
 {

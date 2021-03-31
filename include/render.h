@@ -3,6 +3,7 @@
 
 #include "window.h"
 #include "game.h"
+#include "map.h"
 
 class Render
 {
@@ -28,6 +29,7 @@ private:
 
     Window& wnd = Window::getSingleton();
     Game& game = Game::getSingleton();
+    Map& map = Map::getSingleton();
 };
 
 #endif // RENDER_H

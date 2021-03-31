@@ -3,10 +3,13 @@
 
 #include <vector>
 #include "SDL2/SDL.h"
+#include "map.h"
+#include "util.h"
 
 struct SnakeSegment
 {
     SDL_Rect rect;
+    SDL_Color color;
 };
 
 enum Dir
@@ -22,23 +25,24 @@ class Snake
 {
 public:
     bool isPlayer;
-    SDL_Color color = {32, 128, 32, 255};
     std::vector<SnakeSegment> segments;
-    int segmentSize = 10;
 
     Snake(bool isPlayer, int x, int y);
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
-    void setColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a);
     void setDirection(Dir dir);
     void addSegment();
     void addMultipleSegments(int amount);
-    SDL_Color getColor(){return color;}
     void update();
 
     int dirX, dirY;
 private:
     int snakeKeyMap[_PKI_N];
     int startX, startY;
+    Map& map = Map::getSingleton();
+    Window& wnd = Window::getSingleton();
+
+    bool checkCollision();
+    void checkPickup();
 };
 
 #endif // SNAKE_H
