@@ -97,6 +97,8 @@ Snake::update()
     checkPickup();
 }
 
+// FIXME Speedup intervals not setting correcly according to stepDelay.
+// sets one after it should.
 void
 Snake::checkPickup()
 {
