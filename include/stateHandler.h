@@ -21,9 +21,6 @@ public:
 
 private:
     State current;
-    InputHandler& input = InputHandler::getSingleton();
-    Render& rend = Render::getSingleton();
-    Game& game = Game::getSingleton();
 
     StateHandler(){}
     static StateHandler s_StateHandler;

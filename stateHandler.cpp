@@ -1,4 +1,5 @@
 #include "stateHandler.h"
+#include "game.h"
 
 StateHandler StateHandler::s_StateHandler;
 
@@ -24,6 +25,10 @@ StateHandler::run()
 void
 StateHandler::statePlay()
 {
+    Render& rend = Render::getSingleton();
+    Game& game = Game::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+
     if(!game.started)
 		game.init();
     
@@ -44,6 +49,7 @@ StateHandler::statePlay()
 void
 StateHandler::stateRestart()
 {
+    Game& game = Game::getSingleton();
     game.started = false;
     current = PLAY;
 }

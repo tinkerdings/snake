@@ -4,7 +4,6 @@
 #include <vector>
 #include <SDL.h>
 #include "window.h"
-#include "game.h"
 
 class InputHandler
 {
@@ -21,7 +20,6 @@ private:
     InputHandler(){}
     static InputHandler s_InputHandler;
     Window& wnd = Window::getSingleton();
-    Game& game = Game::getSingleton();
     SDL_Event e;
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
 

@@ -7,6 +7,7 @@ InputHandler InputHandler::s_InputHandler;
 void
 InputHandler::inputPlay()
 {
+    Game& game = Game::getSingleton();
     SDL_PollEvent(&e);
     if(keyRelease(SDLK_ESCAPE))
         wnd.quit();

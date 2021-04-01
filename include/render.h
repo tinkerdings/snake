@@ -2,7 +2,6 @@
 #define RENDER_H
 
 #include "window.h"
-#include "game.h"
 #include "map.h"
 
 class Render
@@ -28,7 +27,6 @@ private:
     static Render s_Render;
 
     Window& wnd = Window::getSingleton();
-    Game& game = Game::getSingleton();
     Map& map = Map::getSingleton();
 };
 

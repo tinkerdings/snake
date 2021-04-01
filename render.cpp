@@ -32,6 +32,7 @@ Render::clear()
 void
 Render::renderSnakes()
 {
+    Game& game = Game::getSingleton();
     for(auto snake : game.snakes)
     {
         for(auto segment : snake.segments)
