@@ -1,6 +1,6 @@
 #include <cstdio>
 #include <iostream>
-#include <SDL2/SDL.h>
+#include <SDL.h>
 #include "render.h"
 #include "snake.h"
 

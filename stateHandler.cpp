@@ -24,6 +24,9 @@ StateHandler::run()
 void
 StateHandler::statePlay()
 {
+    if(!game.started)
+		game.init();
+    
     input.inputPlay();
 
     game.update();
@@ -36,4 +39,11 @@ StateHandler::statePlay()
     rend.renderUI();
 
     rend.show();
+}
+
+void
+StateHandler::stateRestart()
+{
+    game.started = false;
+    current = PLAY;
 }

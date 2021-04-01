@@ -13,19 +13,23 @@ InputHandler::inputPlay()
 
     if(keyPress(SDLK_UP) || keyPress(SDLK_w))
     {
-        game.snakes[0].setDirection(DIR_UP);
+        if(game.snakes[0].dirAvailable(DIR_UP))
+			game.snakes[0].setDirection(DIR_UP);
     }
     if(keyPress(SDLK_DOWN) || keyPress(SDLK_s))
     {
-        game.snakes[0].setDirection(DIR_DOWN);
+        if(game.snakes[0].dirAvailable(DIR_DOWN))
+			game.snakes[0].setDirection(DIR_DOWN);
     }
     if(keyPress(SDLK_LEFT) || keyPress(SDLK_a))
     {
-        game.snakes[0].setDirection(DIR_LEFT);
+        if(game.snakes[0].dirAvailable(DIR_LEFT))
+			game.snakes[0].setDirection(DIR_LEFT);
     }
     if(keyPress(SDLK_RIGHT) || keyPress(SDLK_d))
     {
-        game.snakes[0].setDirection(DIR_RIGHT);
+        if(game.snakes[0].dirAvailable(DIR_RIGHT))
+			game.snakes[0].setDirection(DIR_RIGHT);
     }
 }
 

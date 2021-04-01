@@ -17,20 +17,23 @@ void
 Snake::addSegment()
 {
     int nSegments = segments.size();
-    if(!nSegments)
+    if(nSegments < 2)
     {
+        SDL_Rect rectHead = {startX, startY + (nSegments * map.gridSize), map.gridSize, map.gridSize};
+        SDL_Color colorHead = {255, 128, 64};
         SnakeSegment head = {
-            .rect={startX, startY, map.gridSize, map.gridSize},
-            .color={255, 192, 96}
+            rectHead,
+            colorHead
         };
         segments.push_back(head);
         return;
     }
 
     auto last = segments.end() - 1;
+    SDL_Color colorSegment = {32, (unsigned char)iRandRange(128, 255), 32};
     SnakeSegment segment = {
-        .rect={last->rect.x, last->rect.y+map.gridSize, map.gridSize, map.gridSize},
-        .color={32, (unsigned char)iRandRange(128, 255), 32}
+        last->rect,
+        colorSegment
     };
     segments.push_back(segment);
 }
@@ -42,6 +45,11 @@ Snake::addMultipleSegments(int amount)
         addSegment();
 }
 
+Dir
+Snake::getDirection()
+{
+    return direction;
+}
 void
 Snake::setDirection(Dir dir)
 {
@@ -51,32 +59,77 @@ Snake::setDirection(Dir dir)
         {
             dirX = 0;
             dirY = 0;
+            direction = DIR_NONE;
             break;
         }
         case(DIR_UP):
         {
             dirX = 0;
             dirY = -1;
+            direction = DIR_UP;
             break;
         }
         case(DIR_DOWN):
         {
             dirX = 0;
             dirY = 1;
+            direction = DIR_DOWN;
             break;
         }
         case(DIR_LEFT):
         {
             dirX = -1;
             dirY = 0;
+            direction = DIR_LEFT;
             break;
         }
         case(DIR_RIGHT):
         {
             dirX = 1;
             dirY = 0;
+            direction = DIR_RIGHT;
             break;
         }
+    }
+}
+
+bool
+Snake::dirAvailable(Dir dir)
+{
+    switch (dir)
+    {
+	case(DIR_UP):
+	{
+        int newY = segments[0].rect.y - map.gridSize;
+        if (segments[1].rect.y == newY)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_DOWN):
+	{
+        int newY = segments[0].rect.y + map.gridSize;
+        if (segments[1].rect.y == newY)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_LEFT):
+	{
+        int newX = segments[0].rect.x - map.gridSize;
+        if (segments[1].rect.x == newX)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_RIGHT):
+	{
+        int newX = segments[0].rect.x + map.gridSize;
+        if (segments[1].rect.x == newX)
+            return false;
+        return true;
+        break;
+	}
     }
 }
 
@@ -93,12 +146,10 @@ Snake::update()
         segments[0].rect.x += dirX * map.gridSize;
         segments[0].rect.y += dirY * map.gridSize;
     }
-//     checkCollision();
+    checkCollision();
     checkPickup();
 }
 
-// FIXME Speedup intervals not setting correcly according to stepDelay.
-// sets one after it should.
 void
 Snake::checkPickup()
 {
@@ -112,44 +163,38 @@ Snake::checkPickup()
             int y = iRandRange(0, wh/map.gridSize - 1) * map.gridSize;
             pickup->setPosition(x, y);
             addSegment();
-            if(stepDelay <= 70)
-            {
-                speedup = 5;
-                intervals = 2;
-            }
-            if(stepDelay <= 50)
-            {
-                speedup = 4;
-                intervals = 3;
-            }
-            if(stepDelay <= 40)
-            {
-                speedup = 2;
-                intervals = 4;
-            }
-            if(stepDelay <= 30)
-            {
-                speedup = 1;
-                intervals = 5;
-            }
-            if(stepDelay <= 20)
-            {
-                speedup = 0;
-            }
 
             if(!(score % intervals))
             {
-                stepDelay -= speedup;
-                printf("%d\nintervals: %d\n", stepDelay, intervals);
+                if(stepDelay > 30)
+					stepDelay -= speedup;
+                if (score % 8 && speedup > 2)
+                    speedup--;
             }
 
             score++;
+            printf("SCORE: %d\n", score);
         }
     }
+    if (score == 10)
+        state.setState(RESTART);
 }
 
 bool
 Snake::checkCollision()
 {
+    int ww, wh;
+    wnd.getSize(ww, wh);
+
+    if (segments[0].rect.x <= -map.gridSize)
+        segments[0].rect.x = ww - map.gridSize;
+    if (segments[0].rect.x >= ww)
+        segments[0].rect.x = 0;
+
+    if (segments[0].rect.y <= -map.gridSize)
+        segments[0].rect.y = wh - map.gridSize;
+    if (segments[0].rect.y >= wh)
+        segments[0].rect.y = 0;
+
     return false;
 }

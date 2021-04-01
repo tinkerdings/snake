@@ -18,11 +18,14 @@ public:
         return s_Game;
     }
 
+    bool started = false;
     void init();
+    void restart();
     void update();
 private:
     static Game s_Game;
     Window& wnd = Window::getSingleton();
+    Map& map = Map::getSingleton();
     Uint32 lastTime = 0, currentTime;
 
     Game(){}
