@@ -14,6 +14,7 @@ Window::init(const char* title, int w, int h)
     if(!wnd)
     {
         std::cerr << "SDL_CreateWindow: " << SDL_GetError() << std::endl;
+        SDL_Quit();
         std::exit(1);
     }
 

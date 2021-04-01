@@ -1,6 +1,7 @@
 #include "inputHandler.h"
 #include <iostream>
 #include <cstdio>
+#include "game.h"
 
 InputHandler InputHandler::s_InputHandler;
 

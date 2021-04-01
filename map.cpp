@@ -6,6 +6,7 @@ Map::loadMap()
 {
     int ww, wh;
     wnd.getSize(ww, wh);
+    pickups.clear();
     Pickup pickup(ww/2, wh/2 - 100, gridSize, gridSize, 255, 32, 32, 255);
     pickups.push_back(pickup);
 }

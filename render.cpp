@@ -1,7 +1,10 @@
 #include <cstdio>
 #include <iostream>
 #include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
 #include "render.h"
+#include "game.h"
 #include "snake.h"
 
 Render Render::s_Render;
@@ -13,7 +16,29 @@ Render::init()
     if(!rend)
     {
         std::cerr << "SDL_CreateRenderer: " << SDL_GetError() << std::endl;
+        SDL_Quit();
         std::exit(1);
+    }
+
+    int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int imgInitted = IMG_Init(imgFlags);
+    if((imgInitted & imgFlags) != imgFlags)
+    {
+        std::cerr << "IMG_Init: " << IMG_GetError() << std::endl;
+        SDL_Quit();
+        std::exit(1);
+    }
+
+    if(TTF_Init() == -1)
+    {
+        std::cerr << "TTF_Init: " << TTF_GetError() << std::endl;
+        SDL_Quit();
+        std::exit(1);
+    }
+    font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
+    if(!font)
+    {
+        std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
     }
 }
 
@@ -56,7 +81,39 @@ Render::renderPickups()
 void
 Render::renderUI()
 {
+    renderScores();
+}
 
+void
+Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    SDL_Color color = {r, g, b, a};
+    SDL_Surface *surface = TTF_RenderText_Solid(font, txt, color); 
+    tex->tex = SDL_CreateTextureFromSurface(rend, surface);
+    SDL_QueryTexture(tex->tex, NULL, NULL, &tex->w, &tex->h);
+    SDL_FreeSurface(surface);
+}
+
+void
+Render::renderScores()
+{
+    Game& game = Game::getSingleton();
+    if(!textP1Name.tex)
+        initText(&textP1Name, "P1 SCORE: ", 255, 128, 32, 255);
+    char p1Score[100] = {0};
+    sprintf(p1Score, "%d", game.snakes[0].score);
+    if(textP1Score.tex)
+        SDL_DestroyTexture(textP1Score.tex);
+    initText(&textP1Score, p1Score, 255, 255, 0, 255);
+    renderText(textP1Name.tex, 30, 20, textP1Name.w, textP1Name.h);
+    renderText(textP1Score.tex, textP1Name.out.x + 150, 20, textP1Score.w, textP1Name.h);
+}
+
+void
+Render::renderText(SDL_Texture *tex, int x, int y, int w, int h)
+{
+    SDL_Rect rect = {x, y, w, h};
+    SDL_RenderCopy(rend, tex, NULL, &rect);
 }
 
 void

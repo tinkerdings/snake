@@ -131,6 +131,7 @@ Snake::dirAvailable(Dir dir)
         break;
 	}
     }
+    return false;
 }
 
 void
@@ -173,11 +174,8 @@ Snake::checkPickup()
             }
 
             score++;
-            printf("SCORE: %d\n", score);
         }
     }
-    if (score == 10)
-        state.setState(RESTART);
 }
 
 bool
@@ -195,6 +193,12 @@ Snake::checkCollision()
         segments[0].rect.y = wh - map.gridSize;
     if (segments[0].rect.y >= wh)
         segments[0].rect.y = 0;
+
+    for(auto segment = segments.begin()+1; segment != segments.end(); segment++)
+    {
+        if((segment->rect.x == segments[0].rect.x) && (segment->rect.y == segments[0].rect.y))
+            state.setState(RESTART);
+    }
 
     return false;
 }

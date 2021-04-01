@@ -19,6 +19,11 @@ StateHandler::run()
         statePlay();
         break;
     }
+    case(RESTART):
+    {
+        stateRestart();
+        break;
+    }
     }
 }
 
