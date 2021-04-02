@@ -2,6 +2,7 @@
 #define SNAKE_H
 
 #include <vector>
+#include <thread>
 #include "SDL.h"
 #include "map.h"
 #include "util.h"
@@ -50,7 +51,8 @@ private:
     Window& wnd = Window::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
 
-    bool checkCollision();
+    void checkCollision();
+    void checkCrash();
     void checkPickup();
 };
 

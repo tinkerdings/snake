@@ -6,7 +6,7 @@ CC = g++
 CFLAGS = -O2
 CFLAGS += -I$(INCLDIR) -I$(INCLSDL)
 CFLAGS += -g
-LINK = -lSDL2 -lSDL2_image -lSDL2_ttf# libs
+LINK = -lSDL2 -lSDL2_image -lSDL2_ttf -lpthread# libs
 CFLAGS += $(LINK)
 OUT = f_run#executable
 

@@ -6,6 +6,13 @@
 InputHandler InputHandler::s_InputHandler;
 
 void
+InputHandler::checkQuit()
+{
+    SDL_PollEvent(&e);
+    if(e.type == SDL_QUIT)
+        wnd.quit();
+}
+void
 InputHandler::inputPlay()
 {
     Game& game = Game::getSingleton();

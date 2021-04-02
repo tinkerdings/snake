@@ -15,6 +15,7 @@ public:
         return s_InputHandler;
     }
 
+    void checkQuit();
     void inputPlay();
 private:
     InputHandler(){}

@@ -1,4 +1,5 @@
 #include <iostream>
+#include <thread>
 #include <cstdio>
 #include <iterator>
 #include "snake.h"
@@ -8,7 +9,7 @@ Snake::Snake(bool isPlayer, int x, int y)
 {
     startX = x;
     startY = y;
-    addMultipleSegments(2);
+    addSegment();
     dirX = DIR_NONE;
     dirY = DIR_NONE;
 }
@@ -16,25 +17,24 @@ Snake::Snake(bool isPlayer, int x, int y)
 void
 Snake::addSegment()
 {
-    int nSegments = segments.size();
-    if(nSegments < 2)
+    int nSegments;
+    SDL_Rect rect;
+    SDL_Color color = {32, (unsigned char)iRandRange(128, 255), 32};
+    if(!(nSegments = segments.size()))
     {
-        SDL_Rect rectHead = {startX, startY + (nSegments * map.gridSize), map.gridSize, map.gridSize};
-        SDL_Color colorHead = {255, 128, 64};
-        SnakeSegment head = {
-            rectHead,
-            colorHead
-        };
-        segments.push_back(head);
-        return;
+        rect = {startX, startY + (nSegments * map.gridSize), map.gridSize, map.gridSize};
     }
-
-    auto last = segments.end() - 1;
-    SDL_Color colorSegment = {32, (unsigned char)iRandRange(128, 255), 32};
-    SnakeSegment segment = {
-        last->rect,
-        colorSegment
+    else
+    {
+        auto last = segments.end() - 1;
+        rect = last->rect;
+    }
+    SnakeSegment segment = 
+    {
+        rect,
+        color
     };
+
     segments.push_back(segment);
 }
 
@@ -147,7 +147,14 @@ Snake::update()
         segments[0].rect.x += dirX * map.gridSize;
         segments[0].rect.y += dirY * map.gridSize;
     }
-    checkCollision();
+    std::thread t_collision(&Snake::checkCollision, this);
+    t_collision.join();
+}
+
+void
+Snake::checkCollision()
+{
+    checkCrash();
     checkPickup();
 }
 
@@ -178,8 +185,8 @@ Snake::checkPickup()
     }
 }
 
-bool
-Snake::checkCollision()
+void
+Snake::checkCrash()
 {
     int ww, wh;
     wnd.getSize(ww, wh);
@@ -199,6 +206,4 @@ Snake::checkCollision()
         if((segment->rect.x == segments[0].rect.x) && (segment->rect.y == segments[0].rect.y))
             state.setState(RESTART);
     }
-
-    return false;
 }

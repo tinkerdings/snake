@@ -12,6 +12,8 @@ StateHandler::setState(State set)
 void
 StateHandler::run()
 {
+    InputHandler& input = InputHandler::getSingleton();
+    input.checkQuit();
     switch(current)
     {
     case(PLAY):
