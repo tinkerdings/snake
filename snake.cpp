@@ -10,8 +10,7 @@ Snake::Snake(bool isPlayer, int x, int y)
     startX = x;
     startY = y;
     addSegment();
-    dirX = DIR_NONE;
-    dirY = DIR_NONE;
+    setDirection(DIR_NONE);
 }
 
 void

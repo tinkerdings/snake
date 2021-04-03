@@ -105,15 +105,18 @@ Render::renderScores()
     if(textP1Score.tex)
         SDL_DestroyTexture(textP1Score.tex);
     initText(&textP1Score, p1Score, 255, 255, 0, 255);
-    renderText(textP1Name.tex, 30, 20, textP1Name.w, textP1Name.h);
-    renderText(textP1Score.tex, textP1Name.out.x + 150, 20, textP1Score.w, textP1Name.h);
+    renderText(&textP1Name, 30, 20, textP1Name.w, textP1Name.h);
+    renderText(&textP1Score, textP1Name.out.x + textP1Name.w, textP1Name.out.y, textP1Score.w, textP1Name.h);
 }
 
 void
-Render::renderText(SDL_Texture *tex, int x, int y, int w, int h)
+Render::renderText(Text *tex, int x, int y, int w, int h)
 {
-    SDL_Rect rect = {x, y, w, h};
-    SDL_RenderCopy(rend, tex, NULL, &rect);
+    tex->out.x = x;
+    tex->out.y = y;
+    tex->out.w = w;
+    tex->out.h = h;
+    SDL_RenderCopy(rend, tex->tex, NULL, &tex->out);
 }
 
 void

@@ -28,7 +28,7 @@ public:
     void renderPickups();
     void renderUI();
     void show();
-    void renderText(SDL_Texture *tex, int x, int y, int w, int h);
+    void renderText(Text *tex, int x, int y, int w, int h);
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 
 private:
