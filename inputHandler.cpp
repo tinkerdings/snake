@@ -8,15 +8,18 @@ InputHandler InputHandler::s_InputHandler;
 void
 InputHandler::checkQuit()
 {
-    SDL_PollEvent(&e);
     if(e.type == SDL_QUIT)
         wnd.quit();
+}
+void
+InputHandler::pollInput()
+{
+    SDL_PollEvent(&e);
 }
 void
 InputHandler::inputPlay()
 {
     Game& game = Game::getSingleton();
-    SDL_PollEvent(&e);
     if(keyRelease(SDLK_ESCAPE))
         wnd.quit();
 

@@ -13,6 +13,7 @@ void
 StateHandler::run()
 {
     InputHandler& input = InputHandler::getSingleton();
+    input.pollInput();
     input.checkQuit();
     switch(current)
     {

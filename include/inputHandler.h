@@ -17,12 +17,13 @@ public:
 
     void checkQuit();
     void inputPlay();
+    void pollInput();
 private:
     InputHandler(){}
     static InputHandler s_InputHandler;
     Window& wnd = Window::getSingleton();
-    SDL_Event e;
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
+    SDL_Event e;
 
     // Key input
     bool keyPress(int sdlKeycode);
