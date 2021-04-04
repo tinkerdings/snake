@@ -1,10 +1,15 @@
 #include "game.h"
 #include <iostream>
+#include <functional>
+#include "menu.h"
+#include "render.h"
 
 Game Game::s_Game;
 void
 Game::init()
 {
+    Menu& menu = Menu::getSingleton();
+    Render& rend = Render::getSingleton();
     int ww, wh;
     wnd.getSize(ww, wh);
     snakes.clear();

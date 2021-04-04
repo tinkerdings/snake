@@ -15,6 +15,7 @@ class Render
 {
 public:
     SDL_Renderer *rend;
+    TTF_Font *font = NULL;
 
     Render(const Render&) = delete;
     static Render& getSingleton()
@@ -30,11 +31,11 @@ public:
     void show();
     void renderText(Text *tex, int x, int y, int w, int h);
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    void renderButtonsMenuMain();
 
 private:
     Render(){}
     static Render s_Render;
-    TTF_Font *font = NULL;
     Text textP1Name;
     Text textP2Name;
     Text textP1Score;

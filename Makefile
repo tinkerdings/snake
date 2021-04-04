@@ -16,7 +16,7 @@ _DEPS = # header files
 DEPS = $(patsubst %,$(INCLDIR)/%,$(_DEPS))
 DEPS += $(patsubst %,$(INCLSDL)/%,$(_DEPS))
 
-_OBJS = main.o window.o render.o inputHandler.o game.o snake.o stateHandler.o pickup.o map.o util.o# obj files
+_OBJS = main.o window.o render.o inputHandler.o game.o snake.o stateHandler.o pickup.o map.o util.o menu.o# obj files
 OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 
 $(OBJDIR)/%.o: %.cpp $(DEPS)

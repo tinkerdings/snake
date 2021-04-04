@@ -43,6 +43,8 @@ InputHandler::inputPlay()
         if(game.snakes[0].dirAvailable(DIR_RIGHT))
 			game.snakes[0].setDirection(DIR_RIGHT);
     }
+//     if(mousePress(SDL_BUTTON_LEFT))
+//         std::cout << "left mouse pressed" << std::endl;
 }
 
 // [ INPUT CHECKING METHODS ]
@@ -59,7 +61,14 @@ InputHandler::keyHold(int sdlKeycode)
     return keyboardState[SDL_GetScancodeFromKey(sdlKeycode)];
 }
 
-bool InputHandler::keyRelease(int sdlKeycode)
+bool
+InputHandler::keyRelease(int sdlKeycode)
 {
     return (e.type == SDL_KEYUP) && (sdlKeycode == e.key.keysym.sym);
+}
+
+bool
+InputHandler::mousePress(int sdlMousecode)
+{
+    return (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode);
 }

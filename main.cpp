@@ -33,15 +33,16 @@ main()
 
     // Create window.
     wnd.init("Snake!", WINW, WINH);
-    // Setup game, snakes and so forth.
-    game.init();
     // Create Rendering context.
     rend.init();
+    // Setup game, snakes and so forth.
+    game.init();
     // Set initial state.
-    state.setState(PLAY);
+    state.setState(MENU);
     // Load Map.
     map.loadMap();
 
+    rend.setBG(32, 32, 32, 255);
     while(!wnd.shouldQuit())
     {
         state.run();

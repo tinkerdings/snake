@@ -6,6 +6,7 @@
 #include "render.h"
 #include "game.h"
 #include "snake.h"
+#include "menu.h"
 
 Render Render::s_Render;
 
@@ -29,16 +30,19 @@ Render::init()
         std::exit(1);
     }
 
-    if(TTF_Init() == -1)
+    if(!TTF_WasInit())
     {
-        std::cerr << "TTF_Init: " << TTF_GetError() << std::endl;
-        SDL_Quit();
-        std::exit(1);
-    }
-    font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
-    if(!font)
-    {
-        std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
+        if(TTF_Init() == -1)
+        {
+            std::cerr << "TTF_Init: " << TTF_GetError() << std::endl;
+            SDL_Quit();
+            std::exit(1);
+        }
+        font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
+        if(!font)
+        {
+            std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
+        }
     }
 }
 
@@ -92,6 +96,16 @@ Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, u
     tex->tex = SDL_CreateTextureFromSurface(rend, surface);
     SDL_QueryTexture(tex->tex, NULL, NULL, &tex->w, &tex->h);
     SDL_FreeSurface(surface);
+}
+
+void
+Render::renderButtonsMenuMain()
+{
+    Menu& menu = Menu::getSingleton();
+    for(auto button : menu.buttonsMenuMain)
+    {
+        SDL_RenderCopy(rend, button.tex, NULL, &button.rect);
+    }
 }
 
 void
