@@ -1,6 +1,8 @@
 #ifndef MAP_H
 #define MAP_H
 
+#define GRIDSIZE 20;
+
 #include <vector>
 #include "pickup.h"
 #include "window.h"
@@ -9,7 +11,7 @@ class Map
 {
 public:
     std::vector<Pickup> pickups;
-    int gridSize = 20;
+    int gridSize = GRIDSIZE;
 
     Map(const Map&) = delete;
     static Map& getSingleton()

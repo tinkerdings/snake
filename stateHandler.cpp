@@ -52,7 +52,7 @@ StateHandler::stateMenu()
     menu.createButton(
             std::bind(&StateHandler::setState, this, PLAY),
             "PLAY",
-            ww/2 - 150, 100, 300, 80,
+            ww/2 - 200, 200-50, 400, 100,
             color, colorTxt);
     }
     menu.checkButtonMenuMain();

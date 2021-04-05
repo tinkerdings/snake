@@ -38,7 +38,7 @@ main()
     // Setup game, snakes and so forth.
     game.init();
     // Set initial state.
-    state.setState(MENU);
+    state.setState(PLAY);
     // Load Map.
     map.loadMap();
 

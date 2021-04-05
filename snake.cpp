@@ -3,12 +3,21 @@
 #include <cstdio>
 #include <iterator>
 #include "snake.h"
+#include "render.h"
 #include "util.h"
 
 Snake::Snake(bool isPlayer, int x, int y)
 {
     startX = x;
     startY = y;
+    initTextures(0);
+    addSegment();
+    addSegment();
+    addSegment();
+    addSegment();
+    addSegment();
+    addSegment();
+    addSegment();
     addSegment();
     dirX = DIR_NONE;
     dirY = DIR_NONE;
@@ -17,25 +26,23 @@ Snake::Snake(bool isPlayer, int x, int y)
 void
 Snake::addSegment()
 {
-    int nSegments;
-    SDL_Rect rect;
-    SDL_Color color = {32, (unsigned char)iRandRange(128, 255), 32};
-    if(!(nSegments = segments.size()))
+    SnakeSegment segment;
+    auto currentTail = segments.end()-1;
+    if(!segments.size())
     {
-        rect = {startX, startY + (nSegments * map.gridSize), map.gridSize, map.gridSize};
+        segment.rect = {startX, startY, map.gridSize, map.gridSize};
+        segment.tex = texHead;
+        segment.direction = DIR_UP;
+        segments.push_back(segment);
     }
     else
     {
-        auto last = segments.end() - 1;
-        rect = last->rect;
+        segment.rect = currentTail->rect;
+        segment.tex = texTail;
+        if(segments.size() > 1)
+            currentTail->tex = texBody;
+        segments.push_back(segment);
     }
-    SnakeSegment segment = 
-    {
-        rect,
-        color
-    };
-
-    segments.push_back(segment);
 }
 
 void
@@ -45,52 +52,187 @@ Snake::addMultipleSegments(int amount)
         addSegment();
 }
 
-Dir
-Snake::getDirection()
+void
+Snake::update()
 {
-    return direction;
+    if(dirX + dirY)
+    {
+        auto head = (segments.begin());
+        for(auto segment = (segments.end()-1); segment != head; segment--)
+        {
+            auto prev = (segment-1);
+            segment->rect = prev->rect;
+            if(prev->tex != texCorner)
+                segment->rotation = prev->rotation;
+            if((prev->tex != texHead) && (segment->tex != texTail))
+                segment->tex = prev->tex;
+
+            if(changedDir)
+            {
+                (head+1)->tex = texCorner;
+                switch((head)->corner)
+                {
+                case(UPLEFT):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 0;
+                    break;
+                }
+                case(UPRIGHT):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 270;
+                    break;
+                }
+                case(DOWNLEFT):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 90;
+                    break;
+                }
+                case(DOWNRIGHT):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 180;
+                    break;
+                }
+                case(LEFTUP):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 180;
+                    break;
+                }
+                case(LEFTDOWN):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 270;
+                    break;
+                }
+                case(RIGHTUP):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 90;
+                    break;
+                }
+                case(RIGHTDOWN):
+                {
+                    (head+1)->flip = SDL_FLIP_NONE;
+                    (head+1)->rotation = 0;
+                    break;
+                }
+                }
+            }
+            else
+                head->tex = texBody;
+        }
+        (segments.end()-1)->tex = texTail;
+        head->tex = texHead;
+        segments[0].rect.x += dirX * map.gridSize;
+        segments[0].rect.y += dirY * map.gridSize;
+    }
+    std::thread t_collision(&Snake::checkCollision, this);
+    t_collision.join();
+    changedDir = false;
 }
 void
 Snake::setDirection(Dir dir)
 {
+    auto head = segments.begin();
     switch(dir)
     {
-        case(DIR_NONE):
+    case(DIR_NONE):
+    {
+        dirX = 0;
+        dirY = 0;
+        head->direction = DIR_NONE;
+        break;
+    }
+    case(DIR_UP):
+    {
+        dirX = 0;
+        dirY = -1;
+        switch(head->direction)
         {
-            dirX = 0;
-            dirY = 0;
-            direction = DIR_NONE;
-            break;
-        }
-        case(DIR_UP):
-        {
-            dirX = 0;
-            dirY = -1;
-            direction = DIR_UP;
-            break;
-        }
-        case(DIR_DOWN):
-        {
-            dirX = 0;
-            dirY = 1;
-            direction = DIR_DOWN;
-            break;
-        }
         case(DIR_LEFT):
         {
-            dirX = -1;
-            dirY = 0;
-            direction = DIR_LEFT;
+            head->corner = UPLEFT;
             break;
         }
         case(DIR_RIGHT):
         {
-            dirX = 1;
-            dirY = 0;
-            direction = DIR_RIGHT;
+            head->corner = UPRIGHT;
             break;
         }
+        }
+        head->direction = DIR_UP;
+        head->rotation = 0;
+        break;
     }
+    case(DIR_DOWN):
+    {
+        dirX = 0;
+        dirY = 1;
+        switch(head->direction)
+        {
+        case(DIR_LEFT):
+        {
+            head->corner = DOWNLEFT;
+            break;
+        }
+        case(DIR_RIGHT):
+        {
+            head->corner = DOWNRIGHT;
+            break;
+        }
+        }
+        head->direction = DIR_DOWN;
+        head->rotation = 180;
+        break;
+    }
+    case(DIR_LEFT):
+    {
+        dirX = -1;
+        dirY = 0;
+        switch(head->direction)
+        {
+        case(DIR_UP):
+        {
+            head->corner = LEFTUP;
+            break;
+        }
+        case(DIR_DOWN):
+        {
+            head->corner = LEFTDOWN;
+            break;
+        }
+        }
+        head->direction = DIR_LEFT;
+        head->rotation = 270;
+        break;
+    }
+    case(DIR_RIGHT):
+    {
+        dirX = 1;
+        dirY = 0;
+        switch(head->direction)
+        {
+        case(DIR_UP):
+        {
+            head->corner = RIGHTUP;
+            break;
+        }
+        case(DIR_DOWN):
+        {
+            head->corner = RIGHTDOWN;
+            break;
+        }
+        }
+        head->direction = DIR_RIGHT;
+        head->rotation = 90;
+        break;
+    }
+    }
+    changedDir = true;
 }
 
 bool
@@ -134,21 +276,25 @@ Snake::dirAvailable(Dir dir)
     return false;
 }
 
+
 void
-Snake::update()
+Snake::initTextures(int snakeNr)
 {
-    if(dirX + dirY)
+    Render& rend = Render::getSingleton();
+    if(!snakeNr)
     {
-        for(auto iter = segments.end() - 1; iter != segments.begin(); iter--)
-        {
-            auto prev = iter-1;
-            iter->rect = prev->rect;
-        }
-        segments[0].rect.x += dirX * map.gridSize;
-        segments[0].rect.y += dirY * map.gridSize;
+        texHead     = rend.createTexture("res/snake_head_p1.png");
+        texTail     = rend.createTexture("res/snake_tail_p1.png");
+        texBody     = rend.createTexture("res/snake_body_p1.png");
+        texCorner   = rend.createTexture("res/snake_corner_p1.png");
     }
-    std::thread t_collision(&Snake::checkCollision, this);
-    t_collision.join();
+    else
+    {
+        texHead     = rend.createTexture("res/snake_head_p2.png");
+        texTail     = rend.createTexture("res/snake_tail_p2.png");
+        texBody     = rend.createTexture("res/snake_body_p2.png");
+        texCorner   = rend.createTexture("res/snake_corner_p2.png");
+    }
 }
 
 void

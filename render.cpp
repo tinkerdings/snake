@@ -46,6 +46,24 @@ Render::init()
     }
 }
 
+SDL_Texture*
+Render::createTexture(const char* filename)
+{
+    SDL_Surface *tmp = IMG_Load(filename);
+    if(!tmp)
+    {
+        std::cerr << "IMG_Load: " << IMG_GetError() << std::endl;
+        return NULL;
+    }
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, tmp);
+    if(!tex)
+    {
+        std::cerr << "SDL_CreateTextureFromSurface: " << SDL_GetError() << std::endl;
+        return NULL;
+    }
+
+    return tex;
+}
 void
 Render::setBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
@@ -64,10 +82,9 @@ Render::renderSnakes()
     Game& game = Game::getSingleton();
     for(auto snake : game.snakes)
     {
-        for(auto segment : snake.segments)
+        for(auto segment = snake.segments.begin(); segment != snake.segments.end(); segment++)
         {
-            setBG(segment.color.r, segment.color.g, segment.color.b, segment.color.a);
-            SDL_RenderFillRect(rend, &segment.rect);
+            SDL_RenderCopyEx(rend, segment->tex, NULL, &segment->rect, segment->rotation, NULL, segment->flip);
         }
     }
 }
