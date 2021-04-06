@@ -1,6 +1,12 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
+// TODO TRY NEIGHBORS METHOD FOR CORNER TILES.
+#define NB_UP       0x01
+#define NB_DOWN     0x02
+#define NB_LEFT     0x04
+#define NB_RIGHT    0x08
+
 #include <vector>
 #include <thread>
 #include "SDL.h"
@@ -12,10 +18,6 @@ enum Dir
 {
     DIR_NONE, DIR_UP, DIR_DOWN, DIR_LEFT, DIR_RIGHT
 };
-enum Corner
-{
-    UPLEFT, UPRIGHT, DOWNLEFT, DOWNRIGHT, LEFTUP, LEFTDOWN, RIGHTUP, RIGHTDOWN
-};
 enum SnakeKeyIndex
 {
     PKI_UP, PKI_DOWN, PKI_LEFT, PKI_RIGHT, _PKI_N
@@ -26,10 +28,10 @@ struct SnakeSegment
     SDL_Rect rect;
     SDL_Texture* tex;
     int rotation = 0;
-    Dir direction = DIR_NONE;
+    int dirX = 0;
+    int dirY = 0;
     SDL_RendererFlip flip = SDL_FLIP_NONE;
-    Corner corner;
-    unsigned int neighbors;
+    unsigned char neighbors = 0;
 };
 
 class Snake
@@ -38,7 +40,7 @@ public:
     bool isPlayer;
     std::vector<SnakeSegment> segments;
     int score = 0;
-    int stepDelay = 500;
+    int stepDelay = 100;
 
     Snake(bool isPlayer, int x, int y);
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
@@ -48,6 +50,8 @@ public:
     void addMultipleSegments(int amount);
     void update();
     void initTextures(int snakeNr);
+    void updateNeighbors();
+    void updateTextures();
 
     int dirX, dirY;
 private:

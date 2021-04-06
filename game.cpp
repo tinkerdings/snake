@@ -38,5 +38,7 @@ Game::update()
             snake->update();
             lastTime = currentTime;
         }
+//         snake->updateNeighbors();
+//         snake->updateTextures();
     }
 }

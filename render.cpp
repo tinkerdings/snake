@@ -65,7 +65,7 @@ Render::createTexture(const char* filename)
     return tex;
 }
 void
-Render::setBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+Render::setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     SDL_SetRenderDrawColor(rend, r, g, b, a);
 }
@@ -74,6 +74,30 @@ void
 Render::clear()
 {
     SDL_RenderClear(rend);
+}
+
+void
+Render::renderBG()
+{
+    int w, h, ww, wh;
+    Map& map = Map::getSingleton();
+    Window& wnd = Window::getSingleton();
+    wnd.getSize(ww, wh);
+
+    SDL_QueryTexture(map.bg, NULL, NULL, &w, &h);
+    SDL_Rect out;
+
+    for(int y = 0; y < wh; y+=h)
+    {
+        for(int x = 0; x < ww; x+=w)
+        {
+            out.x = x;
+            out.y = y;
+            out.w = w;
+            out.h = h;
+            SDL_RenderCopy(rend, map.bg, NULL, &out);
+        }
+    }
 }
 
 void
@@ -94,8 +118,7 @@ Render::renderPickups()
 {
     for(auto pickup : map.pickups)
     {
-        setBG(pickup.color.r, pickup.color.g, pickup.color.b, pickup.color.a);
-        SDL_RenderFillRect(rend, &pickup.rect);
+        SDL_RenderCopy(rend, pickup.tex, NULL, &pickup.rect);
     }
 }
 

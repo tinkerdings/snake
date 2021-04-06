@@ -12,6 +12,7 @@ class Map
 public:
     std::vector<Pickup> pickups;
     int gridSize = GRIDSIZE;
+    SDL_Texture *bg;
 
     Map(const Map&) = delete;
     static Map& getSingleton()

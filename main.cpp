@@ -24,12 +24,12 @@ main()
         return 1;
     }
 
-    Window& wnd = Window::getSingleton();
-    Game& game = Game::getSingleton();
+    Window& wnd         = Window::getSingleton();
+    Game& game          = Game::getSingleton();
     InputHandler& input = InputHandler::getSingleton();
-    Render& rend = Render::getSingleton();
+    Render& rend        = Render::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
-    Map& map = Map::getSingleton();
+    Map& map            = Map::getSingleton();
 
     // Create window.
     wnd.init("Snake!", WINW, WINH);
@@ -38,11 +38,11 @@ main()
     // Setup game, snakes and so forth.
     game.init();
     // Set initial state.
-    state.setState(PLAY);
+    state.setState(MENU);
     // Load Map.
     map.loadMap();
 
-    rend.setBG(32, 32, 32, 255);
+    rend.setClear(32, 32, 32, 255);
     while(!wnd.shouldQuit())
     {
         state.run();

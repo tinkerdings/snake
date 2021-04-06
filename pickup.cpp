@@ -1,15 +1,14 @@
 #include "pickup.h"
+#include "render.h"
 
-Pickup::Pickup(int x, int y, int w, int h, int r, int g, int b, int a)
+Pickup::Pickup(int x, int y, int w, int h)
 {
+    Render& rend = Render::getSingleton();
     rect.x = x;
     rect.y = y;
     rect.w = w;
     rect.h = h;
-    color.r = r;
-    color.g = g;
-    color.b = b;
-    color.a = a;
+    tex = rend.createTexture("res/20x20-powerup.png");
 }
 
 void

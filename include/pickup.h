@@ -7,11 +7,10 @@ class Pickup
 {
 public:
     SDL_Rect rect;
-    SDL_Color color;
+    SDL_Texture *tex;
 
-    Pickup(int x, int y, int w, int h, int r, int g, int b, int a);
+    Pickup(int x, int y, int w, int h);
     void setPosition(int x, int y);
-    void setColor(int r, int g, int b, int a);
 };
 
 #endif // PICKUP_H

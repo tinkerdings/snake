@@ -6,17 +6,12 @@
 #include "render.h"
 #include "util.h"
 
+// TODO TRY NEIGHBORS METHOD FOR CORNER TILES.
 Snake::Snake(bool isPlayer, int x, int y)
 {
     startX = x;
     startY = y;
     initTextures(0);
-    addSegment();
-    addSegment();
-    addSegment();
-    addSegment();
-    addSegment();
-    addSegment();
     addSegment();
     addSegment();
     dirX = DIR_NONE;
@@ -32,12 +27,16 @@ Snake::addSegment()
     {
         segment.rect = {startX, startY, map.gridSize, map.gridSize};
         segment.tex = texHead;
-        segment.direction = DIR_UP;
+        segment.dirX = 0;
+        segment.dirY = -1;
         segments.push_back(segment);
     }
     else
     {
-        segment.rect = currentTail->rect;
+        segment.rect = {
+            currentTail->rect.x - (currentTail->dirX * map.gridSize),
+            currentTail->rect.y - (currentTail->dirY * map.gridSize),
+            map.gridSize, map.gridSize};
         segment.tex = texTail;
         if(segments.size() > 1)
             currentTail->tex = texBody;
@@ -62,78 +61,153 @@ Snake::update()
         {
             auto prev = (segment-1);
             segment->rect = prev->rect;
-            if(prev->tex != texCorner)
-                segment->rotation = prev->rotation;
-            if((prev->tex != texHead) && (segment->tex != texTail))
-                segment->tex = prev->tex;
-
-            if(changedDir)
-            {
-                (head+1)->tex = texCorner;
-                switch((head)->corner)
-                {
-                case(UPLEFT):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 0;
-                    break;
-                }
-                case(UPRIGHT):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 270;
-                    break;
-                }
-                case(DOWNLEFT):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 90;
-                    break;
-                }
-                case(DOWNRIGHT):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 180;
-                    break;
-                }
-                case(LEFTUP):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 180;
-                    break;
-                }
-                case(LEFTDOWN):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 270;
-                    break;
-                }
-                case(RIGHTUP):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 90;
-                    break;
-                }
-                case(RIGHTDOWN):
-                {
-                    (head+1)->flip = SDL_FLIP_NONE;
-                    (head+1)->rotation = 0;
-                    break;
-                }
-                }
-            }
-            else
-                head->tex = texBody;
+            segment->dirX = prev->dirX;
+            segment->dirY = prev->dirY;
         }
-        (segments.end()-1)->tex = texTail;
-        head->tex = texHead;
         segments[0].rect.x += dirX * map.gridSize;
         segments[0].rect.y += dirY * map.gridSize;
     }
     std::thread t_collision(&Snake::checkCollision, this);
     t_collision.join();
-    changedDir = false;
+    updateNeighbors();
+    updateTextures();
+//     changedDir = false;
 }
+
+void
+Snake::updateNeighbors()
+{
+    auto segment = segments.begin();
+    segment->neighbors = 0;
+    if((segment+1)->rect.y < segment->rect.y)
+        segment->neighbors |= NB_UP;
+    if((segment+1)->rect.y > segment->rect.y)
+        segment->neighbors |= NB_DOWN;
+    if((segment+1)->rect.x < segment->rect.x)
+        segment->neighbors |= NB_LEFT;
+    if((segment+1)->rect.x > segment->rect.x)
+        segment->neighbors |= NB_RIGHT;
+    segment++;
+    for(; segment < (segments.end()-1) ; segment++)
+    {
+        segment->neighbors = 0;
+        if(((segment-1)->rect.y < segment->rect.y) || ((segment+1)->rect.y < segment->rect.y))
+            segment->neighbors |= NB_UP;
+        if(((segment-1)->rect.y > segment->rect.y) || ((segment+1)->rect.y > segment->rect.y))
+            segment->neighbors |= NB_DOWN;
+        if(((segment-1)->rect.x < segment->rect.x) || ((segment+1)->rect.x < segment->rect.x))
+            segment->neighbors |= NB_LEFT;
+        if(((segment-1)->rect.x > segment->rect.x) || ((segment+1)->rect.x > segment->rect.x))
+            segment->neighbors |= NB_RIGHT;
+    }
+    segment = (segments.end()-1);
+    segment->neighbors = 0;
+    if((segment-1)->rect.y < segment->rect.y)
+        segment->neighbors |= NB_UP;
+    if((segment-1)->rect.y > segment->rect.y)
+        segment->neighbors |= NB_DOWN;
+    if((segment-1)->rect.x < segment->rect.x)
+        segment->neighbors |= NB_LEFT;
+    if((segment-1)->rect.x > segment->rect.x)
+        segment->neighbors |= NB_RIGHT;
+}
+
+void
+Snake::updateTextures()
+{
+    auto segment = segments.begin();
+    segment->tex = texHead;
+    switch(segment->neighbors)
+    {
+    case(NB_UP):
+    {
+        segment->rotation = 180;
+        break;
+    }
+    case(NB_DOWN):
+    {
+        segment->rotation = 0;
+        break;
+    }
+    case(NB_LEFT):
+    {
+        segment->rotation = 90;
+        break;
+    }
+    case(NB_RIGHT):
+    {
+        segment->rotation = 270;
+        break;
+    }
+    }
+    segment++;
+    for(; segment < (segments.end()-1); segment++)
+    {
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_DOWN)))
+        {
+            segment->tex = texBody;
+            segment->rotation = 0;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_LEFT | NB_RIGHT)))
+        {
+            segment->tex = texBody;
+            segment->rotation = 90;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_LEFT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 90;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_RIGHT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 180;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_LEFT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 0;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_RIGHT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 270;
+            continue;
+        }
+    }
+
+    segment = (segments.end()-1);
+    segment->tex = texTail;
+    switch(segment->neighbors)
+    {
+    case(NB_UP):
+    {
+        segment->rotation = 0;
+        break;
+    }
+    case(NB_DOWN):
+    {
+        segment->rotation = 180;
+        break;
+    }
+    case(NB_LEFT):
+    {
+        segment->rotation = 270;
+        break;
+    }
+    case(NB_RIGHT):
+    {
+        segment->rotation = 90;
+        break;
+    }
+    }
+}
+
 void
 Snake::setDirection(Dir dir)
 {
@@ -144,95 +218,43 @@ Snake::setDirection(Dir dir)
     {
         dirX = 0;
         dirY = 0;
-        head->direction = DIR_NONE;
+        head->dirX = 0;
+        head->dirY = 0;
         break;
     }
     case(DIR_UP):
     {
         dirX = 0;
         dirY = -1;
-        switch(head->direction)
-        {
-        case(DIR_LEFT):
-        {
-            head->corner = UPLEFT;
-            break;
-        }
-        case(DIR_RIGHT):
-        {
-            head->corner = UPRIGHT;
-            break;
-        }
-        }
-        head->direction = DIR_UP;
-        head->rotation = 0;
+        head->dirX = 0;
+        head->dirY = -1;
         break;
     }
     case(DIR_DOWN):
     {
         dirX = 0;
         dirY = 1;
-        switch(head->direction)
-        {
-        case(DIR_LEFT):
-        {
-            head->corner = DOWNLEFT;
-            break;
-        }
-        case(DIR_RIGHT):
-        {
-            head->corner = DOWNRIGHT;
-            break;
-        }
-        }
-        head->direction = DIR_DOWN;
-        head->rotation = 180;
+        head->dirX = 0;
+        head->dirY = 1;
         break;
     }
     case(DIR_LEFT):
     {
         dirX = -1;
         dirY = 0;
-        switch(head->direction)
-        {
-        case(DIR_UP):
-        {
-            head->corner = LEFTUP;
-            break;
-        }
-        case(DIR_DOWN):
-        {
-            head->corner = LEFTDOWN;
-            break;
-        }
-        }
-        head->direction = DIR_LEFT;
-        head->rotation = 270;
+        head->dirX = -1;
+        head->dirY = 0;
         break;
     }
     case(DIR_RIGHT):
     {
         dirX = 1;
         dirY = 0;
-        switch(head->direction)
-        {
-        case(DIR_UP):
-        {
-            head->corner = RIGHTUP;
-            break;
-        }
-        case(DIR_DOWN):
-        {
-            head->corner = RIGHTDOWN;
-            break;
-        }
-        }
-        head->direction = DIR_RIGHT;
-        head->rotation = 90;
+        head->dirX = 1;
+        head->dirY = 0;
         break;
     }
     }
-    changedDir = true;
 }
 
 bool
@@ -283,17 +305,17 @@ Snake::initTextures(int snakeNr)
     Render& rend = Render::getSingleton();
     if(!snakeNr)
     {
-        texHead     = rend.createTexture("res/snake_head_p1.png");
-        texTail     = rend.createTexture("res/snake_tail_p1.png");
-        texBody     = rend.createTexture("res/snake_body_p1.png");
-        texCorner   = rend.createTexture("res/snake_corner_p1.png");
+        texHead     = rend.createTexture("res/20x20-head.png");
+        texTail     = rend.createTexture("res/20x20-tail.png");
+        texBody     = rend.createTexture("res/20x20-body.png");
+        texCorner   = rend.createTexture("res/20x20-turn.png");
     }
     else
     {
-        texHead     = rend.createTexture("res/snake_head_p2.png");
-        texTail     = rend.createTexture("res/snake_tail_p2.png");
-        texBody     = rend.createTexture("res/snake_body_p2.png");
-        texCorner   = rend.createTexture("res/snake_corner_p2.png");
+        texHead     = rend.createTexture("res/20x20-body-3.png");
+        texTail     = rend.createTexture("res/20x20-tail-3.png");
+        texBody     = rend.createTexture("res/20x20-body-3.png");
+        texCorner   = rend.createTexture("res/20x20-turn-3.png");
     }
 }
 

@@ -57,7 +57,7 @@ StateHandler::stateMenu()
     }
     menu.checkButtonMenuMain();
 
-    rend.setBG(64, 64, 64, 255);
+    rend.setClear(64, 64, 64, 255);
     rend.clear();
     rend.renderButtonsMenuMain();
     rend.show();
@@ -77,8 +77,9 @@ StateHandler::statePlay()
 
     game.update();
 
-    rend.setBG(64, 64, 64, 255);
+    rend.setClear(64, 64, 64, 255);
     rend.clear();
+    rend.renderBG();
 
     rend.renderSnakes();
     rend.renderPickups();

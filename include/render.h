@@ -23,8 +23,9 @@ public:
         return s_Render;
     }
     void init();
-    void setBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    void setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void clear();
+    void renderBG();
     void renderSnakes();
     void renderPickups();
     void renderUI();
