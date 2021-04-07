@@ -26,6 +26,7 @@ public:
     bool keyHold(int iKeyIndex);
     bool keyRelease(int sdlKeycode);
     bool mousePress(int sdlMousecode);
+    bool mouseDown(int sdlMousecode);
     bool mouseRelease(int sdlMousecode);
 private:
     InputHandler(){}

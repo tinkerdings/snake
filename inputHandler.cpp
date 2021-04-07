@@ -55,17 +55,25 @@ InputHandler::inputCreate()
 {
     Map& map = Map::getSingleton();
     Menu& menu = Menu::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
 
+    mousePress(SDL_BUTTON_RIGHT);
     if(mousePress(SDL_BUTTON_LEFT))
     {
-        if(!menu.checkButtons())
+        menu.checkButtons();
+    }
+    if((e.button.x >= 0) && (e.button.x <= ww) && (e.button.y >= 0) && (e.button.y <= wh))
+    {
+        if(mouseDown(SDL_BUTTON_LEFT))
         {
             map.setTile(e.button.x, e.button.y, TWALL);
         }
-    }
-    if(mousePress(SDL_BUTTON_RIGHT))
-    {
-        map.setTile(e.button.x, e.button.y, TEMPTY);
+        if(mouseDown(SDL_BUTTON_RIGHT))
+        {
+            map.setTile(e.button.x, e.button.y, TEMPTY);
+        }
     }
 }
 
@@ -116,6 +124,24 @@ InputHandler::mousePress(int sdlMousecode)
 
     return false;
 }
+
+bool
+InputHandler::mouseDown(int sdlMousecode)
+{
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        return mouseButton[0];
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        return mouseButton[1];
+    }
+    }
+    return false;
+}
+
 bool
 InputHandler::mouseRelease(int sdlMousecode)
 {
