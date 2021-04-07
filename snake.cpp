@@ -20,6 +20,7 @@ Snake::Snake(bool isPlayer, int x, int y)
 void
 Snake::addSegment()
 {
+    Map& map = Map::getSingleton();
     SnakeSegment segment;
     auto currentTail = segments.end()-1;
     if(!segments.size())
@@ -41,6 +42,7 @@ Snake::addSegment()
             currentTail->tex = texBody;
         segments.push_back(segment);
     }
+    map.setTile(segment.rect.x, segment.rect.y, TSNAKE);
 }
 
 void
@@ -53,9 +55,15 @@ Snake::addMultipleSegments(int amount)
 void
 Snake::update()
 {
+    Map& map = Map::getSingleton();
+    int prevHeadX, prevHeadY, prevTailX, prevTailY;
     if(dirX + dirY)
     {
         auto head = (segments.begin());
+        prevHeadX = segments[0].rect.x;
+        prevHeadY = segments[0].rect.y;
+        prevTailX = (segments.end()-1)->rect.x;
+        prevTailY = (segments.end()-1)->rect.y;
         for(auto segment = (segments.end()-1); segment != head; segment--)
         {
             auto prev = (segment-1);
@@ -65,6 +73,8 @@ Snake::update()
         }
         segments[0].rect.x += dirX * map.gridSize;
         segments[0].rect.y += dirY * map.gridSize;
+        map.setTile(prevHeadX, prevHeadY, TSNAKE);
+        map.setTile(prevTailX, prevTailY, TEMPTY);
     }
     std::thread t_collision(&Snake::checkCollision, this);
     t_collision.join();
@@ -371,9 +381,11 @@ Snake::checkPickup()
 void
 Snake::checkCrash()
 {
+    Map& map = Map::getSingleton();
     int ww, wh;
     wnd.getSize(ww, wh);
 
+    // Screenwrap.
     if (segments[0].rect.x <= -map.gridSize)
         segments[0].rect.x = ww - map.gridSize;
     if (segments[0].rect.x >= ww)
@@ -384,9 +396,9 @@ Snake::checkCrash()
     if (segments[0].rect.y >= wh)
         segments[0].rect.y = 0;
 
-    for(auto segment = segments.begin()+1; segment != segments.end(); segment++)
+    if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)
     {
-        if((segment->rect.x == segments[0].rect.x) && (segment->rect.y == segments[0].rect.y))
-            state.setState(RESTART);
+        state.setState(RESTART);
+        map.resetMap();
     }
 }

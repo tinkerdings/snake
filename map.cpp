@@ -13,3 +13,27 @@ Map::loadMap()
     Pickup pickup(ww/2, wh/2 - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);
 }
+
+void
+Map::setTile(int xPos, int yPos, TileType val)
+{
+    map[xPos/gridSize][yPos/gridSize] = val;
+}
+
+TileType
+Map::getTile(int xPos, int yPos)
+{
+    return map[xPos/gridSize][yPos/gridSize];
+}
+
+void
+Map::resetMap()
+{
+    for(int i = 0; i < MAPH; i++)
+    {
+        for(int j = 0; j < MAPW; j++)
+        {
+            map[j][i] = TEMPTY;
+        }
+    }
+}

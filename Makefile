@@ -22,7 +22,10 @@ OBJS = $(patsubst %,$(OBJDIR)/%,$(_OBJS))
 $(OBJDIR)/%.o: %.cpp $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-$(OUT): clean $(OBJS)
+$(OUT): $(OBJS)
+	$(CC) -o $@ $^ $(CFLAGS)
+
+re: clean $(OBJS)
 	$(CC) -o $@ $(OBJS) $(CFLAGS)
 
 .PHONY: clean

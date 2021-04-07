@@ -1,5 +1,8 @@
+#include "util.h"
 #include "pickup.h"
 #include "render.h"
+#include "game.h"
+#include "map.h"
 
 Pickup::Pickup(int x, int y, int w, int h)
 {
