@@ -6,7 +6,7 @@
 
 enum State
 {
-    MENU, PLAY, RESTART
+    MENU, MENU_CREATE, PLAY, RESTART
 };
 class StateHandler
 {
@@ -27,6 +27,7 @@ private:
     void statePlay();
     void stateRestart();
     void stateMenu();
+    void stateMenuCreate();
 };
 
 #endif // STATEHANDLER_H

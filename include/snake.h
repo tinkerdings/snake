@@ -1,7 +1,6 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-// TODO TRY NEIGHBORS METHOD FOR CORNER TILES.
 #define NB_UP       0x01
 #define NB_DOWN     0x02
 #define NB_LEFT     0x04

@@ -6,7 +6,6 @@
 #include "render.h"
 #include "util.h"
 
-// TODO TRY NEIGHBORS METHOD FOR CORNER TILES.
 Snake::Snake(bool isPlayer, int x, int y)
 {
     startX = x;
@@ -303,19 +302,35 @@ void
 Snake::initTextures(int snakeNr)
 {
     Render& rend = Render::getSingleton();
-    if(!snakeNr)
+    switch(snakeNr)
+    {
+    case(0):
     {
         texHead     = rend.createTexture("res/20x20-head.png");
         texTail     = rend.createTexture("res/20x20-tail.png");
         texBody     = rend.createTexture("res/20x20-body.png");
         texCorner   = rend.createTexture("res/20x20-turn.png");
+
+        break;
     }
-    else
+    case(1):
     {
-        texHead     = rend.createTexture("res/20x20-body-3.png");
+        texHead     = rend.createTexture("res/20x20-head-2.png");
+        texTail     = rend.createTexture("res/20x20-tail-2.png");
+        texBody     = rend.createTexture("res/20x20-body-2.png");
+        texCorner   = rend.createTexture("res/20x20-turn-2.png");
+
+        break;
+    }
+    case(2):
+    {
+        texHead     = rend.createTexture("res/20x20-head-3.png");
         texTail     = rend.createTexture("res/20x20-tail-3.png");
         texBody     = rend.createTexture("res/20x20-body-3.png");
         texCorner   = rend.createTexture("res/20x20-turn-3.png");
+
+        break;
+    }
     }
 }
 

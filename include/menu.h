@@ -11,14 +11,13 @@ struct Button
     std::function<void()> clickFunction;
     SDL_Rect rect;
     SDL_Texture* tex;
-    SDL_Color color, colorHover;
-    bool clicked = false;
+    SDL_Color color;
 };
 
 class Menu
 {
 public:
-    std::vector<Button> buttonsMenuMain;
+    std::vector<Button> buttons;
 
     Menu(const Menu&) = delete;
     static Menu& getSingleton()
@@ -31,8 +30,9 @@ void createButton(
         int x, int y, int w, int h,
         SDL_Color color,
         SDL_Color colorTxt);
-void checkButtonMenuMain();
+void checkButtons();
 void buttonCallbackSetBG();
+void clearButtons();
 private:
     Menu(){}
     static Menu s_Menu;

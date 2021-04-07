@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdio>
 #include "game.h"
+#include "menu.h"
 
 InputHandler InputHandler::s_InputHandler;
 
@@ -10,18 +11,29 @@ InputHandler::checkQuit()
 {
     if(e.type == SDL_QUIT)
         wnd.quit();
+    if(keyRelease(SDLK_ESCAPE))
+        wnd.quit();
+    mouseRelease(SDL_BUTTON_LEFT);
+    mouseRelease(SDL_BUTTON_RIGHT);
 }
 void
 InputHandler::pollInput()
 {
     SDL_PollEvent(&e);
 }
+// void
+// InputHandler::inputMenu()
+// {
+//     Menu& menu = Menu::getSingleton();
+//     if(keyPress(SDLK_g))
+//         menu.buttons.clear();
+//     if(mousePress(SDL_BUTTON_LEFT))
+//         menu.buttons.clear();
+// }
 void
 InputHandler::inputPlay()
 {
     Game& game = Game::getSingleton();
-    if(keyRelease(SDLK_ESCAPE))
-        wnd.quit();
 
     if(keyPress(SDLK_UP) || keyPress(SDLK_w))
     {
@@ -43,8 +55,6 @@ InputHandler::inputPlay()
         if(game.snakes[0].dirAvailable(DIR_RIGHT))
 			game.snakes[0].setDirection(DIR_RIGHT);
     }
-//     if(mousePress(SDL_BUTTON_LEFT))
-//         std::cout << "left mouse pressed" << std::endl;
 }
 
 // [ INPUT CHECKING METHODS ]
@@ -70,5 +80,34 @@ InputHandler::keyRelease(int sdlKeycode)
 bool
 InputHandler::mousePress(int sdlMousecode)
 {
-    return (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode);
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        return !mouseButton[0] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[0] = true);
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        return !mouseButton[1] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[0] = true);
+    }
+    }
+
+    return false;
+}
+bool
+InputHandler::mouseRelease(int sdlMousecode)
+{
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        return mouseButton[0] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[0] = false);
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        return mouseButton[1] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[0] = false);
+    }
+    }
+
+    return false;
 }

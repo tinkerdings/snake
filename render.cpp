@@ -139,10 +139,10 @@ Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, u
 }
 
 void
-Render::renderButtonsMenuMain()
+Render::renderButtons()
 {
     Menu& menu = Menu::getSingleton();
-    for(auto button : menu.buttonsMenuMain)
+    for(auto button : menu.buttons)
     {
         SDL_RenderCopy(rend, button.tex, NULL, &button.rect);
     }

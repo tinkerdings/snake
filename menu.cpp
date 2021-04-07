@@ -66,23 +66,38 @@ Menu::createButton(
     SDL_FreeSurface(surfButton);
     SDL_FreeSurface(surfTxt);
 
-    buttonsMenuMain.push_back(button);
+    buttons.push_back(button);
 }
 
 void
-Menu::checkButtonMenuMain()
+Menu::checkButtons()
 {
     InputHandler& input = InputHandler::getSingleton();
     if(input.mousePress(SDL_BUTTON_LEFT))
     {
-        for(auto button = buttonsMenuMain.begin(); button != buttonsMenuMain.end(); button++)
+        for(auto button = buttons.begin(); button != buttons.end(); button++)
         {
+            if(!buttons.size())
+                break;
             if(((input.e.button.x >= button->rect.x)&&(input.e.button.x <= (button->rect.x+button->rect.w))) &&
                ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
             {
-                std::cout << "left mouse pressed" << std::endl;
                 button->clickFunction();
             }
         }
+    }
+}
+
+void
+Menu::clearButtons()
+{
+    if(buttons.size())
+    {
+        for(auto button = buttons.begin(); button != buttons.end(); button++)
+        {
+            SDL_DestroyTexture(button->tex);
+            button->clickFunction = NULL;
+        }
+        buttons.clear();
     }
 }
