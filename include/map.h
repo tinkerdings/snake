@@ -21,6 +21,7 @@ public:
     int gridSize = GRIDSIZE;
     TileType map[MAPW][MAPH] = {TEMPTY};
     SDL_Texture *bg;
+    SDL_Texture *texWall, *texWallCorner;
 
     Map(const Map&) = delete;
     static Map& getSingleton()
@@ -31,6 +32,7 @@ public:
     void loadMap();
     void setTile(int xPos, int yPos, TileType val);
     void resetMap();
+    void saveMap();
     TileType getTile(int xPos, int yPos);
 
 private:

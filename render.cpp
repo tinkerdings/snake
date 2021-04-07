@@ -174,6 +174,27 @@ Render::renderText(Text *tex, int x, int y, int w, int h)
 }
 
 void
+Render::renderMap()
+{
+    Map& map = Map::getSingleton();
+    SDL_Rect texWallRect;
+    SDL_QueryTexture(map.texWall, NULL, NULL, &texWallRect.w, &texWallRect.h);
+
+    for(int i = 0; i < MAPH; i++)
+    {
+        for(int j = 0; j < MAPW; j++)
+        {
+            if(map.map[j][i] == TWALL)
+            {
+                texWallRect.x = j * map.gridSize;
+                texWallRect.y = i * map.gridSize;
+                SDL_RenderCopy(rend, map.texWall, NULL, &texWallRect);
+            }
+        }
+    }
+}
+
+void
 Render::show()
 {
     SDL_RenderPresent(rend);

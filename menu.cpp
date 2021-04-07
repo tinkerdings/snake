@@ -69,23 +69,22 @@ Menu::createButton(
     buttons.push_back(button);
 }
 
-void
+bool
 Menu::checkButtons()
 {
     InputHandler& input = InputHandler::getSingleton();
-    if(input.mousePress(SDL_BUTTON_LEFT))
+    for(auto button = buttons.begin(); button != buttons.end(); button++)
     {
-        for(auto button = buttons.begin(); button != buttons.end(); button++)
+        if(!buttons.size())
+            break;
+        if(((input.e.button.x >= button->rect.x)&&(input.e.button.x <= (button->rect.x+button->rect.w))) &&
+           ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
         {
-            if(!buttons.size())
-                break;
-            if(((input.e.button.x >= button->rect.x)&&(input.e.button.x <= (button->rect.x+button->rect.w))) &&
-               ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
-            {
-                button->clickFunction();
-            }
+            button->clickFunction();
+            return true;
         }
     }
+    return false;
 }
 
 void

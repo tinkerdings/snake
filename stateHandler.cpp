@@ -1,6 +1,7 @@
 #include "stateHandler.h"
 #include "game.h"
 #include "menu.h"
+#include "map.h"
 
 StateHandler StateHandler::s_StateHandler;
 
@@ -33,6 +34,11 @@ StateHandler::run()
     case(PLAY):
     {
         statePlay();
+        break;
+    }
+    case(CREATE):
+    {
+        stateCreate();
         break;
     }
     case(RESTART):
@@ -72,9 +78,16 @@ StateHandler::stateMenu()
             "CREATE",
             ww/2 - 200, 300, 400, 100,
             color, colorTxt);
+
+        menu.createButton(
+            std::bind(&Window::quit, &wnd),
+            "QUIT",
+            20, wh - 60, 80, 40,
+            color, colorTxt);
     }
+
     rend.renderButtons();
-    menu.checkButtons();
+    input.inputMenu();
     rend.show();
 
 }
@@ -84,6 +97,7 @@ StateHandler::stateMenuCreate()
 {
     Menu& menu = Menu::getSingleton();
     Render& rend = Render::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
     Window& wnd = Window::getSingleton();
     int ww, wh;
     wnd.getSize(ww, wh);
@@ -96,7 +110,7 @@ StateHandler::stateMenuCreate()
         SDL_Color colorTxt = {0, 255, 64, 255};
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, PLAY),
+            std::bind(&StateHandler::setState, this, CREATE),
             "+",
             ww/2 - 200, 140, 400, 100,
             color, colorTxt);
@@ -108,7 +122,8 @@ StateHandler::stateMenuCreate()
             color, colorTxt);
     }
     rend.renderButtons();
-    menu.checkButtons();
+    input.inputMenu();
+
     rend.show();
 }
 
@@ -133,6 +148,44 @@ StateHandler::statePlay()
     rend.renderPickups();
     rend.renderUI();
 
+    rend.show();
+}
+
+void
+StateHandler::stateCreate()
+{
+    Render& rend = Render::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+
+    wnd.getSize(ww, wh);
+
+    if(!menu.buttons.size())
+    {
+        SDL_Color color = {64, 64, 255, 255};
+        SDL_Color colorTxt = {0, 255, 64, 255};
+
+        menu.createButton(
+            std::bind(&Map::saveMap, &map),
+            "SAVE",
+            ww - 100, wh - 60, 80, 40,
+            color, colorTxt);
+
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU),
+            "QUIT",
+            20, wh - 60, 80, 40,
+            color, colorTxt);
+    }
+
+    input.inputCreate();
+
+    rend.renderBG();
+    rend.renderMap();
+    rend.renderButtons();
     rend.show();
 }
 

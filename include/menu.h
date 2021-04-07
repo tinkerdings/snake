@@ -30,7 +30,7 @@ void createButton(
         int x, int y, int w, int h,
         SDL_Color color,
         SDL_Color colorTxt);
-void checkButtons();
+bool checkButtons();
 void buttonCallbackSetBG();
 void clearButtons();
 private:

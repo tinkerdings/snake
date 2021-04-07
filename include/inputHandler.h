@@ -18,6 +18,7 @@ public:
     SDL_Event e;
     void checkQuit();
     void inputPlay();
+    void inputCreate();
     void inputMenu();
     void pollInput();
     // Key input

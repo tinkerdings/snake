@@ -1,3 +1,4 @@
+#include <iostream>
 #include "map.h"
 #include "render.h"
 
@@ -9,6 +10,8 @@ Map::loadMap()
     int ww, wh;
     wnd.getSize(ww, wh);
     bg = rend.createTexture("res/20x20-bg.png");
+    texWall = rend.createTexture("res/20x20-0bstacle-2.png");
+    texWallCorner = rend.createTexture("res/20x20-obstacle.png");
     pickups.clear();
     Pickup pickup(ww/2, wh/2 - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);
@@ -17,7 +20,8 @@ Map::loadMap()
 void
 Map::setTile(int xPos, int yPos, TileType val)
 {
-    map[xPos/gridSize][yPos/gridSize] = val;
+    if(getTile(xPos, yPos) != val)
+        map[xPos/gridSize][yPos/gridSize] = val;
 }
 
 TileType
@@ -36,4 +40,10 @@ Map::resetMap()
             map[j][i] = TEMPTY;
         }
     }
+}
+
+void
+Map::saveMap()
+{
+    std::cout << "Map saved!" << std::endl;
 }

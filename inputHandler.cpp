@@ -16,20 +16,13 @@ InputHandler::checkQuit()
     mouseRelease(SDL_BUTTON_LEFT);
     mouseRelease(SDL_BUTTON_RIGHT);
 }
+
 void
 InputHandler::pollInput()
 {
     SDL_PollEvent(&e);
 }
-// void
-// InputHandler::inputMenu()
-// {
-//     Menu& menu = Menu::getSingleton();
-//     if(keyPress(SDLK_g))
-//         menu.buttons.clear();
-//     if(mousePress(SDL_BUTTON_LEFT))
-//         menu.buttons.clear();
-// }
+
 void
 InputHandler::inputPlay()
 {
@@ -54,6 +47,35 @@ InputHandler::inputPlay()
     {
         if(game.snakes[0].dirAvailable(DIR_RIGHT))
 			game.snakes[0].setDirection(DIR_RIGHT);
+    }
+}
+
+void
+InputHandler::inputCreate()
+{
+    Map& map = Map::getSingleton();
+    Menu& menu = Menu::getSingleton();
+
+    if(mousePress(SDL_BUTTON_LEFT))
+    {
+        if(!menu.checkButtons())
+        {
+            map.setTile(e.button.x, e.button.y, TWALL);
+        }
+    }
+    if(mousePress(SDL_BUTTON_RIGHT))
+    {
+        map.setTile(e.button.x, e.button.y, TEMPTY);
+    }
+}
+
+void
+InputHandler::inputMenu()
+{
+    Menu& menu = Menu::getSingleton();
+    if(mousePress(SDL_BUTTON_LEFT))
+    {
+        menu.checkButtons();
     }
 }
 
@@ -88,7 +110,7 @@ InputHandler::mousePress(int sdlMousecode)
     }
     case(SDL_BUTTON_RIGHT):
     {
-        return !mouseButton[1] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[0] = true);
+        return !mouseButton[1] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[1] = true);
     }
     }
 
@@ -105,7 +127,7 @@ InputHandler::mouseRelease(int sdlMousecode)
     }
     case(SDL_BUTTON_RIGHT):
     {
-        return mouseButton[1] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[0] = false);
+        return mouseButton[1] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[1] = false);
     }
     }
 
