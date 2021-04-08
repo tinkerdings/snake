@@ -24,18 +24,20 @@ public:
     {
         return s_Menu;
     }
+void setButtonColorBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void createButton(
         std::function<void()> callback,
         const char* txt,
-        int x, int y, int w, int h,
-        SDL_Color color,
-        SDL_Color colorTxt);
+        int x, int y, int w, int h);
 bool checkButtons();
 void buttonCallbackSetBG();
 void clearButtons();
 private:
     Menu(){}
     static Menu s_Menu;
+    SDL_Color color = {0, 0, 0, 255};
+    SDL_Color colorTxt = {255, 255, 255, 255};
 };
 
 #endif // MENU_H

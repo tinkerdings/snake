@@ -9,6 +9,7 @@ void
 StateHandler::setState(State set)
 {
     Menu& menu = Menu::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
     menu.clearButtons();
     current = set;
 }
@@ -18,7 +19,7 @@ StateHandler::run()
 {
     InputHandler& input = InputHandler::getSingleton();
     input.pollInput();
-    input.checkQuit();
+    input.commonInput();
     switch(current)
     {
     case(MENU):
@@ -64,26 +65,23 @@ StateHandler::stateMenu()
 
     if(!menu.buttons.size())
     {
-        SDL_Color color = {64, 64, 255, 255};
-        SDL_Color colorTxt = {0, 255, 64, 255};
+        menu.setButtonColorBG(64, 64, 255, 255);
+        menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, PLAY),
             "PLAY",
-            ww/2 - 200, 140, 400, 100,
-            color, colorTxt);
+            ww/2 - 200, 140, 400, 100);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE),
             "CREATE",
-            ww/2 - 200, 300, 400, 100,
-            color, colorTxt);
+            ww/2 - 200, 300, 400, 100);
 
         menu.createButton(
             std::bind(&Window::quit, &wnd),
             "QUIT",
-            20, wh - 60, 80, 40,
-            color, colorTxt);
+            20, wh - 60, 80, 40);
     }
 
     rend.renderButtons();
@@ -106,20 +104,18 @@ StateHandler::stateMenuCreate()
 
     if(!menu.buttons.size())
     {
-        SDL_Color color = {64, 64, 255, 255};
-        SDL_Color colorTxt = {0, 255, 64, 255};
+        menu.setButtonColorBG(64, 64, 255, 255);
+        menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, CREATE),
             "+",
-            ww/2 - 200, 140, 400, 100,
-            color, colorTxt);
+            ww/2 - 200, 140, 400, 100);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU),
             "BACK",
-            ww/2 - 200, 300, 400, 100,
-            color, colorTxt);
+            ww/2 - 200, 300, 400, 100);
     }
     rend.renderButtons();
     input.inputMenu();
@@ -165,20 +161,24 @@ StateHandler::stateCreate()
 
     if(!menu.buttons.size())
     {
-        SDL_Color color = {64, 64, 255, 255};
-        SDL_Color colorTxt = {0, 255, 64, 255};
+        menu.setButtonColorBG(64, 64, 255, 255);
+        menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&Map::saveMap, &map),
             "SAVE",
-            ww - 100, wh - 60, 80, 40,
-            color, colorTxt);
+            ww - 100, wh - 60, 80, 40);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, MENU),
-            "QUIT",
-            20, wh - 60, 80, 40,
-            color, colorTxt);
+            std::bind(&StateHandler::setState, this, MENU_CREATE),
+            "MENU",
+            20, wh - 60, 80, 40);
+
+        menu.setButtonColorTxt(255, 64, 64, 255);
+        menu.createButton(
+            std::bind(&Map::resetMap, &map),
+            "CLEAR",
+            ww/2 - 40, wh - 60, 80, 40);
     }
 
     input.inputCreate();

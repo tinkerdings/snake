@@ -5,14 +5,28 @@
 #include "render.h"
 #include "inputHandler.h"
 
+void
+Menu::setButtonColorBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    color.r = r;
+    color.g = g;
+    color.b = b;
+    color.a = a;
+}
+void
+Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    colorTxt.r = r;
+    colorTxt.g = g;
+    colorTxt.b = b;
+    colorTxt.a = a;
+}
 Menu Menu::s_Menu;
 void
 Menu::createButton(
         std::function<void()> callback,
         const char* txt,
-        int x, int y, int w, int h,
-        SDL_Color color,
-        SDL_Color colorTxt)
+        int x, int y, int w, int h)
 {
     Render& rend = Render::getSingleton();
     if(!TTF_WasInit())

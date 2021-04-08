@@ -7,14 +7,13 @@
 InputHandler InputHandler::s_InputHandler;
 
 void
-InputHandler::checkQuit()
+InputHandler::commonInput()
 {
     if(e.type == SDL_QUIT)
         wnd.quit();
     if(keyRelease(SDLK_ESCAPE))
         wnd.quit();
-    mouseRelease(SDL_BUTTON_LEFT);
-    mouseRelease(SDL_BUTTON_RIGHT);
+    updateMouse();
 }
 
 void
@@ -59,8 +58,7 @@ InputHandler::inputCreate()
     int ww, wh;
     wnd.getSize(ww, wh);
 
-    mousePress(SDL_BUTTON_RIGHT);
-    if(mousePress(SDL_BUTTON_LEFT))
+    if(mouseRelease(SDL_BUTTON_LEFT))
     {
         menu.checkButtons();
     }
@@ -107,6 +105,51 @@ InputHandler::keyRelease(int sdlKeycode)
     return (e.type == SDL_KEYUP) && (sdlKeycode == e.key.keysym.sym);
 }
 
+void
+InputHandler::updateMouse()
+{
+    switch(e.type)
+    {
+    case(SDL_MOUSEBUTTONDOWN):
+    {
+        switch(e.button.button)
+        {
+        case(SDL_BUTTON_LEFT):
+        {
+            mouseButton[0].prevDown = mouseButton[0].curDown;
+            mouseButton[0].curDown = true;
+            break;
+        }
+        case(SDL_BUTTON_RIGHT):
+        {
+            mouseButton[1].prevDown = mouseButton[1].curDown;
+            mouseButton[1].curDown = true;
+            break;
+        }
+        }
+        break;
+    }
+    case(SDL_MOUSEBUTTONUP):
+    {
+        switch(e.button.button)
+        {
+        case(SDL_BUTTON_LEFT):
+        {
+            mouseButton[0].prevDown = mouseButton[0].curDown;
+            mouseButton[0].curDown = false;
+            break;
+        }
+        case(SDL_BUTTON_RIGHT):
+        {
+            mouseButton[1].prevDown = mouseButton[1].curDown;
+            mouseButton[1].curDown = false;
+            break;
+        }
+        }
+        break;
+    }
+    }
+}
 bool
 InputHandler::mousePress(int sdlMousecode)
 {
@@ -114,14 +157,21 @@ InputHandler::mousePress(int sdlMousecode)
     {
     case(SDL_BUTTON_LEFT):
     {
-        return !mouseButton[0] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[0] = true);
+        if(!mouseButton[0].prevDown && mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
     }
     case(SDL_BUTTON_RIGHT):
     {
-        return !mouseButton[1] && (e.type == SDL_MOUSEBUTTONDOWN) && (e.button.button == sdlMousecode) && (mouseButton[1] = true);
+        if(!mouseButton[1].prevDown && mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
     }
     }
-
     return false;
 }
 
@@ -132,11 +182,19 @@ InputHandler::mouseDown(int sdlMousecode)
     {
     case(SDL_BUTTON_LEFT):
     {
-        return mouseButton[0];
+        if(mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
     }
     case(SDL_BUTTON_RIGHT):
     {
-        return mouseButton[1];
+        if(mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
     }
     }
     return false;
@@ -149,13 +207,20 @@ InputHandler::mouseRelease(int sdlMousecode)
     {
     case(SDL_BUTTON_LEFT):
     {
-        return mouseButton[0] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[0] = false);
+        if(mouseButton[0].prevDown && !mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
     }
     case(SDL_BUTTON_RIGHT):
     {
-        return mouseButton[1] && (e.type == SDL_MOUSEBUTTONUP) && (e.button.button == sdlMousecode) && (mouseButton[1] = false);
+        if(mouseButton[1].prevDown && !mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
     }
     }
-
     return false;
 }

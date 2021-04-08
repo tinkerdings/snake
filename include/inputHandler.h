@@ -5,6 +5,11 @@
 #include <SDL.h>
 #include "window.h"
 
+struct MouseState
+{
+    bool prevDown = false;
+    bool curDown = false;
+};
 class InputHandler
 {
 public:
@@ -16,7 +21,7 @@ public:
     }
 
     SDL_Event e;
-    void checkQuit();
+    void commonInput();
     void inputPlay();
     void inputCreate();
     void inputMenu();
@@ -25,6 +30,7 @@ public:
     bool keyPress(int sdlKeycode);
     bool keyHold(int iKeyIndex);
     bool keyRelease(int sdlKeycode);
+    void updateMouse();
     bool mousePress(int sdlMousecode);
     bool mouseDown(int sdlMousecode);
     bool mouseRelease(int sdlMousecode);
@@ -33,7 +39,7 @@ private:
     static InputHandler s_InputHandler;
     Window& wnd = Window::getSingleton();
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
-    bool mouseButton[2] = {0};
+    MouseState mouseButton[2] = {0};
 
 };
 
