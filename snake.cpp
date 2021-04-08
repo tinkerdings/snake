@@ -354,14 +354,12 @@ Snake::checkCollision()
 void
 Snake::checkPickup()
 {
-    int ww, wh;
-    wnd.getSize(ww, wh);
     for(auto pickup = map.pickups.begin(); pickup != map.pickups.end(); pickup++)
     {
         if((pickup->rect.x == segments[0].rect.x) && (pickup->rect.y == segments[0].rect.y))
         {
-            int x = iRandRange(0, ww/map.gridSize - 1) * map.gridSize;
-            int y = iRandRange(0, wh/map.gridSize - 1) * map.gridSize;
+            int x = iRandRange(map.mapX, map.mapX + map.mapW - 1) * map.gridSize;
+            int y = iRandRange(map.mapY, map.mapY + map.mapH - 1) * map.gridSize;
             pickup->setPosition(x, y);
             addSegment();
 
@@ -378,6 +376,7 @@ Snake::checkPickup()
     }
 }
 
+// TODO fix positions according to map offset
 void
 Snake::checkCrash()
 {
@@ -386,15 +385,15 @@ Snake::checkCrash()
     wnd.getSize(ww, wh);
 
     // Screenwrap.
-    if (segments[0].rect.x <= -map.gridSize)
-        segments[0].rect.x = ww - map.gridSize;
-    if (segments[0].rect.x >= ww)
-        segments[0].rect.x = 0;
+    if (segments[0].rect.x <= map.mapX - map.gridSize)
+        segments[0].rect.x = map.mapX + map.mapW - map.gridSize;
+    if (segments[0].rect.x >= map.mapX + map.mapW)
+        segments[0].rect.x = map.mapX;
 
-    if (segments[0].rect.y <= -map.gridSize)
-        segments[0].rect.y = wh - map.gridSize;
-    if (segments[0].rect.y >= wh)
-        segments[0].rect.y = 0;
+    if (segments[0].rect.y <= map.mapY - map.gridSize)
+        segments[0].rect.y = map.mapY + map.mapH - map.gridSize;
+    if (segments[0].rect.y >= map.mapY + map.mapH)
+        segments[0].rect.y = map.mapY;
 
     if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)
     {

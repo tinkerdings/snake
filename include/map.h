@@ -22,6 +22,10 @@ public:
     TileType map[MAPW][MAPH] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
+    int mapW = MAPW * GRIDSIZE;
+    int mapH = MAPH * GRIDSIZE;
+    int mapX = 80;
+    int mapY = 100;
 
     Map(const Map&) = delete;
     static Map& getSingleton()

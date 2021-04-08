@@ -11,8 +11,8 @@
 #include "stateHandler.h"
 #include "game.h"
 
-#define WINW 800
-#define WINH 600
+#define WINW 960
+#define WINH 720
 
 int
 main()
