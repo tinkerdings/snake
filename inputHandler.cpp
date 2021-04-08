@@ -86,16 +86,26 @@ InputHandler::inputButtons()
     static Button *button = NULL;
     if(mousePress(SDL_BUTTON_LEFT))
     {
-        if(button = menu.checkButtons())
+        if((button = menu.checkButtons()))
         {
-            button->active = true;
+            if(button->trigger == BPRESS)
+            {
+                button->clickFunction();
+            }
+            else
+            {
+                button->active = true;
+            }
         }
     }
     if(mouseRelease(SDL_BUTTON_LEFT))
     {
-        if(button)
+        if((button = menu.checkButtons()) && button->active)
         {
-            button->clickFunction();
+            if(button->trigger == BRELEASE)
+            {
+                button->clickFunction();
+            }
         }
     }
 }

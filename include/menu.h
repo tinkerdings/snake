@@ -6,9 +6,15 @@
 #include <SDL.h>
 #include <functional>
 
+enum ButtonTrigger
+{
+    BPRESS, BRELEASE
+};
+
 struct Button
 {
     std::function<void()> clickFunction;
+    ButtonTrigger trigger = BRELEASE;
     SDL_Rect rect;
     SDL_Texture* tex;
     SDL_Color color;
@@ -28,7 +34,7 @@ public:
 void setButtonColorBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void createButton(
-        std::function<void()> callback,
+        std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
         int x, int y, int w, int h);
 Button* checkButtons();

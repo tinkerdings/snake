@@ -24,7 +24,7 @@ Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsig
 Menu Menu::s_Menu;
 void
 Menu::createButton(
-        std::function<void()> callback,
+        std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
         int x, int y, int w, int h)
 {
@@ -76,6 +76,7 @@ Menu::createButton(
     }
 
     button.clickFunction = callback;
+    button.trigger = trigger;
 
     SDL_FreeSurface(surfButton);
     SDL_FreeSurface(surfTxt);
@@ -95,6 +96,10 @@ Menu::checkButtons()
            ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
         {
             return &(*button);
+        }
+        else
+        {
+            button->active = false;
         }
     }
     return NULL;

@@ -69,17 +69,17 @@ StateHandler::stateMenu()
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, PLAY),
+            std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
             "PLAY",
             ww/2 - 200, 140, 400, 100);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, MENU_CREATE),
+            std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "CREATE",
             ww/2 - 200, 300, 400, 100);
 
         menu.createButton(
-            std::bind(&Window::quit, &wnd),
+            std::bind(&Window::quit, &wnd), BRELEASE,
             "QUIT",
             20, wh - 60, 80, 40);
     }
@@ -108,12 +108,12 @@ StateHandler::stateMenuCreate()
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, CREATE),
+            std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
             "+",
             ww/2 - 200, 140, 400, 100);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, MENU),
+            std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
             ww/2 - 200, 300, 400, 100);
     }
@@ -165,18 +165,18 @@ StateHandler::stateCreate()
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
-            std::bind(&Map::saveMap, &map),
+            std::bind(&Map::saveMap, &map), BRELEASE,
             "SAVE",
             ww - 100, wh - 60, 80, 40);
 
         menu.createButton(
-            std::bind(&StateHandler::setState, this, MENU_CREATE),
+            std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
             20, wh - 60, 80, 40);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
-            std::bind(&Map::resetMap, &map),
+            std::bind(&Map::resetMap, &map), BRELEASE,
             "CLEAR",
             ww/2 - 40, wh - 60, 80, 40);
     }
