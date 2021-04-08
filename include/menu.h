@@ -12,6 +12,7 @@ struct Button
     SDL_Rect rect;
     SDL_Texture* tex;
     SDL_Color color;
+    bool active = false;
 };
 
 class Menu
@@ -30,7 +31,7 @@ void createButton(
         std::function<void()> callback,
         const char* txt,
         int x, int y, int w, int h);
-bool checkButtons();
+Button* checkButtons();
 void buttonCallbackSetBG();
 void clearButtons();
 private:

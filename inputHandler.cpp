@@ -58,10 +58,8 @@ InputHandler::inputCreate()
     int ww, wh;
     wnd.getSize(ww, wh);
 
-    if(mouseRelease(SDL_BUTTON_LEFT))
-    {
-        menu.checkButtons();
-    }
+    inputButtons();
+
     if((e.button.x >= 0) && (e.button.x <= ww) && (e.button.y >= 0) && (e.button.y <= wh))
     {
         if(mouseDown(SDL_BUTTON_LEFT))
@@ -78,10 +76,27 @@ InputHandler::inputCreate()
 void
 InputHandler::inputMenu()
 {
+    inputButtons();
+}
+
+void
+InputHandler::inputButtons()
+{
     Menu& menu = Menu::getSingleton();
+    static Button *button = NULL;
     if(mousePress(SDL_BUTTON_LEFT))
     {
-        menu.checkButtons();
+        if(button = menu.checkButtons())
+        {
+            button->active = true;
+        }
+    }
+    if(mouseRelease(SDL_BUTTON_LEFT))
+    {
+        if(button)
+        {
+            button->clickFunction();
+        }
     }
 }
 

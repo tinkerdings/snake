@@ -83,7 +83,7 @@ Menu::createButton(
     buttons.push_back(button);
 }
 
-bool
+Button*
 Menu::checkButtons()
 {
     InputHandler& input = InputHandler::getSingleton();
@@ -94,11 +94,10 @@ Menu::checkButtons()
         if(((input.e.button.x >= button->rect.x)&&(input.e.button.x <= (button->rect.x+button->rect.w))) &&
            ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
         {
-            button->clickFunction();
-            return true;
+            return &(*button);
         }
     }
-    return false;
+    return NULL;
 }
 
 void
