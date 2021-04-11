@@ -38,6 +38,7 @@ public:
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void renderButtons();
     void renderMap();
+    void renderTilePlacementBox();
     void renderTilePreview();
     void renderScores();
     void renderBorders();

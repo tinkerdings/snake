@@ -236,6 +236,27 @@ Render::renderMap()
 }
 
 void
+Render::renderTilePlacementBox()
+{
+    Map& map = Map::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+
+    if(((input.e.button.x >= map.mapX) && (input.e.button.x < map.mapX + map.mapW)) &&
+        ((input.e.button.y >= map.mapY) && (input.e.button.y < map.mapY + map.mapH)))
+    {
+        setClear(64, 255, 64, 64);
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
+        SDL_Rect rect = {
+            (input.e.button.x / map.gridSize) * map.gridSize,
+            (input.e.button.y / map.gridSize) * map.gridSize,
+            map.gridSize, map.gridSize};
+        SDL_RenderFillRect(rend, &rect);
+
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
+    }
+}
+
+void
 Render::renderTilePreview()
 {
     int w, h;

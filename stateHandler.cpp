@@ -198,6 +198,7 @@ StateHandler::stateCreate()
     rend.renderBorders();
     rend.renderTilePreview();
     rend.renderMap();
+    rend.renderTilePlacementBox();
     rend.renderButtons();
     rend.show();
 }
