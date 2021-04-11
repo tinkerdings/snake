@@ -67,23 +67,37 @@ Menu::createButton(
         SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
     }
 
-    SDL_Color colorTxtShadow = {21, 10, 36, 255};
     SDL_Color colorTxtBase = colorTxt;
-    SDL_Surface *surfTxtShadow = TTF_RenderText_Solid(rend.font, txt, colorTxtShadow);
+    SDL_Color colorTxtShadow = {21, 10, 36, 255};
+    SDL_Color colorTxtLight = {90, 14, 194, 255};
     SDL_Surface *surfTxtBase = TTF_RenderText_Solid(rend.font, txt, colorTxtBase);
-    if(!surfTxtBase || !surfTxtShadow)
+    SDL_Surface *surfTxtShadow = TTF_RenderText_Solid(rend.font, txt, colorTxtShadow);
+    SDL_Surface *surfTxtLight = TTF_RenderText_Solid(rend.font, txt, colorTxtLight);
+    if(!surfTxtBase || !surfTxtShadow || !surfTxtLight)
     {
         std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
         return;
     }
     SDL_Rect rectTxtBase = {(button.rect.w/2)-(surfTxtBase->w/2), (button.rect.h/2)-(surfTxtBase->h/2), button.rect.w, button.rect.h};
+
     SDL_Rect rectTxtShadowR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2), button.rect.w, button.rect.h};
     SDL_Rect rectTxtShadowU = {(button.rect.w/2)-(surfTxtShadow->w/2), (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
     SDL_Rect rectTxtShadowUR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowUL = {(button.rect.w/2)-(surfTxtShadow->w/2) - 2, (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+
+    SDL_Rect rectTxtLightL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/2)-(surfTxtLight->h/2), button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightD = {(button.rect.w/2)-(surfTxtLight->w/2), (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightDL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightDR = {(button.rect.w/2)-(surfTxtLight->w/2) + 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
     if(
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightL) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightD) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightDL) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightDR) < 0) ||
             (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowR) < 0) ||
             (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowU) < 0) ||
             (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowUR) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowUL) < 0) ||
             (SDL_BlitSurface(surfTxtBase, NULL, surfButton, &rectTxtBase) < 0))
     {
         std::cerr << "SDL_BlitSurface: " << SDL_GetError() << std::endl;
@@ -103,6 +117,7 @@ Menu::createButton(
 
     SDL_FreeSurface(surfButton);
     SDL_FreeSurface(surfTxtShadow);
+    SDL_FreeSurface(surfTxtLight);
     SDL_FreeSurface(surfTxtBase);
 
     buttons.push_back(button);
