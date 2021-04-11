@@ -25,25 +25,27 @@ class Menu
 {
 public:
     std::vector<Button> buttons;
+    SDL_Texture* btnMenuBig, *btnMenuSmall, *btnEditor;
 
     Menu(const Menu&) = delete;
     static Menu& getSingleton()
     {
         return s_Menu;
     }
-void setButtonColorBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+void setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void createButton(
         std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
-        int x, int y, int w, int h);
+        int x, int y, int w, int h,
+        int emboss);
 Button* checkButtons();
 void buttonCallbackSetBG();
 void clearButtons();
 private:
-    Menu(){}
+    Menu(){};
     static Menu s_Menu;
-    SDL_Color color = {0, 0, 0, 255};
+    SDL_Color colorTint = {0, 0, 0, 64};
     SDL_Color colorTxt = {255, 255, 255, 255};
 };
 

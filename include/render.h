@@ -16,6 +16,8 @@ class Render
 public:
     SDL_Renderer *rend;
     TTF_Font *font = NULL;
+    SDL_Texture *bgUIFramed;
+    SDL_Texture *bgUI;
 
     Render(const Render&) = delete;
     static Render& getSingleton()
@@ -25,7 +27,7 @@ public:
     void init();
     void setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void clear();
-    void renderBG();
+    void renderBG(SDL_Texture *tex);
     void renderSnakes();
     void renderPickups();
     void show();

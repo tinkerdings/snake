@@ -6,12 +6,12 @@
 #include "inputHandler.h"
 
 void
-Menu::setButtonColorBG(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+Menu::setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
-    color.r = r;
-    color.g = g;
-    color.b = b;
-    color.a = a;
+    colorTint.r = r;
+    colorTint.g = g;
+    colorTint.b = b;
+    colorTint.a = a;
 }
 void
 Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
@@ -26,7 +26,8 @@ void
 Menu::createButton(
         std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
-        int x, int y, int w, int h)
+        int x, int y, int w, int h,
+        int emboss)
 {
     Render& rend = Render::getSingleton();
     if(!TTF_WasInit())
@@ -52,16 +53,38 @@ Menu::createButton(
         std::cerr << "SDL_CreateRGBSurface: " << SDL_GetError() << std::endl;
         return;
     }
-    button.color = color;
-    SDL_FillRect(surfButton, NULL, SDL_MapRGBA(surfButton->format, button.color.r, button.color.g, button.color.b, button.color.a));
-    SDL_Surface *surfTxt = TTF_RenderText_Solid(rend.font, txt, colorTxt);
-    if(!surfTxt)
+
+    SDL_FillRect(surfButton, NULL, SDL_MapRGBA(surfButton->format, 48, 6, 105, 255));
+    for(int i = 0; i < emboss; i++)
+    {
+        SDL_Rect shadowL = {i, i, 1, h-i};
+        SDL_Rect shadowB = {emboss, h-i, w-emboss-i, 1};
+        SDL_Rect lightT = {i, i, w-i, 1};
+        SDL_Rect lightR = {w-i, 0, 1, h-i};
+        SDL_FillRect(surfButton, &shadowL, SDL_MapRGBA(surfButton->format, 21, 10, 36, 255));
+        SDL_FillRect(surfButton, &shadowB, SDL_MapRGBA(surfButton->format, 21, 10, 36, 255));
+        SDL_FillRect(surfButton, &lightT, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
+        SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
+    }
+
+    SDL_Color colorTxtShadow = {21, 10, 36, 255};
+    SDL_Color colorTxtBase = colorTxt;
+    SDL_Surface *surfTxtShadow = TTF_RenderText_Solid(rend.font, txt, colorTxtShadow);
+    SDL_Surface *surfTxtBase = TTF_RenderText_Solid(rend.font, txt, colorTxtBase);
+    if(!surfTxtBase || !surfTxtShadow)
     {
         std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
         return;
     }
-    SDL_Rect rectTxt = {(button.rect.w/2)-(surfTxt->w/2), (button.rect.h/2)-(surfTxt->h/2), button.rect.w, button.rect.h};
-    if(SDL_BlitSurface(surfTxt, NULL, surfButton, &rectTxt) < 0)
+    SDL_Rect rectTxtBase = {(button.rect.w/2)-(surfTxtBase->w/2), (button.rect.h/2)-(surfTxtBase->h/2), button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2), button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowU = {(button.rect.w/2)-(surfTxtShadow->w/2), (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowUR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+    if(
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowR) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowU) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowUR) < 0) ||
+            (SDL_BlitSurface(surfTxtBase, NULL, surfButton, &rectTxtBase) < 0))
     {
         std::cerr << "SDL_BlitSurface: " << SDL_GetError() << std::endl;
         return;
@@ -79,7 +102,8 @@ Menu::createButton(
     button.trigger = trigger;
 
     SDL_FreeSurface(surfButton);
-    SDL_FreeSurface(surfTxt);
+    SDL_FreeSurface(surfTxtShadow);
+    SDL_FreeSurface(surfTxtBase);
 
     buttons.push_back(button);
 }

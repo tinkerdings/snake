@@ -44,6 +44,11 @@ Render::init()
             std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
         }
     }
+
+    Menu& menu = Menu::getSingleton();
+    bgUI = createTexture("res/ui-bg-brick.png");
+    bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
+    menu.btnMenuBig = createTexture("res/ui-button-editor-base.png");
 }
 
 SDL_Texture*
@@ -77,7 +82,7 @@ Render::clear()
 }
 
 void
-Render::renderBG()
+Render::renderBG(SDL_Texture *tex)
 {
     int w, h, ww, wh;
     Window& wnd = Window::getSingleton();
@@ -85,7 +90,7 @@ Render::renderBG()
 
     wnd.getSize(ww, wh);
 
-    SDL_QueryTexture(map.bg, NULL, NULL, &w, &h);
+    SDL_QueryTexture(tex, NULL, NULL, &w, &h);
     SDL_Rect out;
 
     for(int y = 0; y < wh; y+=h)
@@ -96,7 +101,7 @@ Render::renderBG()
             out.y = y;
             out.w = w;
             out.h = h;
-            SDL_RenderCopy(rend, map.bg, NULL, &out);
+            SDL_RenderCopy(rend, tex, NULL, &out);
         }
     }
 }
@@ -157,10 +162,10 @@ Render::renderBorders()
     SDL_Rect right = {ww - map.mapX, map.mapY, map.mapX, wh - map.mapY};
     SDL_Rect bottom = {map.mapX, wh - map.mapBottom, map.mapW, map.mapBottom};
 
-    SDL_RenderFillRect(rend, &top);
-    SDL_RenderFillRect(rend, &left);
-    SDL_RenderFillRect(rend, &right);
-    SDL_RenderFillRect(rend, &bottom);
+    SDL_RenderCopy(rend, bgUIFramed, &top, &top);
+    SDL_RenderCopy(rend, bgUIFramed, &left, &left);
+    SDL_RenderCopy(rend, bgUIFramed, &right, &right);
+    SDL_RenderCopy(rend, bgUIFramed, &bottom, &bottom);
 }
 void
 Render::renderScores()

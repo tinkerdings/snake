@@ -61,27 +61,29 @@ StateHandler::stateMenu()
 
     wnd.getSize(ww, wh);
 
-    rend.renderBG();
+    rend.renderBG(rend.bgUI);
 
     if(!menu.buttons.size())
     {
-        menu.setButtonColorBG(64, 64, 255, 255);
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
             "PLAY",
-            ww/2 - 200, 140, 400, 100);
+            ww/2 - 200, 140, 400, 100,
+            10);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "CREATE",
-            ww/2 - 200, 300, 400, 100);
+            ww/2 - 200, 300, 400, 100,
+            10);
 
         menu.createButton(
             std::bind(&Window::quit, &wnd), BRELEASE,
             "QUIT",
-            20, wh - 60, 80, 40);
+            20, wh - 60, 80, 40,
+            5);
     }
 
     rend.renderButtons();
@@ -100,22 +102,23 @@ StateHandler::stateMenuCreate()
     int ww, wh;
     wnd.getSize(ww, wh);
 
-    rend.renderBG();
+    rend.renderBG(rend.bgUI);
 
     if(!menu.buttons.size())
     {
-        menu.setButtonColorBG(64, 64, 255, 255);
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
             "+",
-            ww/2 - 200, 140, 400, 100);
+            ww/2 - 200, 140, 400, 100,
+            10);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
-            ww/2 - 200, 300, 400, 100);
+            ww/2 - 200, 300, 400, 100,
+            10);
     }
     rend.renderButtons();
     input.inputMenu();
@@ -130,6 +133,7 @@ StateHandler::statePlay()
     Game& game = Game::getSingleton();
     InputHandler& input = InputHandler::getSingleton();
     Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
 
     if(!game.started)
 		game.init();
@@ -138,7 +142,7 @@ StateHandler::statePlay()
 
     game.update();
 
-    rend.renderBG();
+    rend.renderBG(map.bg);
 
     rend.renderSnakes();
     rend.renderPickups();
@@ -162,29 +166,31 @@ StateHandler::stateCreate()
 
     if(!menu.buttons.size())
     {
-        menu.setButtonColorBG(64, 64, 255, 255);
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
             std::bind(&Map::saveMap, &map), BRELEASE,
             "SAVE",
-            map.mapX + map.mapW - 80, 30, 80, 40);
+            705, 17, 190, 46,
+            5);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
-            map.mapX, 30, 80, 40);
+            65, 17, 190, 46,
+            5);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Map::resetMap, &map), BRELEASE,
             "CLEAR",
-            ww/2 - 40, 30, 80, 40);
+            ww/2 - 95, 17, 190, 46,
+            5);
     }
 
     input.inputCreate();
 
-    rend.renderBG();
+    rend.renderBG(map.bg);
     rend.renderBorders();
     rend.renderMap();
     rend.renderButtons();
