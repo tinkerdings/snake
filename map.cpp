@@ -7,13 +7,11 @@ void
 Map::loadMap()
 {
     Render& rend = Render::getSingleton();
-    int ww, wh;
-    wnd.getSize(ww, wh);
     bg = rend.createTexture("res/20x20-bg.png");
     texWall = rend.createTexture("res/20x20-0bstacle-2.png");
     texWallCorner = rend.createTexture("res/20x20-obstacle.png");
     pickups.clear();
-    Pickup pickup(ww/2, wh/2 - (3*gridSize), gridSize, gridSize);
+    Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);
 }
 
@@ -21,13 +19,13 @@ void
 Map::setTile(int xPos, int yPos, TileType val)
 {
     if(getTile(xPos, yPos) != val)
-        map[xPos/gridSize][yPos/gridSize] = val;
+        map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
 }
 
 TileType
 Map::getTile(int xPos, int yPos)
 {
-    return map[xPos/gridSize][yPos/gridSize];
+    return map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize];
 }
 
 void

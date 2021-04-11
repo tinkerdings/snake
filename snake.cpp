@@ -6,13 +6,13 @@
 #include "render.h"
 #include "util.h"
 
-Snake::Snake(bool isPlayer, int x, int y)
+Snake::Snake()
 {
-    startX = x;
-    startY = y;
+    Map& map = Map::getSingleton();
+    startX = map.mapX + (map.mapW/2);
+    startY = map.mapY + (map.mapH/2);
     initTextures(0);
-    addSegment();
-    addSegment();
+    addMultipleSegments(2);
     dirX = DIR_NONE;
     dirY = DIR_NONE;
 }
@@ -358,8 +358,8 @@ Snake::checkPickup()
     {
         if((pickup->rect.x == segments[0].rect.x) && (pickup->rect.y == segments[0].rect.y))
         {
-            int x = iRandRange(map.mapX, map.mapX + map.mapW - 1) * map.gridSize;
-            int y = iRandRange(map.mapY, map.mapY + map.mapH - 1) * map.gridSize;
+            int x = (iRandRange(0, map.mapNW - 1) * map.gridSize) + map.mapX; 
+            int y = (iRandRange(0, map.mapNH - 1) * map.gridSize) + map.mapY; 
             pickup->setPosition(x, y);
             addSegment();
 
@@ -385,14 +385,14 @@ Snake::checkCrash()
     wnd.getSize(ww, wh);
 
     // Screenwrap.
-    if (segments[0].rect.x <= map.mapX - map.gridSize)
-        segments[0].rect.x = map.mapX + map.mapW - map.gridSize;
-    if (segments[0].rect.x >= map.mapX + map.mapW)
+    if (segments[0].rect.x <= (map.mapX - map.gridSize))
+        segments[0].rect.x = (map.mapX + map.mapW - map.gridSize);
+    if (segments[0].rect.x >= (map.mapX + map.mapW))
         segments[0].rect.x = map.mapX;
 
-    if (segments[0].rect.y <= map.mapY - map.gridSize)
-        segments[0].rect.y = map.mapY + map.mapH - map.gridSize;
-    if (segments[0].rect.y >= map.mapY + map.mapH)
+    if (segments[0].rect.y <= (map.mapY - map.gridSize))
+        segments[0].rect.y = (map.mapY + map.mapH - map.gridSize);
+    if (segments[0].rect.y >= (map.mapY + map.mapH))
         segments[0].rect.y = map.mapY;
 
     if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)

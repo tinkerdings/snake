@@ -13,7 +13,7 @@ Game::init()
     int ww, wh;
     wnd.getSize(ww, wh);
     snakes.clear();
-    Snake player1 = {true, ww/2, wh/2};
+    Snake player1;
     snakes.push_back(player1);
     map.loadMap();
     started = true;

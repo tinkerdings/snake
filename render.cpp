@@ -80,8 +80,9 @@ void
 Render::renderBG()
 {
     int w, h, ww, wh;
-    Map& map = Map::getSingleton();
     Window& wnd = Window::getSingleton();
+    Map& map = Map::getSingleton();
+
     wnd.getSize(ww, wh);
 
     SDL_QueryTexture(map.bg, NULL, NULL, &w, &h);
@@ -125,6 +126,7 @@ Render::renderPickups()
 void
 Render::renderUI()
 {
+    renderBorders();
     renderScores();
 }
 
@@ -148,6 +150,25 @@ Render::renderButtons()
     }
 }
 
+void
+Render::renderBorders()
+{
+    int ww, wh;
+    Window& wnd = Window::getSingleton();
+    Map& map = Map::getSingleton();
+
+    wnd.getSize(ww, wh);
+    setClear(64, 64, 64, 255);
+    SDL_Rect top = {0, 0, ww, map.mapY};
+    SDL_Rect left = {0, map.mapY, map.mapX, wh - map.mapY};
+    SDL_Rect right = {ww - map.mapX, map.mapY, map.mapX, wh - map.mapY};
+    SDL_Rect bottom = {map.mapX, wh - map.mapBottom, map.mapW, map.mapBottom};
+
+    SDL_RenderFillRect(rend, &top);
+    SDL_RenderFillRect(rend, &left);
+    SDL_RenderFillRect(rend, &right);
+    SDL_RenderFillRect(rend, &bottom);
+}
 void
 Render::renderScores()
 {
@@ -186,8 +207,8 @@ Render::renderMap()
         {
             if(map.map[j][i] == TWALL)
             {
-                texWallRect.x = j * map.gridSize;
-                texWallRect.y = i * map.gridSize;
+                texWallRect.x = (j * map.gridSize) + map.mapX;
+                texWallRect.y = (i * map.gridSize) + map.mapY;
                 SDL_RenderCopy(rend, map.texWall, NULL, &texWallRect);
             }
         }

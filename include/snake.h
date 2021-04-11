@@ -41,7 +41,7 @@ public:
     int score = 0;
     int stepDelay = 100;
 
-    Snake(bool isPlayer, int x, int y);
+    Snake();
     void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
     void setDirection(Dir dir);
     bool dirAvailable(Dir dir);

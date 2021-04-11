@@ -47,6 +47,7 @@ private:
     Window& wnd = Window::getSingleton();
     Map& map = Map::getSingleton();
     void renderScores();
+    void renderBorders();
 };
 
 #endif // RENDER_H

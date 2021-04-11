@@ -26,6 +26,9 @@ public:
     int mapH = MAPH * GRIDSIZE;
     int mapX = 80;
     int mapY = 100;
+    int mapNW = MAPW;
+    int mapNH = MAPH;
+    int mapBottom = 20;
 
     Map(const Map&) = delete;
     static Map& getSingleton()

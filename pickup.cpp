@@ -17,6 +17,7 @@ Pickup::Pickup(int x, int y, int w, int h)
 void
 Pickup::setPosition(int x, int y)
 {
+    Map& map = Map::getSingleton();
     rect.x = x;
     rect.y = y;
 }

@@ -60,7 +60,9 @@ InputHandler::inputCreate()
 
     inputButtons();
 
-    if((e.button.x >= 0) && (e.button.x <= ww) && (e.button.y >= 0) && (e.button.y <= wh))
+    if(
+        (e.button.x > map.mapX) && (e.button.x < (map.mapX + map.mapW)) &&
+        (e.button.y > map.mapY) && (e.button.y < (map.mapY + map.mapH)))
     {
         if(mouseDown(SDL_BUTTON_LEFT))
         {
