@@ -8,8 +8,8 @@ Map::loadMap()
 {
     Render& rend = Render::getSingleton();
     bg = rend.createTexture("res/20x20-bg.png");
-    texWall = rend.createTexture("res/20x20-0bstacle-2.png");
-    texWallCorner = rend.createTexture("res/20x20-obstacle.png");
+    texWall= rend.createTexture("res/20x20-obstacle.png");
+    texWallCorner = rend.createTexture("res/20x20-0bstacle-2.png");
     pickups.clear();
     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);

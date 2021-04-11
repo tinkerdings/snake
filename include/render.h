@@ -19,6 +19,7 @@ public:
     SDL_Texture *bgUIFramed;
     SDL_Texture *bgUI;
     SDL_Texture *logo;
+    SDL_Texture *previewFrame;
 
     Render(const Render&) = delete;
     static Render& getSingleton()
@@ -37,6 +38,7 @@ public:
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void renderButtons();
     void renderMap();
+    void renderTilePreview();
     void renderScores();
     void renderBorders();
     SDL_Texture* createTexture(const char* filename);

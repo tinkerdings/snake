@@ -50,6 +50,7 @@ Render::init()
     logo = createTexture("res/logo.png");
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
+    previewFrame = createTexture("res/tile-preview.png");
     menu.btnMenuBig = createTexture("res/ui-button-editor-base.png");
 }
 
@@ -213,12 +214,34 @@ Render::renderMap()
         {
             if(map.map[j][i] == TWALL)
             {
+                bool corner = false;
+                if(
+                    ((map.map[j-1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                    ((map.map[j-1][i] == TWALL) && (map.map[j][i+1] == TWALL)) ||
+                    ((map.map[j+1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                    ((map.map[j+1][i] == TWALL) && (map.map[j][i+1] == TWALL)))
+                {
+                    corner = true;
+                }
+
                 texWallRect.x = (j * map.gridSize) + map.mapX;
                 texWallRect.y = (i * map.gridSize) + map.mapY;
-                SDL_RenderCopy(rend, map.texWall, NULL, &texWallRect);
+                if(corner)
+                    SDL_RenderCopy(rend, map.texWallCorner, NULL, &texWallRect);
+                else
+                    SDL_RenderCopy(rend, map.texWall, NULL, &texWallRect);
             }
         }
     }
+}
+
+void
+Render::renderTilePreview()
+{
+    int w, h;
+    SDL_QueryTexture(previewFrame, NULL, NULL, &w, &h);
+    SDL_Rect rect = {1, 81, w, h};
+    SDL_RenderCopy(rend, previewFrame, NULL, &rect);
 }
 
 void

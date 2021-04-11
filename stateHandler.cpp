@@ -112,10 +112,11 @@ StateHandler::stateMenuCreate()
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
-            "+",
+            "NEW",
             ww/2 - 200, 140, 400, 100,
             10);
 
+        menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
@@ -176,6 +177,7 @@ StateHandler::stateCreate()
             705, 17, 190, 46,
             5);
 
+        menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
@@ -194,6 +196,7 @@ StateHandler::stateCreate()
 
     rend.renderBG(map.bg);
     rend.renderBorders();
+    rend.renderTilePreview();
     rend.renderMap();
     rend.renderButtons();
     rend.show();

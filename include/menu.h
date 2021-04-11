@@ -18,6 +18,7 @@ struct Button
     SDL_Rect rect;
     SDL_Texture* tex;
     SDL_Color color;
+    SDL_Color tint;
     bool active = false;
 };
 
@@ -32,7 +33,6 @@ public:
     {
         return s_Menu;
     }
-void setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
 void createButton(
         std::function<void()> callback, ButtonTrigger trigger,
@@ -45,7 +45,6 @@ void clearButtons();
 private:
     Menu(){};
     static Menu s_Menu;
-    SDL_Color colorTint = {0, 10, 0, 100};
     SDL_Color colorTxt = {255, 255, 255, 255};
 };
 

@@ -6,14 +6,6 @@
 #include "inputHandler.h"
 
 void
-Menu::setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
-{
-    colorTint.r = r;
-    colorTint.g = g;
-    colorTint.b = b;
-    colorTint.a = a;
-}
-void
 Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     colorTxt.r = r;
