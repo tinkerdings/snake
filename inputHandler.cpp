@@ -11,8 +11,6 @@ InputHandler::commonInput()
 {
     if(e.type == SDL_QUIT)
         wnd.quit();
-    if(keyRelease(SDLK_ESCAPE))
-        wnd.quit();
     updateMouse();
 }
 
@@ -26,7 +24,13 @@ void
 InputHandler::inputPlay()
 {
     Game& game = Game::getSingleton();
+    StateHandler& state = StateHandler::getSingleton();
 
+    if(keyPress(SDLK_ESCAPE))
+    {
+        state.setState(MENU);
+        return;
+    }
     if(keyPress(SDLK_UP) || keyPress(SDLK_w))
     {
         if(game.snakes[0].dirAvailable(DIR_UP))

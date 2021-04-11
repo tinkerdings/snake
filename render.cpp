@@ -124,13 +124,6 @@ Render::renderPickups()
 }
 
 void
-Render::renderUI()
-{
-    renderBorders();
-    renderScores();
-}
-
-void
 Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     SDL_Color color = {r, g, b, a};

@@ -142,7 +142,8 @@ StateHandler::statePlay()
 
     rend.renderSnakes();
     rend.renderPickups();
-    rend.renderUI();
+    rend.renderBorders();
+    rend.renderScores();
 
     rend.show();
 }
@@ -167,23 +168,24 @@ StateHandler::stateCreate()
         menu.createButton(
             std::bind(&Map::saveMap, &map), BRELEASE,
             "SAVE",
-            ww - 100, wh - 60, 80, 40);
+            map.mapX + map.mapW - 80, 30, 80, 40);
 
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
-            20, wh - 60, 80, 40);
+            map.mapX, 30, 80, 40);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Map::resetMap, &map), BRELEASE,
             "CLEAR",
-            ww/2 - 40, wh - 60, 80, 40);
+            ww/2 - 40, 30, 80, 40);
     }
 
     input.inputCreate();
 
     rend.renderBG();
+    rend.renderBorders();
     rend.renderMap();
     rend.renderButtons();
     rend.show();

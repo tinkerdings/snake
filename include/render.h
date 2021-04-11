@@ -28,12 +28,13 @@ public:
     void renderBG();
     void renderSnakes();
     void renderPickups();
-    void renderUI();
     void show();
     void renderText(Text *tex, int x, int y, int w, int h);
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void renderButtons();
     void renderMap();
+    void renderScores();
+    void renderBorders();
     SDL_Texture* createTexture(const char* filename);
 
 private:
@@ -46,8 +47,6 @@ private:
 
     Window& wnd = Window::getSingleton();
     Map& map = Map::getSingleton();
-    void renderScores();
-    void renderBorders();
 };
 
 #endif // RENDER_H
