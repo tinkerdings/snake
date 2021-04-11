@@ -66,26 +66,28 @@ StateHandler::stateMenu()
     if(!menu.buttons.size())
     {
         menu.setButtonColorTxt(0, 255, 64, 255);
-
         menu.createButton(
             std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
             "PLAY",
-            ww/2 - 200, 140, 400, 100,
+            ww/2 - 200, 240, 400, 100,
             10);
 
+        menu.setButtonColorTxt(64, 128, 255, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "CREATE",
-            ww/2 - 200, 300, 400, 100,
+            ww/2 - 200, 400, 400, 100,
             10);
 
+        menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Window::quit, &wnd), BRELEASE,
             "QUIT",
-            20, wh - 60, 80, 40,
-            5);
+            ww/2 - 200, 560, 400, 100,
+            10);
     }
 
+    rend.renderLogo();
     rend.renderButtons();
     input.inputMenu();
     rend.show();

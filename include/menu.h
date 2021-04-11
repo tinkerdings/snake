@@ -45,7 +45,7 @@ void clearButtons();
 private:
     Menu(){};
     static Menu s_Menu;
-    SDL_Color colorTint = {0, 0, 0, 64};
+    SDL_Color colorTint = {0, 10, 0, 100};
     SDL_Color colorTxt = {255, 255, 255, 255};
 };
 

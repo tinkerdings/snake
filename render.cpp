@@ -46,6 +46,8 @@ Render::init()
     }
 
     Menu& menu = Menu::getSingleton();
+
+    logo = createTexture("res/logo.png");
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
     menu.btnMenuBig = createTexture("res/ui-button-editor-base.png");
@@ -104,6 +106,12 @@ Render::renderBG(SDL_Texture *tex)
             SDL_RenderCopy(rend, tex, NULL, &out);
         }
     }
+}
+
+void
+Render::renderLogo()
+{
+    SDL_RenderCopy(rend, logo, NULL, NULL);
 }
 
 void

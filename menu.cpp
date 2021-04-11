@@ -54,17 +54,17 @@ Menu::createButton(
         return;
     }
 
-    SDL_FillRect(surfButton, NULL, SDL_MapRGBA(surfButton->format, 48, 6, 105, 255));
+    SDL_FillRect(surfButton, NULL, SDL_MapRGBA(surfButton->format, 96, 96, 96, 255));
     for(int i = 0; i < emboss; i++)
     {
         SDL_Rect shadowL = {i, i, 1, h-i};
         SDL_Rect shadowB = {emboss, h-i, w-emboss-i, 1};
         SDL_Rect lightT = {i, i, w-i, 1};
         SDL_Rect lightR = {w-i, 0, 1, h-i};
-        SDL_FillRect(surfButton, &shadowL, SDL_MapRGBA(surfButton->format, 21, 10, 36, 255));
-        SDL_FillRect(surfButton, &shadowB, SDL_MapRGBA(surfButton->format, 21, 10, 36, 255));
-        SDL_FillRect(surfButton, &lightT, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
-        SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
+        SDL_FillRect(surfButton, &shadowL, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+        SDL_FillRect(surfButton, &shadowB, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+        SDL_FillRect(surfButton, &lightT, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
+        SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
     }
 
     SDL_Color colorTxtBase = colorTxt;
