@@ -61,7 +61,6 @@ StateHandler::stateMenu()
 
     wnd.getSize(ww, wh);
 
-    rend.renderBG(rend.bgUI);
 
     if(!menu.buttons.size())
     {
@@ -87,11 +86,18 @@ StateHandler::stateMenu()
             10);
     }
 
-    rend.renderLogo();
-    rend.renderButtons();
-    input.inputMenu();
-    rend.show();
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
 
+        rend.renderBG(rend.bgUI);
+        rend.renderLogo();
+        rend.renderButtons();
+        rend.show();
+    }
+
+    input.inputMenu();
 }
 
 void
@@ -104,7 +110,6 @@ StateHandler::stateMenuCreate()
     int ww, wh;
     wnd.getSize(ww, wh);
 
-    rend.renderBG(rend.bgUI);
 
     if(!menu.buttons.size())
     {
@@ -123,10 +128,20 @@ StateHandler::stateMenuCreate()
             ww/2 - 200, 300, 400, 100,
             10);
     }
-    rend.renderButtons();
-    input.inputMenu();
 
-    rend.show();
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
+
+        rend.renderBG(rend.bgUI);
+
+        rend.renderButtons();
+
+        rend.show();
+    }
+
+    input.inputMenu();
 }
 
 void
@@ -141,18 +156,24 @@ StateHandler::statePlay()
     if(!game.started)
 		game.init();
     
-    input.inputPlay();
-
     game.update();
 
-    rend.renderBG(map.bg);
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
 
-    rend.renderSnakes();
-    rend.renderPickups();
-    rend.renderBorders();
-    rend.renderScores();
+        rend.renderBG(map.bg);
 
-    rend.show();
+        rend.renderSnakes();
+        rend.renderPickups();
+        rend.renderBorders();
+        rend.renderScores();
+
+        rend.show();
+    }
+
+    input.inputPlay();
 }
 
 void
@@ -192,15 +213,23 @@ StateHandler::stateCreate()
             5);
     }
 
-    input.inputCreate();
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
 
-    rend.renderBG(map.bg);
-    rend.renderBorders();
-    rend.renderTilePreview();
-    rend.renderMap();
-    rend.renderTilePlacementBox();
-    rend.renderButtons();
-    rend.show();
+        rend.renderBG(map.bg);
+
+        rend.renderBorders();
+        rend.renderTilePreview();
+        rend.renderMap();
+        rend.renderTilePlacementBox();
+        rend.renderButtons();
+
+        rend.show();
+    }
+
+    input.inputCreate();
 }
 
 void

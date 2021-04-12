@@ -5,6 +5,8 @@
 #include "render.h"
 #include "inputHandler.h"
 
+Menu Menu::s_Menu;
+
 void
 Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
@@ -13,7 +15,16 @@ Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsig
     colorTxt.b = b;
     colorTxt.a = a;
 }
-Menu Menu::s_Menu;
+
+void
+Menu::setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    colorTint.r = r;
+    colorTint.g = g;
+    colorTint.b = b;
+    colorTint.a = a;
+}
+
 void
 Menu::createButton(
         std::function<void()> callback, ButtonTrigger trigger,

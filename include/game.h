@@ -1,11 +1,12 @@
 #ifndef GAME_H
 #define GAME_H
 
+#define FPS 60
+
 #include <vector>
 #include "snake.h"
 #include "window.h"
 #include "pickup.h"
-
 
 class Game
 {

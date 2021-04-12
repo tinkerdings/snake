@@ -21,6 +21,8 @@ public:
 
 private:
     State current;
+    unsigned int timePrev = 0;
+    unsigned int timeNow;
 
     StateHandler(){}
     static StateHandler s_StateHandler;
