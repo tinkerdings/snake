@@ -96,14 +96,16 @@ InputHandler::inputCreate()
         {
             map.setTile(e.button.x, e.button.y, TEMPTY);
         }
-    }
-    if(mouseScroll(SCROLLUP))
-    {
-        map.nextEditorTile();
-    }
-    if(mouseScroll(SCROLLDOWN))
-    {
-        map.prevEditorTile();
+        if(mouseScroll(SCROLLUP))
+        {
+            std::cout << "scrollup" << std::endl;
+            map.editorActiveTile++;
+        }
+        if(mouseScroll(SCROLLDOWN))
+        {
+            std::cout << "scrollup" << std::endl;
+            map.editorActiveTile--;
+        }
     }
 }
 
@@ -167,11 +169,6 @@ InputHandler::keyRelease(int sdlKeycode)
 void
 InputHandler::updateMouse()
 {
-    static int i = 0;
-    scrollDown[0] = scrollDown[1];
-    scrollUp[0] = scrollUp[1];
-    scrollUp[1] = false;
-    scrollDown[1] = false;
     switch(e.type)
     {
     case(SDL_MOUSEBUTTONDOWN):
@@ -214,19 +211,17 @@ InputHandler::updateMouse()
     }
     case(SDL_MOUSEWHEEL):
     {
-        if(e.wheel.y > 0)
+        if(e.wheel.y > 100)
         {
-            scrollUp[1] = true;
+            std::cout << "wheel up" << std::endl;
         }
-        if(e.wheel.y < 0)
+        if(e.wheel.y < -100)
         {
-            scrollDown[1] = true;
+            std::cout << "wheel down" << std::endl;
         }
-        e.wheel.y = 0;
         break;
     }
     }
-
 }
 bool
 InputHandler::mousePress(int sdlMousecode)
@@ -310,11 +305,11 @@ InputHandler::mouseScroll(Mscroll scroll)
     {
     case(SCROLLUP):
     {
-        return (scrollUp[1] && !scrollUp[0]);
+        return ((e.type == SDL_MOUSEWHEEL) && (e.wheel.y > 0));
     }
     case(SCROLLDOWN):
     {
-        return (scrollDown[1] && !scrollDown[0]);
+        return ((e.type == SDL_MOUSEWHEEL) && (e.wheel.y < 0));
     }
     }
 

@@ -11,7 +11,7 @@
 
 enum TileType
 {
-    TEMPTY, TPICKUP, TWALL, TSNAKE
+    TEMPTY, TPICKUP, TWALL, TSNAKE, TP1START, TP2START
 };
 
 class Map
@@ -22,6 +22,7 @@ public:
     TileType map[MAPW][MAPH] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
+    SDL_Texture *texP1Start, *texP2Start;
     int mapW = MAPW * GRIDSIZE;
     int mapH = MAPH * GRIDSIZE;
     int mapX = 80;
@@ -29,6 +30,12 @@ public:
     int mapNW = MAPW;
     int mapNH = MAPH;
     int mapBottom = 20;
+
+    int editorTileIndex = 0;
+    std::vector<TileType> editorTiles = {
+        TWALL, TP1START, TP2START
+    };
+    TileType editorActiveTile = editorTiles[editorTileIndex];
 
     Map(const Map&) = delete;
     static Map& getSingleton()
@@ -40,13 +47,15 @@ public:
     void setTile(int xPos, int yPos, TileType val);
     void resetMap();
     void saveMap();
+    void nextEditorTile();
+    void prevEditorTile();
     TileType getTile(int xPos, int yPos);
 
 private:
     static Map s_Map;
     Window& wnd = Window::getSingleton();
 
-    Map(){}
+    Map(){editorActiveTile = TWALL;}
 };
 
 #endif // MAP_H

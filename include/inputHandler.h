@@ -5,6 +5,10 @@
 #include <SDL.h>
 #include "window.h"
 
+enum Mscroll
+{
+    SCROLLUP, SCROLLDOWN
+};
 struct MouseState
 {
     bool prevDown = false;
@@ -35,9 +39,12 @@ public:
     bool mousePress(int sdlMousecode);
     bool mouseDown(int sdlMousecode);
     bool mouseRelease(int sdlMousecode);
+    bool mouseScroll(Mscroll scroll);
 private:
     InputHandler(){}
     static InputHandler s_InputHandler;
+    bool scrollUp[2] = {0};
+    bool scrollDown[2] = {0};
     Window& wnd = Window::getSingleton();
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
     MouseState mouseButton[2] = {0};

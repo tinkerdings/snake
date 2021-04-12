@@ -259,10 +259,39 @@ Render::renderTilePlacementBox()
 void
 Render::renderTilePreview()
 {
+    Map& map = Map::getSingleton();
     int w, h;
+    int previewBoxX = 1;
+    int previewBoxY = 81;
+
     SDL_QueryTexture(previewFrame, NULL, NULL, &w, &h);
-    SDL_Rect rect = {1, 81, w, h};
-    SDL_RenderCopy(rend, previewFrame, NULL, &rect);
+    SDL_Rect rectPreviewBox = {previewBoxX, previewBoxY, w, h};
+    SDL_RenderCopy(rend, previewFrame, NULL, &rectPreviewBox);
+
+    switch(map.editorActiveTile)
+    {
+    case(TWALL):
+    {
+        SDL_QueryTexture(map.texWall, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texWall, NULL, &rectPreviewTile);
+        break;
+    }
+    case(TP1START):
+    {
+        SDL_QueryTexture(map.texP1Start, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texP1Start, NULL, &rectPreviewTile);
+        break;
+    }
+    case(TP2START):
+    {
+        SDL_QueryTexture(map.texP2Start, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texP2Start, NULL, &rectPreviewTile);
+        break;
+    }
+    }
 }
 
 void
