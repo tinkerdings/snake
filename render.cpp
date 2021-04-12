@@ -240,16 +240,66 @@ Render::renderTilePlacementBox()
 {
     Map& map = Map::getSingleton();
     InputHandler& input = InputHandler::getSingleton();
+    SDL_Rect rect;
 
-    if(((input.e.button.x >= map.mapX) && (input.e.button.x < map.mapX + map.mapW)) &&
-        ((input.e.button.y >= map.mapY) && (input.e.button.y < map.mapY + map.mapH)))
+    if(((input.mouseX >= map.mapX) && (input.mouseX < map.mapX + map.mapW)) &&
+        ((input.mouseY >= map.mapY) && (input.mouseY < map.mapY + map.mapH)))
     {
-        setClear(64, 255, 64, 64);
+        if(map.editorValidPlacement)
+            setClear(64, 255, 64, 64);
+        else
+            setClear(255, 64, 64, 64);
+
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
-        SDL_Rect rect = {
-            (input.e.button.x / map.gridSize) * map.gridSize,
-            (input.e.button.y / map.gridSize) * map.gridSize,
-            map.gridSize, map.gridSize};
+        if((map.editorActiveTile == TP1START) || (map.editorActiveTile == TP2START))
+        {
+            switch(map.editorRotation)
+            {
+            case(0):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = map.gridSize;
+                rect.h = 2*map.gridSize;
+
+                break;
+            }
+            case(90):
+            {
+                rect.x = ((input.mouseX / map.gridSize) * map.gridSize) - map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = 2*map.gridSize;
+                rect.h = map.gridSize;
+
+                break;
+            }
+            case(180):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = ((input.mouseY / map.gridSize) * map.gridSize) - map.gridSize;
+                rect.w = map.gridSize;
+                rect.h = 2*map.gridSize;
+
+                break;
+            }
+            case(270):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = 2*map.gridSize;
+                rect.h = map.gridSize;
+
+                break;
+            }
+            }
+        }
+        else
+        {
+            rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+            rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+            rect.w = map.gridSize;
+            rect.h = map.gridSize;
+        }
         SDL_RenderFillRect(rend, &rect);
 
         SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);

@@ -65,9 +65,19 @@ InputHandler::inputCreate()
     inputButtons();
 
     if(
-        (e.button.x > map.mapX) && (e.button.x < (map.mapX + map.mapW)) &&
-        (e.button.y > map.mapY) && (e.button.y < (map.mapY + map.mapH)))
+        (mouseX > map.mapX) && (mouseX < (map.mapX + map.mapW)) &&
+        (mouseY > map.mapY) && (mouseY < (map.mapY + map.mapH)))
     {
+        map.editorValidPlacement = true;
+        if((mouseY >= map.mapY+map.mapH-map.gridSize) && map.editorRotation == 0)
+            map.editorValidPlacement = false;
+        if((mouseX < map.mapX+map.gridSize) && map.editorRotation == 90)
+            map.editorValidPlacement = false;
+        if((mouseY < map.mapY+map.gridSize) && map.editorRotation == 180)
+            map.editorValidPlacement = false;
+        if((mouseX >= map.mapX+map.mapW-map.gridSize) && map.editorRotation == 270)
+            map.editorValidPlacement = false;
+
         if(mouseDown(SDL_BUTTON_LEFT))
         {
             switch(map.editorActiveTile)
@@ -97,6 +107,10 @@ InputHandler::inputCreate()
             map.setTile(e.button.x, e.button.y, TEMPTY);
         }
     }
+    else
+    {
+        map.editorValidPlacement = false;
+    }
     if(mouseScroll(SCROLLUP))
     {
         map.nextEditorTile();
@@ -104,6 +118,10 @@ InputHandler::inputCreate()
     if(mouseScroll(SCROLLDOWN))
     {
         map.prevEditorTile();
+    }
+    if(keyPress(SDLK_r))
+    {
+        map.editorRotate();
     }
 }
 
@@ -167,11 +185,22 @@ InputHandler::keyRelease(int sdlKeycode)
 void
 InputHandler::updateMouse()
 {
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
     static int i = 0;
+    wnd.getSize(ww, wh);
+
     scrollDown[0] = scrollDown[1];
     scrollUp[0] = scrollUp[1];
     scrollUp[1] = false;
     scrollDown[1] = false;
+
+    if((e.type == SDL_MOUSEMOTION))
+    {
+        mouseX = e.button.x;
+        mouseY = e.button.y;
+    }
+
     switch(e.type)
     {
     case(SDL_MOUSEBUTTONDOWN):

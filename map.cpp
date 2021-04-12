@@ -50,6 +50,14 @@ Map::prevEditorTile()
 }
 
 void
+Map::editorRotate()
+{
+    editorRotation+=90;
+    if(editorRotation == 360)
+        editorRotation = 0;
+}
+
+void
 Map::resetMap()
 {
     for(int i = 0; i < MAPH; i++)

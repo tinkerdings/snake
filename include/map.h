@@ -36,6 +36,8 @@ public:
         TWALL, TP1START, TP2START
     };
     TileType editorActiveTile = editorTiles[editorTileIndex];
+    int editorRotation = 0;
+    bool editorValidPlacement = true;
 
     Map(const Map&) = delete;
     static Map& getSingleton()
@@ -49,6 +51,7 @@ public:
     void saveMap();
     void nextEditorTile();
     void prevEditorTile();
+    void editorRotate();
     TileType getTile(int xPos, int yPos);
 
 private:

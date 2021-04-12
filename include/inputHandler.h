@@ -40,15 +40,16 @@ public:
     bool mouseDown(int sdlMousecode);
     bool mouseRelease(int sdlMousecode);
     bool mouseScroll(Mscroll scroll);
+    int mouseX = 0;
+    int mouseY = 0;
 private:
     InputHandler(){}
     static InputHandler s_InputHandler;
-    bool scrollUp[2] = {0};
-    bool scrollDown[2] = {0};
     Window& wnd = Window::getSingleton();
     const Uint8 *keyboardState = SDL_GetKeyboardState(NULL);
     MouseState mouseButton[2] = {0};
-
+    bool scrollUp[2] = {0};
+    bool scrollDown[2] = {0};
 };
 
 #endif // INPUTHANDLER_H
