@@ -1,4 +1,7 @@
 #include <iostream>
+#include <string>
+#include <sstream>
+#include <fstream>
 #include "map.h"
 #include "render.h"
 
@@ -9,13 +12,13 @@ void
 Map::loadMap()
 {
     Render& rend = Render::getSingleton();
-    bg = rend.createTexture("res/20x20-bg.png");
-    texWall= rend.createTexture("res/20x20-obstacle.png");
-    texWallCorner = rend.createTexture("res/20x20-0bstacle-2.png");
-    texP1Head = rend.createTexture("res/20x20-head.png");
-    texP1Tail = rend.createTexture("res/20x20-tail.png");
-    texP2Head = rend.createTexture("res/20x20-head-3.png");
-    texP2Tail = rend.createTexture("res/20x20-tail-3.png");
+    bg              = rend.createTexture("res/20x20-bg.png");
+    texWall         = rend.createTexture("res/20x20-obstacle.png");
+    texWallCorner   = rend.createTexture("res/20x20-0bstacle-2.png");
+    texP1Head       = rend.createTexture("res/20x20-head.png");
+    texP1Tail       = rend.createTexture("res/20x20-tail.png");
+    texP2Head       = rend.createTexture("res/20x20-head-3.png");
+    texP2Tail       = rend.createTexture("res/20x20-tail-3.png");
     pickups.clear();
     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);
@@ -24,6 +27,9 @@ Map::loadMap()
 void
 Map::setTile(int xPos, int yPos, TileType val)
 {
+    // in GAME
+
+    // can only place one of each player.
     if(val == TEMPTY)
     {
         if((((xPos - mapX)/gridSize) == editorP1HeadStartX) && (((yPos - mapY)/gridSize) == editorP1HeadStartY) ||
@@ -48,7 +54,7 @@ Map::setTile(int xPos, int yPos, TileType val)
         map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
     }
 
-    // EDITOR
+    // in EDITOR
     if((editorValidPlacement) && (getTile(xPos, yPos) != val))
     {
         switch(val)
@@ -202,7 +208,69 @@ Map::resetMap()
 }
 
 void
-Map::saveMap()
+Map::saveMap(std::string mapName)
 {
-    std::cout << "Map saved!" << std::endl;
+    std::stringstream ss;
+    ss << mapName << ".map";
+    std::string filename = ss.str();
+
+    std::ofstream file(filename);
+    if(!file)
+    {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
+    }
+
+    std::stringstream saveStream;
+    for(int i = 0; i < MAPH; i++)
+    {
+        for(int j = 0; j < MAPW; j++)
+        {
+            switch(map[j][i])
+            {
+            case(TEMPTY):
+            {
+                saveStream << "0";
+                break;
+            }
+            case(TWALL):
+            {
+                saveStream << "#";
+                break;
+            }
+            case(TP1HEAD):
+            {
+                saveStream << "H";
+                break;
+            }
+            case(TP1TAIL):
+            {
+                saveStream << "T";
+                break;
+            }
+            case(TP2HEAD):
+            {
+                saveStream << "h";
+                break;
+            }
+            case(TP2TAIL):
+            {
+                saveStream << "t";
+                break;
+            }
+            default:
+            {
+                saveStream << "?";
+                break;
+            }
+            }
+        }
+        saveStream << "\n";
+    }
+    saveStream << "\0";
+    
+    std::string saveString = saveStream.str();
+
+    file << saveString;
+    file.close();
 }

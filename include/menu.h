@@ -39,7 +39,8 @@ void createButton(
         std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
         int x, int y, int w, int h,
-        int emboss);
+        int emboss,
+        bool isInputBox);
 Button* checkButtons();
 void buttonCallbackSetBG();
 void clearButtons();

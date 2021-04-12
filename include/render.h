@@ -16,6 +16,8 @@ class Render
 public:
     SDL_Renderer *rend;
     TTF_Font *font = NULL;
+    TTF_Font *fontInput = NULL;
+    SDL_Texture *alphabet[26];
     SDL_Texture *bgUIFramed;
     SDL_Texture *bgUI;
     SDL_Texture *logo;

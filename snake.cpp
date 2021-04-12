@@ -42,7 +42,7 @@ Snake::addSegment()
             currentTail->tex = texBody;
         segments.push_back(segment);
     }
-    map.setTile(segment.rect.x, segment.rect.y, TSNAKE);
+//     map.setTile(segment.rect.x, segment.rect.y, TSNAKE);
 }
 
 void

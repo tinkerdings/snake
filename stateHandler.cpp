@@ -69,21 +69,21 @@ StateHandler::stateMenu()
             std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
             "PLAY",
             ww/2 - 200, 240, 400, 100,
-            10);
+            10, false);
 
         menu.setButtonColorTxt(64, 128, 255, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "CREATE",
             ww/2 - 200, 400, 400, 100,
-            10);
+            10, false);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Window::quit, &wnd), BRELEASE,
             "QUIT",
             ww/2 - 200, 560, 400, 100,
-            10);
+            10, false);
     }
 
     timeNow = SDL_GetTicks();
@@ -119,14 +119,14 @@ StateHandler::stateMenuCreate()
             std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
             "NEW",
             ww/2 - 200, 140, 400, 100,
-            10);
+            10, false);
 
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
             ww/2 - 200, 300, 400, 100,
-            10);
+            10, false);
     }
 
     timeNow = SDL_GetTicks();
@@ -193,24 +193,24 @@ StateHandler::stateCreate()
         menu.setButtonColorTxt(0, 255, 64, 255);
 
         menu.createButton(
-            std::bind(&Map::saveMap, &map), BRELEASE,
+            std::bind(&Map::saveMap, &map, map.currentMapName), BRELEASE,
             "SAVE",
             705, 17, 190, 46,
-            5);
+            5, false);
 
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
             65, 17, 190, 46,
-            5);
+            5, false);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Map::resetMap, &map), BRELEASE,
             "CLEAR",
             ww/2 - 95, 17, 190, 46,
-            5);
+            5, false);
     }
 
     timeNow = SDL_GetTicks();

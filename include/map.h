@@ -6,6 +6,7 @@
 #define MAPH 30
 
 #include <vector>
+#include <string>
 #include "pickup.h"
 #include "window.h"
 
@@ -46,6 +47,7 @@ public:
     int editorP2TailStartX = -1;
     int editorP2HeadStartY = -1;
     int editorP2TailStartY = -1;
+    std::string currentMapName = "test";
 
     Map(const Map&) = delete;
     static Map& getSingleton()
@@ -56,7 +58,7 @@ public:
     void loadMap();
     void setTile(int xPos, int yPos, TileType val);
     void resetMap();
-    void saveMap();
+    void saveMap(std::string mapName);
     void nextEditorTile();
     void prevEditorTile();
     void editorRotate();

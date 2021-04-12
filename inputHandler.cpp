@@ -65,18 +65,21 @@ InputHandler::inputCreate()
     inputButtons();
 
     if(
-        (mouseX > map.mapX) && (mouseX < (map.mapX + map.mapW)) &&
-        (mouseY > map.mapY) && (mouseY < (map.mapY + map.mapH)))
+        (mouseX >= map.mapX) && (mouseX < (map.mapX + map.mapW)) &&
+        (mouseY >= map.mapY) && (mouseY < (map.mapY + map.mapH)))
     {
         map.editorValidPlacement = true;
-        if((mouseY >= map.mapY+map.mapH-map.gridSize) && map.editorRotation == 0)
-            map.editorValidPlacement = false;
-        if((mouseX < map.mapX+map.gridSize) && map.editorRotation == 90)
-            map.editorValidPlacement = false;
-        if((mouseY < map.mapY+map.gridSize) && map.editorRotation == 180)
-            map.editorValidPlacement = false;
-        if((mouseX >= map.mapX+map.mapW-map.gridSize) && map.editorRotation == 270)
-            map.editorValidPlacement = false;
+        if((map.editorActiveTile == TP1START) || (map.editorActiveTile == TP2START))
+        {
+            if((mouseY >= map.mapY+map.mapH-map.gridSize) && map.editorRotation == 0)
+                map.editorValidPlacement = false;
+            if((mouseX < map.mapX+map.gridSize) && map.editorRotation == 90)
+                map.editorValidPlacement = false;
+            if((mouseY < map.mapY+map.gridSize) && map.editorRotation == 180)
+                map.editorValidPlacement = false;
+            if((mouseX >= map.mapX+map.mapW-map.gridSize) && map.editorRotation == 270)
+                map.editorValidPlacement = false;
+        }
 
         if(mouseDown(SDL_BUTTON_LEFT))
         {

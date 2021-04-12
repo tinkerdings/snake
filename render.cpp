@@ -39,7 +39,8 @@ Render::init()
             std::exit(1);
         }
         font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
-        if(!font)
+        fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 16);
+        if(!font || !fontInput)
         {
             std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
         }
