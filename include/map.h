@@ -11,7 +11,7 @@
 
 enum TileType
 {
-    TEMPTY, TPICKUP, TWALL, TSNAKE, TP1START, TP2START
+    TEMPTY, TPICKUP, TWALL, TSNAKE, TP1START, TP2START, TP1HEAD, TP1TAIL, TP2HEAD, TP2TAIL
 };
 
 class Map
@@ -22,7 +22,7 @@ public:
     TileType map[MAPW][MAPH] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
-    SDL_Texture *texP1Start, *texP2Start;
+    SDL_Texture *texP1Head, *texP1Tail, *texP2Head, *texP2Tail;
     int mapW = MAPW * GRIDSIZE;
     int mapH = MAPH * GRIDSIZE;
     int mapX = 80;
@@ -38,6 +38,14 @@ public:
     TileType editorActiveTile = editorTiles[editorTileIndex];
     int editorRotation = 0;
     bool editorValidPlacement = true;
+    int editorP1HeadStartX = -1;
+    int editorP1TailStartX = -1;
+    int editorP1HeadStartY = -1;
+    int editorP1TailStartY = -1;
+    int editorP2HeadStartX = -1;
+    int editorP2TailStartX = -1;
+    int editorP2HeadStartY = -1;
+    int editorP2TailStartY = -1;
 
     Map(const Map&) = delete;
     static Map& getSingleton()

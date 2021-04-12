@@ -1,0 +1,1869 @@
+#include "game.h"
+#include <iostream>
+#include <functional>
+#include "menu.h"
+#include "render.h"
+
+Game Game::s_Game;
+void
+Game::init()
+{
+    Menu& menu = Menu::getSingleton();
+    Render& rend = Render::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
+    snakes.clear();
+    Snake player1;
+    snakes.push_back(player1);
+    map.loadMap();
+    started = true;
+}
+
+void
+Game::restart()
+{
+    if (snakes.size())
+        snakes.clear();
+    init();
+}
+
+void
+Game::update()
+{
+    currentTime = SDL_GetTicks();
+    for(auto snake = snakes.begin(); snake != snakes.end(); snake++)
+    {
+        if(currentTime > lastTime + snake->stepDelay)
+        {
+            snake->update();
+            lastTime = currentTime;
+        }
+//         snake->updateNeighbors();
+//         snake->updateTextures();
+    }
+}
+#include "inputHandler.h"
+#include <iostream>
+#include <cstdio>
+#include "game.h"
+#include "menu.h"
+
+InputHandler InputHandler::s_InputHandler;
+
+void
+InputHandler::commonInput()
+{
+    if(e.type == SDL_QUIT)
+        wnd.quit();
+    updateMouse();
+}
+
+void
+InputHandler::pollInput()
+{
+    SDL_PollEvent(&e);
+}
+
+void
+InputHandler::inputPlay()
+{
+    Game& game = Game::getSingleton();
+    StateHandler& state = StateHandler::getSingleton();
+
+    if(keyPress(SDLK_ESCAPE))
+    {
+        state.setState(MENU);
+        return;
+    }
+    if(keyPress(SDLK_UP) || keyPress(SDLK_w))
+    {
+        if(game.snakes[0].dirAvailable(DIR_UP))
+			game.snakes[0].setDirection(DIR_UP);
+    }
+    if(keyPress(SDLK_DOWN) || keyPress(SDLK_s))
+    {
+        if(game.snakes[0].dirAvailable(DIR_DOWN))
+			game.snakes[0].setDirection(DIR_DOWN);
+    }
+    if(keyPress(SDLK_LEFT) || keyPress(SDLK_a))
+    {
+        if(game.snakes[0].dirAvailable(DIR_LEFT))
+			game.snakes[0].setDirection(DIR_LEFT);
+    }
+    if(keyPress(SDLK_RIGHT) || keyPress(SDLK_d))
+    {
+        if(game.snakes[0].dirAvailable(DIR_RIGHT))
+			game.snakes[0].setDirection(DIR_RIGHT);
+    }
+}
+
+void
+InputHandler::inputCreate()
+{
+    Map& map = Map::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
+
+    inputButtons();
+
+    if(
+        (mouseX > map.mapX) && (mouseX < (map.mapX + map.mapW)) &&
+        (mouseY > map.mapY) && (mouseY < (map.mapY + map.mapH)))
+    {
+        map.editorValidPlacement = true;
+        if((mouseY >= map.mapY+map.mapH-map.gridSize) && map.editorRotation == 0)
+            map.editorValidPlacement = false;
+        if((mouseX < map.mapX+map.gridSize) && map.editorRotation == 90)
+            map.editorValidPlacement = false;
+        if((mouseY < map.mapY+map.gridSize) && map.editorRotation == 180)
+            map.editorValidPlacement = false;
+        if((mouseX >= map.mapX+map.mapW-map.gridSize) && map.editorRotation == 270)
+            map.editorValidPlacement = false;
+
+        if(mouseDown(SDL_BUTTON_LEFT))
+        {
+            switch(map.editorActiveTile)
+            {
+            case(TWALL):
+            {
+                map.setTile(mouseX, mouseY, TWALL);
+
+                break;
+            }
+            case(TP1START):
+            {
+                map.setTile(mouseX, mouseY, TP1START);
+
+                break;
+            }
+            case(TP2START):
+            {
+                map.setTile(mouseX, mouseY, TP2START);
+
+                break;
+            }
+            }
+        }
+        if(mouseDown(SDL_BUTTON_RIGHT))
+        {
+            map.setTile(mouseX, mouseY, TEMPTY);
+        }
+    }
+    else
+    {
+        map.editorValidPlacement = false;
+    }
+    if(mouseScroll(SCROLLUP))
+    {
+        map.nextEditorTile();
+    }
+    if(mouseScroll(SCROLLDOWN))
+    {
+        map.prevEditorTile();
+    }
+    if(keyPress(SDLK_r))
+    {
+        map.editorRotate();
+    }
+}
+
+void
+InputHandler::inputMenu()
+{
+    inputButtons();
+}
+
+void
+InputHandler::inputButtons()
+{
+    Menu& menu = Menu::getSingleton();
+    static Button *button = NULL;
+    if(mousePress(SDL_BUTTON_LEFT))
+    {
+        if((button = menu.checkButtons()))
+        {
+            if(button->trigger == BPRESS)
+            {
+                button->clickFunction();
+            }
+            else
+            {
+                button->active = true;
+            }
+        }
+    }
+    if(mouseRelease(SDL_BUTTON_LEFT))
+    {
+        if((button = menu.checkButtons()) && button->active)
+        {
+            if(button->trigger == BRELEASE)
+            {
+                button->clickFunction();
+            }
+        }
+    }
+}
+
+// [ INPUT CHECKING METHODS ]
+bool
+InputHandler::keyPress(int sdlKeycode)
+{
+    return (e.type == SDL_KEYDOWN) && ((!e.key.repeat) && (sdlKeycode == e.key.keysym.sym));
+}
+
+bool
+InputHandler::keyHold(int sdlKeycode)
+{
+    SDL_PumpEvents();
+    return keyboardState[SDL_GetScancodeFromKey(sdlKeycode)];
+}
+
+bool
+InputHandler::keyRelease(int sdlKeycode)
+{
+    return (e.type == SDL_KEYUP) && (sdlKeycode == e.key.keysym.sym);
+}
+
+void
+InputHandler::updateMouse()
+{
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+    static int i = 0;
+    wnd.getSize(ww, wh);
+
+    scrollDown[0] = scrollDown[1];
+    scrollUp[0] = scrollUp[1];
+    scrollUp[1] = false;
+    scrollDown[1] = false;
+
+    if((e.type == SDL_MOUSEMOTION))
+    {
+        mouseX = e.button.x;
+        mouseY = e.button.y;
+    }
+
+    switch(e.type)
+    {
+    case(SDL_MOUSEBUTTONDOWN):
+    {
+        switch(e.button.button)
+        {
+        case(SDL_BUTTON_LEFT):
+        {
+            mouseButton[0].prevDown = mouseButton[0].curDown;
+            mouseButton[0].curDown = true;
+            break;
+        }
+        case(SDL_BUTTON_RIGHT):
+        {
+            mouseButton[1].prevDown = mouseButton[1].curDown;
+            mouseButton[1].curDown = true;
+            break;
+        }
+        }
+        break;
+    }
+    case(SDL_MOUSEBUTTONUP):
+    {
+        switch(e.button.button)
+        {
+        case(SDL_BUTTON_LEFT):
+        {
+            mouseButton[0].prevDown = mouseButton[0].curDown;
+            mouseButton[0].curDown = false;
+            break;
+        }
+        case(SDL_BUTTON_RIGHT):
+        {
+            mouseButton[1].prevDown = mouseButton[1].curDown;
+            mouseButton[1].curDown = false;
+            break;
+        }
+        }
+        break;
+    }
+    case(SDL_MOUSEWHEEL):
+    {
+        if(e.wheel.y > 0)
+        {
+            scrollUp[1] = true;
+        }
+        if(e.wheel.y < 0)
+        {
+            scrollDown[1] = true;
+        }
+        e.wheel.y = 0;
+        break;
+    }
+    }
+
+}
+bool
+InputHandler::mousePress(int sdlMousecode)
+{
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        if(!mouseButton[0].prevDown && mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        if(!mouseButton[1].prevDown && mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    }
+    return false;
+}
+
+bool
+InputHandler::mouseDown(int sdlMousecode)
+{
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        if(mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        if(mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    }
+    return false;
+}
+
+bool
+InputHandler::mouseRelease(int sdlMousecode)
+{
+    switch(sdlMousecode)
+    {
+    case(SDL_BUTTON_LEFT):
+    {
+        if(mouseButton[0].prevDown && !mouseButton[0].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    case(SDL_BUTTON_RIGHT):
+    {
+        if(mouseButton[1].prevDown && !mouseButton[1].curDown)
+        {
+            return true;
+        }
+        break;
+    }
+    }
+    return false;
+}
+
+bool
+InputHandler::mouseScroll(Mscroll scroll)
+{
+    switch(scroll)
+    {
+    case(SCROLLUP):
+    {
+        return (scrollUp[1] && !scrollUp[0]);
+    }
+    case(SCROLLDOWN):
+    {
+        return (scrollDown[1] && !scrollDown[0]);
+    }
+    }
+
+    return false;
+}
+#include <iostream>
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL_ttf.h>
+#include <SDL2/SDL_mixer.h>
+#include <cstdlib>
+#include <ctime>
+#include "window.h"
+#include "render.h"
+#include "inputHandler.h"
+#include "stateHandler.h"
+#include "game.h"
+
+#define WINW 960
+#define WINH 720
+
+int
+main()
+{
+    std::srand(std::time(nullptr));
+    if(SDL_Init(SDL_INIT_EVERYTHING))
+    {
+        std::cerr << "SDL_Init: " << SDL_GetError() << std::endl;
+        return 1;
+    }
+
+    Window& wnd         = Window::getSingleton();
+    Game& game          = Game::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Render& rend        = Render::getSingleton();
+    StateHandler& state = StateHandler::getSingleton();
+    Map& map            = Map::getSingleton();
+
+    // Create window.
+    wnd.init("Snake!", WINW, WINH);
+    // Create Rendering context.
+    rend.init();
+    // Setup game, snakes and so forth.
+    game.init();
+    // Set initial state.
+    state.setState(MENU);
+    // Load Map.
+    map.loadMap();
+
+    rend.setClear(32, 32, 32, 255);
+    while(!wnd.shouldQuit())
+    {
+        state.run();
+    }
+    
+    SDL_Quit();
+    return 0;
+}
+#include <iostream>
+#include "map.h"
+#include "render.h"
+
+#define HERE std::cout << "here!" << std::endl
+
+Map Map::s_Map;
+void
+Map::loadMap()
+{
+    Render& rend = Render::getSingleton();
+    bg = rend.createTexture("res/20x20-bg.png");
+    texWall= rend.createTexture("res/20x20-obstacle.png");
+    texWallCorner = rend.createTexture("res/20x20-0bstacle-2.png");
+    texP1Head = rend.createTexture("res/20x20-head.png");
+    texP1Tail = rend.createTexture("res/20x20-tail.png");
+    texP2Head = rend.createTexture("res/20x20-head-3.png");
+    texP2Tail = rend.createTexture("res/20x20-tail-3.png");
+    pickups.clear();
+    Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
+    pickups.push_back(pickup);
+}
+
+void
+Map::setTile(int xPos, int yPos, TileType val)
+{
+    std::cout << "xPos " << xPos << std::endl;
+    std::cout << "yPos " << yPos << std::endl;
+    if((editorValidPlacement) && (getTile(xPos, yPos) != val))
+    {
+        switch(val)
+        {
+        case(TWALL):
+        {
+            map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
+            break;
+        }
+        case(TP1START): // FALLTHROUGH
+        {
+            if(editorP1HeadStartX != -1) 
+            {
+                HERE;
+                std::cout << "editorP1HeadStartX: " << editorP1HeadStartX << std::endl;
+                std::cout << "editorP1HeadStartY: " << editorP1HeadStartY << std::endl;
+                map[editorP1HeadStartX][editorP1HeadStartY] = TEMPTY;
+                map[editorP1TailStartX][editorP1TailStartY] = TEMPTY;
+                HERE;
+            }
+            switch(editorRotation)
+            {
+            case(0):
+            {
+                int indexHeadX = (xPos - mapX)/gridSize;
+                int indexHeadY = (yPos - mapY)/gridSize;
+                std::cout << "indexHeadX = " << indexHeadX << std::endl;
+                std::cout << "indexHeadY = " << indexHeadY << std::endl;
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
+                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) + 1] = TP1TAIL;
+                editorP1TailStartX = (xPos - mapX/gridSize);
+                editorP1TailStartY = (yPos - mapY/gridSize) + 1;
+                break;
+            }
+            case(90):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
+                map[((xPos - mapX)/gridSize) - 1][(yPos - mapY)/gridSize] = TP1TAIL;
+                editorP1TailStartX = (xPos - mapX/gridSize) - 1;
+                editorP1TailStartY = (yPos - mapY/gridSize);
+                break;
+            }
+            case(180):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
+                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) - 1] = TP1TAIL;
+                editorP1TailStartX = (xPos - mapX/gridSize);
+                editorP1TailStartY = (yPos - mapY/gridSize) - 1;
+                break;
+            }
+            case(270):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
+                map[((xPos - mapX)/gridSize) + 1][(yPos - mapY)/gridSize] = TP1TAIL;
+                editorP1TailStartX = (xPos - mapX/gridSize) + 1;
+                editorP1TailStartY = (yPos - mapY/gridSize);
+                break;
+            }
+            }
+
+            editorP1HeadStartX = (xPos - mapX/gridSize);
+            editorP1HeadStartY = (yPos - mapY/gridSize);
+            break;
+        }
+        case(TP2START):
+        {
+            if(editorP2HeadStartX != -1) 
+            {
+                map[editorP2HeadStartX][editorP2HeadStartY] = TEMPTY;
+                map[editorP2TailStartX][editorP2TailStartY] = TEMPTY;
+            }
+            switch(editorRotation)
+            {
+            case(0):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
+                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) + 1] = TP2TAIL;
+                editorP2TailStartX = (xPos - mapX/gridSize);
+                editorP2TailStartY = (yPos - mapY/gridSize) + 1;
+                break;
+            }
+            case(90):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
+                map[((xPos - mapX)/gridSize) - 1][(yPos - mapY)/gridSize] = TP2TAIL;
+                editorP2TailStartX = (xPos - mapX/gridSize) - 1;
+                editorP2TailStartY = (yPos - mapY/gridSize);
+                break;
+            }
+            case(180):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
+                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) - 1] = TP2TAIL;
+                editorP2TailStartX = (xPos - mapX/gridSize);
+                editorP2TailStartY = (yPos - mapY/gridSize) - 1;
+                break;
+            }
+            case(270):
+            {
+                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
+                map[((xPos - mapX)/gridSize) + 1][(yPos - mapY)/gridSize] = TP2TAIL;
+                editorP2TailStartX = (xPos - mapX/gridSize) + 1;
+                editorP2TailStartY = (yPos - mapY/gridSize);
+                break;
+            }
+            }
+            editorP2HeadStartX = (xPos - mapX/gridSize);
+            editorP2HeadStartY = (yPos - mapY/gridSize);
+            break;
+        }
+        }
+    }
+
+    std::cout << "here" << std::endl;
+}
+
+TileType
+Map::getTile(int xPos, int yPos)
+{
+    return map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize];
+}
+
+void
+Map::nextEditorTile()
+{
+    editorTileIndex++;
+    int nTiles = editorTiles.size();
+    if(editorTileIndex >= nTiles)
+            editorTileIndex = nTiles-1;
+    editorActiveTile = editorTiles[editorTileIndex];
+}
+
+void
+Map::prevEditorTile()
+{
+    editorTileIndex--;
+    if(editorTileIndex < 0)
+            editorTileIndex = 0;
+    editorActiveTile = editorTiles[editorTileIndex];
+}
+
+void
+Map::editorRotate()
+{
+    editorRotation+=90;
+    if(editorRotation == 360)
+        editorRotation = 0;
+}
+
+void
+Map::resetMap()
+{
+    for(int i = 0; i < MAPH; i++)
+    {
+        for(int j = 0; j < MAPW; j++)
+        {
+            map[j][i] = TEMPTY;
+        }
+    }
+}
+
+void
+Map::saveMap()
+{
+    std::cout << "Map saved!" << std::endl;
+}
+#include "menu.h"
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <thread>
+#include "render.h"
+#include "inputHandler.h"
+
+void
+Menu::setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    colorTxt.r = r;
+    colorTxt.g = g;
+    colorTxt.b = b;
+    colorTxt.a = a;
+}
+Menu Menu::s_Menu;
+void
+Menu::createButton(
+        std::function<void()> callback, ButtonTrigger trigger,
+        const char* txt,
+        int x, int y, int w, int h,
+        int emboss)
+{
+    Render& rend = Render::getSingleton();
+    if(!TTF_WasInit())
+    {
+        if(TTF_Init() == -1)
+        {
+            std::cerr << "TTF_Init: " << TTF_GetError() << std::endl;
+            SDL_Quit();
+            std::exit(1);
+        }
+        rend.font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
+        if(!rend.font)
+        {
+            std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
+        }
+    }
+
+    Button button; 
+    button.rect = {x, y, w, h};
+    SDL_Surface *surfButton = SDL_CreateRGBSurface(0, button.rect.w, button.rect.h, 32, 0, 0, 0, 0);
+    if(!surfButton)
+    {
+        std::cerr << "SDL_CreateRGBSurface: " << SDL_GetError() << std::endl;
+        return;
+    }
+
+    SDL_FillRect(surfButton, NULL, SDL_MapRGBA(surfButton->format, 96, 96, 96, 255));
+    for(int i = 0; i < emboss; i++)
+    {
+        SDL_Rect shadowL = {i, i, 1, h-i};
+        SDL_Rect shadowB = {emboss, h-i, w-emboss-i, 1};
+        SDL_Rect lightT = {i, i, w-i, 1};
+        SDL_Rect lightR = {w-i, 0, 1, h-i};
+        SDL_FillRect(surfButton, &shadowL, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+        SDL_FillRect(surfButton, &shadowB, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+        SDL_FillRect(surfButton, &lightT, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
+        SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
+    }
+
+    SDL_Color colorTxtBase = colorTxt;
+    SDL_Color colorTxtShadow = {21, 10, 36, 255};
+    SDL_Color colorTxtLight = {90, 14, 194, 255};
+    SDL_Surface *surfTxtBase = TTF_RenderText_Solid(rend.font, txt, colorTxtBase);
+    SDL_Surface *surfTxtShadow = TTF_RenderText_Solid(rend.font, txt, colorTxtShadow);
+    SDL_Surface *surfTxtLight = TTF_RenderText_Solid(rend.font, txt, colorTxtLight);
+    if(!surfTxtBase || !surfTxtShadow || !surfTxtLight)
+    {
+        std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
+        return;
+    }
+    SDL_Rect rectTxtBase = {(button.rect.w/2)-(surfTxtBase->w/2), (button.rect.h/2)-(surfTxtBase->h/2), button.rect.w, button.rect.h};
+
+    SDL_Rect rectTxtShadowR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2), button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowU = {(button.rect.w/2)-(surfTxtShadow->w/2), (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowUR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtShadowUL = {(button.rect.w/2)-(surfTxtShadow->w/2) - 2, (button.rect.h/2)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+
+    SDL_Rect rectTxtLightL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/2)-(surfTxtLight->h/2), button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightD = {(button.rect.w/2)-(surfTxtLight->w/2), (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightDL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+    SDL_Rect rectTxtLightDR = {(button.rect.w/2)-(surfTxtLight->w/2) + 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+    if(
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightL) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightD) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightDL) < 0) ||
+            (SDL_BlitSurface(surfTxtLight, NULL, surfButton, &rectTxtLightDR) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowR) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowU) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowUR) < 0) ||
+            (SDL_BlitSurface(surfTxtShadow, NULL, surfButton, &rectTxtShadowUL) < 0) ||
+            (SDL_BlitSurface(surfTxtBase, NULL, surfButton, &rectTxtBase) < 0))
+    {
+        std::cerr << "SDL_BlitSurface: " << SDL_GetError() << std::endl;
+        return;
+    }
+    if(rend.rend == NULL)
+        std::cerr << "Renderer not initialized" << std::endl;
+    button.tex = SDL_CreateTextureFromSurface(rend.rend, surfButton);
+    if(!button.tex)
+    {
+        std::cerr << "SDL_CreateTextureFromSurface: " << SDL_GetError() << std::endl;
+        return;
+    }
+
+    button.clickFunction = callback;
+    button.trigger = trigger;
+
+    SDL_FreeSurface(surfButton);
+    SDL_FreeSurface(surfTxtShadow);
+    SDL_FreeSurface(surfTxtLight);
+    SDL_FreeSurface(surfTxtBase);
+
+    buttons.push_back(button);
+}
+
+Button*
+Menu::checkButtons()
+{
+    InputHandler& input = InputHandler::getSingleton();
+    for(auto button = buttons.begin(); button != buttons.end(); button++)
+    {
+        if(!buttons.size())
+            break;
+        if(((input.e.button.x >= button->rect.x)&&(input.e.button.x <= (button->rect.x+button->rect.w))) &&
+           ((input.e.button.y >= button->rect.y)&&(input.e.button.y <= (button->rect.y+button->rect.h))))
+        {
+            return &(*button);
+        }
+        else
+        {
+            button->active = false;
+        }
+    }
+    return NULL;
+}
+
+void
+Menu::clearButtons()
+{
+    if(buttons.size())
+    {
+        for(auto button = buttons.begin(); button != buttons.end(); button++)
+        {
+            SDL_DestroyTexture(button->tex);
+            button->clickFunction = NULL;
+        }
+        buttons.clear();
+    }
+}
+#include "util.h"
+#include "pickup.h"
+#include "render.h"
+#include "game.h"
+#include "map.h"
+
+Pickup::Pickup(int x, int y, int w, int h)
+{
+    Render& rend = Render::getSingleton();
+    rect.x = x;
+    rect.y = y;
+    rect.w = w;
+    rect.h = h;
+    tex = rend.createTexture("res/20x20-powerup.png");
+}
+
+void
+Pickup::setPosition(int x, int y)
+{
+    Map& map = Map::getSingleton();
+    rect.x = x;
+    rect.y = y;
+}
+#include <cstdio>
+#include <iostream>
+#include <SDL.h>
+#include <SDL_ttf.h>
+#include <SDL_image.h>
+#include "render.h"
+#include "game.h"
+#include "snake.h"
+#include "menu.h"
+
+Render Render::s_Render;
+
+void
+Render::init()
+{
+    rend = SDL_CreateRenderer(wnd.getWindow(), -1, SDL_RENDERER_ACCELERATED);
+    if(!rend)
+    {
+        std::cerr << "SDL_CreateRenderer: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        std::exit(1);
+    }
+
+    int imgFlags = IMG_INIT_JPG | IMG_INIT_PNG;
+    int imgInitted = IMG_Init(imgFlags);
+    if((imgInitted & imgFlags) != imgFlags)
+    {
+        std::cerr << "IMG_Init: " << IMG_GetError() << std::endl;
+        SDL_Quit();
+        std::exit(1);
+    }
+
+    if(!TTF_WasInit())
+    {
+        if(TTF_Init() == -1)
+        {
+            std::cerr << "TTF_Init: " << TTF_GetError() << std::endl;
+            SDL_Quit();
+            std::exit(1);
+        }
+        font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
+        if(!font)
+        {
+            std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
+        }
+    }
+
+    Menu& menu = Menu::getSingleton();
+
+    logo = createTexture("res/logo.png");
+    bgUI = createTexture("res/ui-bg-brick.png");
+    bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
+    previewFrame = createTexture("res/tile-preview.png");
+    menu.btnMenuBig = createTexture("res/ui-button-editor-base.png");
+}
+
+SDL_Texture*
+Render::createTexture(const char* filename)
+{
+    SDL_Surface *tmp = IMG_Load(filename);
+    if(!tmp)
+    {
+        std::cerr << "IMG_Load: " << IMG_GetError() << std::endl;
+        return NULL;
+    }
+    SDL_Texture *tex = SDL_CreateTextureFromSurface(rend, tmp);
+    if(!tex)
+    {
+        std::cerr << "SDL_CreateTextureFromSurface: " << SDL_GetError() << std::endl;
+        return NULL;
+    }
+
+    return tex;
+}
+void
+Render::setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    SDL_SetRenderDrawColor(rend, r, g, b, a);
+}
+
+void
+Render::clear()
+{
+    SDL_RenderClear(rend);
+}
+
+void
+Render::renderBG(SDL_Texture *tex)
+{
+    int w, h, ww, wh;
+    Window& wnd = Window::getSingleton();
+    Map& map = Map::getSingleton();
+
+    wnd.getSize(ww, wh);
+
+    SDL_QueryTexture(tex, NULL, NULL, &w, &h);
+    SDL_Rect out;
+
+    for(int y = 0; y < wh; y+=h)
+    {
+        for(int x = 0; x < ww; x+=w)
+        {
+            out.x = x;
+            out.y = y;
+            out.w = w;
+            out.h = h;
+            SDL_RenderCopy(rend, tex, NULL, &out);
+        }
+    }
+}
+
+void
+Render::renderLogo()
+{
+    SDL_RenderCopy(rend, logo, NULL, NULL);
+}
+
+void
+Render::renderSnakes()
+{
+    Game& game = Game::getSingleton();
+    for(auto snake : game.snakes)
+    {
+        for(auto segment = snake.segments.begin(); segment != snake.segments.end(); segment++)
+        {
+            SDL_RenderCopyEx(rend, segment->tex, NULL, &segment->rect, segment->rotation, NULL, segment->flip);
+        }
+    }
+}
+
+void
+Render::renderPickups()
+{
+    for(auto pickup : map.pickups)
+    {
+        SDL_RenderCopy(rend, pickup.tex, NULL, &pickup.rect);
+    }
+}
+
+void
+Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
+{
+    SDL_Color color = {r, g, b, a};
+    SDL_Surface *surface = TTF_RenderText_Solid(font, txt, color); 
+    tex->tex = SDL_CreateTextureFromSurface(rend, surface);
+    SDL_QueryTexture(tex->tex, NULL, NULL, &tex->w, &tex->h);
+    SDL_FreeSurface(surface);
+}
+
+void
+Render::renderButtons()
+{
+    Menu& menu = Menu::getSingleton();
+    for(auto button : menu.buttons)
+    {
+        SDL_RenderCopy(rend, button.tex, NULL, &button.rect);
+    }
+}
+
+void
+Render::renderBorders()
+{
+    int ww, wh;
+    Window& wnd = Window::getSingleton();
+    Map& map = Map::getSingleton();
+
+    wnd.getSize(ww, wh);
+    setClear(64, 64, 64, 255);
+    SDL_Rect top = {0, 0, ww, map.mapY};
+    SDL_Rect left = {0, map.mapY, map.mapX, wh - map.mapY};
+    SDL_Rect right = {ww - map.mapX, map.mapY, map.mapX, wh - map.mapY};
+    SDL_Rect bottom = {map.mapX, wh - map.mapBottom, map.mapW, map.mapBottom};
+
+    SDL_RenderCopy(rend, bgUIFramed, &top, &top);
+    SDL_RenderCopy(rend, bgUIFramed, &left, &left);
+    SDL_RenderCopy(rend, bgUIFramed, &right, &right);
+    SDL_RenderCopy(rend, bgUIFramed, &bottom, &bottom);
+}
+void
+Render::renderScores()
+{
+    Game& game = Game::getSingleton();
+    if(!textP1Name.tex)
+        initText(&textP1Name, "P1 SCORE: ", 255, 128, 32, 255);
+    char p1Score[100] = {0};
+    sprintf(p1Score, "%d", game.snakes[0].score);
+    if(textP1Score.tex)
+        SDL_DestroyTexture(textP1Score.tex);
+    initText(&textP1Score, p1Score, 255, 255, 0, 255);
+    renderText(&textP1Name, 30, 20, textP1Name.w, textP1Name.h);
+    renderText(&textP1Score, textP1Name.out.x + textP1Name.w, textP1Name.out.y, textP1Score.w, textP1Name.h);
+}
+
+void
+Render::renderText(Text *tex, int x, int y, int w, int h)
+{
+    tex->out.x = x;
+    tex->out.y = y;
+    tex->out.w = w;
+    tex->out.h = h;
+    SDL_RenderCopy(rend, tex->tex, NULL, &tex->out);
+}
+
+void
+Render::renderMap()
+{
+    Map& map = Map::getSingleton();
+    SDL_Rect rect;
+    SDL_QueryTexture(map.texWall, NULL, NULL, &rect.w, &rect.h);
+
+    for(int i = 0; i < MAPH; i++)
+    {
+        for(int j = 0; j < MAPW; j++)
+        {
+            rect.x = (j * map.gridSize) + map.mapX;
+            rect.y = (i * map.gridSize) + map.mapY;
+            switch(map.map[j][i])
+            {
+            case(TWALL):
+            {
+                bool corner = false;
+                if(
+                    ((map.map[j-1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                    ((map.map[j-1][i] == TWALL) && (map.map[j][i+1] == TWALL)) ||
+                    ((map.map[j+1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                    ((map.map[j+1][i] == TWALL) && (map.map[j][i+1] == TWALL)))
+                {
+                    corner = true;
+                }
+
+                if(corner)
+                    SDL_RenderCopy(rend, map.texWallCorner, NULL, &rect);
+                else
+                    SDL_RenderCopy(rend, map.texWall, NULL, &rect);
+
+                break;
+            }
+            case(TP1HEAD):
+            {
+                if(map.editorP1TailStartX < map.editorP1HeadStartX)
+                {
+                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                    rect.x -= map.gridSize;
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                }
+                else if(map.editorP1TailStartX > map.editorP1HeadStartX)
+                {
+                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                    rect.x += map.gridSize;
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                }
+                else if(map.editorP1TailStartY > map.editorP1HeadStartY)
+                {
+                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                    rect.y += map.gridSize;
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                }
+                else if(map.editorP1TailStartY < map.editorP1HeadStartY)
+                {
+                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                    rect.y -= map.gridSize;
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                }
+
+                break;
+            }
+            case(TP1TAIL):
+            {
+                
+
+                break;
+            }
+            case(TP2HEAD):
+            {
+                
+
+                break;
+            }
+            case(TP2TAIL):
+            {
+                
+
+                break;
+            }
+            }
+        }
+    }
+}
+
+void
+Render::renderTilePlacementBox()
+{
+    Map& map = Map::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    SDL_Rect rect;
+
+    if(((input.mouseX >= map.mapX) && (input.mouseX < map.mapX + map.mapW)) &&
+        ((input.mouseY >= map.mapY) && (input.mouseY < map.mapY + map.mapH)))
+    {
+        if(map.editorValidPlacement)
+            setClear(64, 255, 64, 64);
+        else
+            setClear(255, 64, 64, 64);
+
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_BLEND);
+        if((map.editorActiveTile == TP1START) || (map.editorActiveTile == TP2START))
+        {
+            switch(map.editorRotation)
+            {
+            case(0):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = map.gridSize;
+                rect.h = 2*map.gridSize;
+
+                break;
+            }
+            case(90):
+            {
+                rect.x = ((input.mouseX / map.gridSize) * map.gridSize) - map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = 2*map.gridSize;
+                rect.h = map.gridSize;
+
+                break;
+            }
+            case(180):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = ((input.mouseY / map.gridSize) * map.gridSize) - map.gridSize;
+                rect.w = map.gridSize;
+                rect.h = 2*map.gridSize;
+
+                break;
+            }
+            case(270):
+            {
+                rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+                rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+                rect.w = 2*map.gridSize;
+                rect.h = map.gridSize;
+
+                break;
+            }
+            }
+        }
+        else
+        {
+            rect.x = (input.mouseX / map.gridSize) * map.gridSize;
+            rect.y = (input.mouseY / map.gridSize) * map.gridSize;
+            rect.w = map.gridSize;
+            rect.h = map.gridSize;
+        }
+        SDL_RenderFillRect(rend, &rect);
+
+        SDL_SetRenderDrawBlendMode(rend, SDL_BLENDMODE_NONE);
+    }
+}
+
+void
+Render::renderTilePreview()
+{
+    Map& map = Map::getSingleton();
+    int w, h;
+    int previewBoxX = 1;
+    int previewBoxY = 81;
+
+    SDL_QueryTexture(previewFrame, NULL, NULL, &w, &h);
+    SDL_Rect rectPreviewBox = {previewBoxX, previewBoxY, w, h};
+    SDL_RenderCopy(rend, previewFrame, NULL, &rectPreviewBox);
+
+    switch(map.editorActiveTile)
+    {
+    case(TWALL):
+    {
+        SDL_QueryTexture(map.texWall, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texWall, NULL, &rectPreviewTile);
+        break;
+    }
+    case(TP1START):
+    {
+        SDL_QueryTexture(map.texP1Head, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texP1Head, NULL, &rectPreviewTile);
+        break;
+    }
+    case(TP2START):
+    {
+        SDL_QueryTexture(map.texP2Head, NULL, NULL, &w, &h);
+        SDL_Rect rectPreviewTile = {previewBoxX + 21, previewBoxY + 21, w, h};
+        SDL_RenderCopy(rend, map.texP2Head, NULL, &rectPreviewTile);
+        break;
+    }
+    }
+}
+
+void
+Render::show()
+{
+    SDL_RenderPresent(rend);
+}
+#include <iostream>
+#include <thread>
+#include <cstdio>
+#include <iterator>
+#include "snake.h"
+#include "render.h"
+#include "util.h"
+
+Snake::Snake()
+{
+    Map& map = Map::getSingleton();
+    startX = map.mapX + (map.mapW/2);
+    startY = map.mapY + (map.mapH/2);
+    initTextures(0);
+    addMultipleSegments(2);
+    dirX = DIR_NONE;
+    dirY = DIR_NONE;
+}
+
+void
+Snake::addSegment()
+{
+    Map& map = Map::getSingleton();
+    SnakeSegment segment;
+    auto currentTail = segments.end()-1;
+    if(!segments.size())
+    {
+        segment.rect = {startX, startY, map.gridSize, map.gridSize};
+        segment.tex = texHead;
+        segment.dirX = 0;
+        segment.dirY = -1;
+        segments.push_back(segment);
+    }
+    else
+    {
+        segment.rect = {
+            currentTail->rect.x - (currentTail->dirX * map.gridSize),
+            currentTail->rect.y - (currentTail->dirY * map.gridSize),
+            map.gridSize, map.gridSize};
+        segment.tex = texTail;
+        if(segments.size() > 1)
+            currentTail->tex = texBody;
+        segments.push_back(segment);
+    }
+    map.setTile(segment.rect.x, segment.rect.y, TSNAKE);
+}
+
+void
+Snake::addMultipleSegments(int amount)
+{
+    for(int i = 0; i < amount; i++)
+        addSegment();
+}
+
+void
+Snake::update()
+{
+    Map& map = Map::getSingleton();
+    int prevHeadX, prevHeadY, prevTailX, prevTailY;
+    if(dirX + dirY)
+    {
+        auto head = (segments.begin());
+        prevHeadX = segments[0].rect.x;
+        prevHeadY = segments[0].rect.y;
+        prevTailX = (segments.end()-1)->rect.x;
+        prevTailY = (segments.end()-1)->rect.y;
+        for(auto segment = (segments.end()-1); segment != head; segment--)
+        {
+            auto prev = (segment-1);
+            segment->rect = prev->rect;
+            segment->dirX = prev->dirX;
+            segment->dirY = prev->dirY;
+        }
+        segments[0].rect.x += dirX * map.gridSize;
+        segments[0].rect.y += dirY * map.gridSize;
+        map.setTile(prevHeadX, prevHeadY, TSNAKE);
+        map.setTile(prevTailX, prevTailY, TEMPTY);
+    }
+    std::thread t_collision(&Snake::checkCollision, this);
+    t_collision.join();
+    updateNeighbors();
+    updateTextures();
+//     changedDir = false;
+}
+
+void
+Snake::updateNeighbors()
+{
+    auto segment = segments.begin();
+    segment->neighbors = 0;
+    if((segment+1)->rect.y < segment->rect.y)
+        segment->neighbors |= NB_UP;
+    if((segment+1)->rect.y > segment->rect.y)
+        segment->neighbors |= NB_DOWN;
+    if((segment+1)->rect.x < segment->rect.x)
+        segment->neighbors |= NB_LEFT;
+    if((segment+1)->rect.x > segment->rect.x)
+        segment->neighbors |= NB_RIGHT;
+    segment++;
+    for(; segment < (segments.end()-1) ; segment++)
+    {
+        segment->neighbors = 0;
+        if(((segment-1)->rect.y < segment->rect.y) || ((segment+1)->rect.y < segment->rect.y))
+            segment->neighbors |= NB_UP;
+        if(((segment-1)->rect.y > segment->rect.y) || ((segment+1)->rect.y > segment->rect.y))
+            segment->neighbors |= NB_DOWN;
+        if(((segment-1)->rect.x < segment->rect.x) || ((segment+1)->rect.x < segment->rect.x))
+            segment->neighbors |= NB_LEFT;
+        if(((segment-1)->rect.x > segment->rect.x) || ((segment+1)->rect.x > segment->rect.x))
+            segment->neighbors |= NB_RIGHT;
+    }
+    segment = (segments.end()-1);
+    segment->neighbors = 0;
+    if((segment-1)->rect.y < segment->rect.y)
+        segment->neighbors |= NB_UP;
+    if((segment-1)->rect.y > segment->rect.y)
+        segment->neighbors |= NB_DOWN;
+    if((segment-1)->rect.x < segment->rect.x)
+        segment->neighbors |= NB_LEFT;
+    if((segment-1)->rect.x > segment->rect.x)
+        segment->neighbors |= NB_RIGHT;
+}
+
+void
+Snake::updateTextures()
+{
+    auto segment = segments.begin();
+    segment->tex = texHead;
+    switch(segment->neighbors)
+    {
+    case(NB_UP):
+    {
+        segment->rotation = 180;
+        break;
+    }
+    case(NB_DOWN):
+    {
+        segment->rotation = 0;
+        break;
+    }
+    case(NB_LEFT):
+    {
+        segment->rotation = 90;
+        break;
+    }
+    case(NB_RIGHT):
+    {
+        segment->rotation = 270;
+        break;
+    }
+    }
+    segment++;
+    for(; segment < (segments.end()-1); segment++)
+    {
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_DOWN)))
+        {
+            segment->tex = texBody;
+            segment->rotation = 0;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_LEFT | NB_RIGHT)))
+        {
+            segment->tex = texBody;
+            segment->rotation = 90;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_LEFT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 90;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_RIGHT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 180;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_LEFT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 0;
+            continue;
+        }
+        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_RIGHT)))
+        {
+            segment->tex = texCorner;
+            segment->rotation = 270;
+            continue;
+        }
+    }
+
+    segment = (segments.end()-1);
+    segment->tex = texTail;
+    switch(segment->neighbors)
+    {
+    case(NB_UP):
+    {
+        segment->rotation = 0;
+        break;
+    }
+    case(NB_DOWN):
+    {
+        segment->rotation = 180;
+        break;
+    }
+    case(NB_LEFT):
+    {
+        segment->rotation = 270;
+        break;
+    }
+    case(NB_RIGHT):
+    {
+        segment->rotation = 90;
+        break;
+    }
+    }
+}
+
+void
+Snake::setDirection(Dir dir)
+{
+    auto head = segments.begin();
+    switch(dir)
+    {
+    case(DIR_NONE):
+    {
+        dirX = 0;
+        dirY = 0;
+        head->dirX = 0;
+        head->dirY = 0;
+        break;
+    }
+    case(DIR_UP):
+    {
+        dirX = 0;
+        dirY = -1;
+        head->dirX = 0;
+        head->dirY = -1;
+        break;
+    }
+    case(DIR_DOWN):
+    {
+        dirX = 0;
+        dirY = 1;
+        head->dirX = 0;
+        head->dirY = 1;
+        break;
+    }
+    case(DIR_LEFT):
+    {
+        dirX = -1;
+        dirY = 0;
+        head->dirX = -1;
+        head->dirY = 0;
+        break;
+    }
+    case(DIR_RIGHT):
+    {
+        dirX = 1;
+        dirY = 0;
+        head->dirX = 1;
+        head->dirY = 0;
+        break;
+    }
+    }
+}
+
+bool
+Snake::dirAvailable(Dir dir)
+{
+    switch (dir)
+    {
+	case(DIR_UP):
+	{
+        int newY = segments[0].rect.y - map.gridSize;
+        if (segments[1].rect.y == newY)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_DOWN):
+	{
+        int newY = segments[0].rect.y + map.gridSize;
+        if (segments[1].rect.y == newY)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_LEFT):
+	{
+        int newX = segments[0].rect.x - map.gridSize;
+        if (segments[1].rect.x == newX)
+            return false;
+        return true;
+        break;
+	}
+	case(DIR_RIGHT):
+	{
+        int newX = segments[0].rect.x + map.gridSize;
+        if (segments[1].rect.x == newX)
+            return false;
+        return true;
+        break;
+	}
+    }
+    return false;
+}
+
+
+void
+Snake::initTextures(int snakeNr)
+{
+    Render& rend = Render::getSingleton();
+    switch(snakeNr)
+    {
+    case(0):
+    {
+        texHead     = rend.createTexture("res/20x20-head.png");
+        texTail     = rend.createTexture("res/20x20-tail.png");
+        texBody     = rend.createTexture("res/20x20-body.png");
+        texCorner   = rend.createTexture("res/20x20-turn.png");
+
+        break;
+    }
+    case(1):
+    {
+        texHead     = rend.createTexture("res/20x20-head-2.png");
+        texTail     = rend.createTexture("res/20x20-tail-2.png");
+        texBody     = rend.createTexture("res/20x20-body-2.png");
+        texCorner   = rend.createTexture("res/20x20-turn-2.png");
+
+        break;
+    }
+    case(2):
+    {
+        texHead     = rend.createTexture("res/20x20-head-3.png");
+        texTail     = rend.createTexture("res/20x20-tail-3.png");
+        texBody     = rend.createTexture("res/20x20-body-3.png");
+        texCorner   = rend.createTexture("res/20x20-turn-3.png");
+
+        break;
+    }
+    }
+}
+
+void
+Snake::checkCollision()
+{
+    checkCrash();
+    checkPickup();
+}
+
+void
+Snake::checkPickup()
+{
+    for(auto pickup = map.pickups.begin(); pickup != map.pickups.end(); pickup++)
+    {
+        if((pickup->rect.x == segments[0].rect.x) && (pickup->rect.y == segments[0].rect.y))
+        {
+            int x = (iRandRange(0, map.mapNW - 1) * map.gridSize) + map.mapX; 
+            int y = (iRandRange(0, map.mapNH - 1) * map.gridSize) + map.mapY; 
+            pickup->setPosition(x, y);
+            addSegment();
+
+            if(!(score % intervals))
+            {
+                if(stepDelay > 30)
+					stepDelay -= speedup;
+                if (score % 8 && speedup > 2)
+                    speedup--;
+            }
+
+            score++;
+        }
+    }
+}
+
+// TODO fix positions according to map offset
+void
+Snake::checkCrash()
+{
+    Map& map = Map::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
+
+    // Screenwrap.
+    if (segments[0].rect.x <= (map.mapX - map.gridSize))
+        segments[0].rect.x = (map.mapX + map.mapW - map.gridSize);
+    if (segments[0].rect.x >= (map.mapX + map.mapW))
+        segments[0].rect.x = map.mapX;
+
+    if (segments[0].rect.y <= (map.mapY - map.gridSize))
+        segments[0].rect.y = (map.mapY + map.mapH - map.gridSize);
+    if (segments[0].rect.y >= (map.mapY + map.mapH))
+        segments[0].rect.y = map.mapY;
+
+    if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)
+    {
+        state.setState(RESTART);
+        map.resetMap();
+    }
+}
+#include "stateHandler.h"
+#include "game.h"
+#include "menu.h"
+#include "map.h"
+
+StateHandler StateHandler::s_StateHandler;
+
+void
+StateHandler::setState(State set)
+{
+    Menu& menu = Menu::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    menu.clearButtons();
+    current = set;
+}
+
+void
+StateHandler::run()
+{
+    InputHandler& input = InputHandler::getSingleton();
+    input.pollInput();
+    input.commonInput();
+    switch(current)
+    {
+    case(MENU):
+    {
+        stateMenu();
+        break;
+    }
+    case(MENU_CREATE):
+    {
+        stateMenuCreate();
+        break;
+    }
+    case(PLAY):
+    {
+        statePlay();
+        break;
+    }
+    case(CREATE):
+    {
+        stateCreate();
+        break;
+    }
+    case(RESTART):
+    {
+        stateRestart();
+        break;
+    }
+    }
+}
+
+void
+StateHandler::stateMenu()
+{
+    Menu& menu = Menu::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Render& rend = Render::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+
+    wnd.getSize(ww, wh);
+
+    rend.renderBG(rend.bgUI);
+
+    if(!menu.buttons.size())
+    {
+        menu.setButtonColorTxt(0, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
+            "PLAY",
+            ww/2 - 200, 240, 400, 100,
+            10);
+
+        menu.setButtonColorTxt(64, 128, 255, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
+            "CREATE",
+            ww/2 - 200, 400, 400, 100,
+            10);
+
+        menu.setButtonColorTxt(255, 64, 64, 255);
+        menu.createButton(
+            std::bind(&Window::quit, &wnd), BRELEASE,
+            "QUIT",
+            ww/2 - 200, 560, 400, 100,
+            10);
+    }
+
+    rend.renderLogo();
+    rend.renderButtons();
+    input.inputMenu();
+    rend.show();
+
+}
+
+void
+StateHandler::stateMenuCreate()
+{
+    Menu& menu = Menu::getSingleton();
+    Render& rend = Render::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
+
+    rend.renderBG(rend.bgUI);
+
+    if(!menu.buttons.size())
+    {
+        menu.setButtonColorTxt(0, 255, 64, 255);
+
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
+            "NEW",
+            ww/2 - 200, 140, 400, 100,
+            10);
+
+        menu.setButtonColorTxt(255, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU), BRELEASE,
+            "BACK",
+            ww/2 - 200, 300, 400, 100,
+            10);
+    }
+    rend.renderButtons();
+    input.inputMenu();
+
+    rend.show();
+}
+
+void
+StateHandler::statePlay()
+{
+    Render& rend = Render::getSingleton();
+    Game& game = Game::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
+
+    if(!game.started)
+		game.init();
+    
+    input.inputPlay();
+
+    game.update();
+
+    rend.renderBG(map.bg);
+
+    rend.renderSnakes();
+    rend.renderPickups();
+    rend.renderBorders();
+    rend.renderScores();
+
+    rend.show();
+}
+
+void
+StateHandler::stateCreate()
+{
+    Render& rend = Render::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+
+    wnd.getSize(ww, wh);
+
+    if(!menu.buttons.size())
+    {
+        menu.setButtonColorTxt(0, 255, 64, 255);
+
+        menu.createButton(
+            std::bind(&Map::saveMap, &map), BRELEASE,
+            "SAVE",
+            705, 17, 190, 46,
+            5);
+
+        menu.setButtonColorTxt(255, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
+            "MENU",
+            65, 17, 190, 46,
+            5);
+
+        menu.setButtonColorTxt(255, 64, 64, 255);
+        menu.createButton(
+            std::bind(&Map::resetMap, &map), BRELEASE,
+            "CLEAR",
+            ww/2 - 95, 17, 190, 46,
+            5);
+    }
+
+    input.inputCreate();
+
+    rend.renderBG(map.bg);
+    rend.renderBorders();
+    rend.renderTilePreview();
+    rend.renderMap();
+    rend.renderTilePlacementBox();
+    rend.renderButtons();
+    rend.show();
+}
+
+void
+StateHandler::stateRestart()
+{
+    Game& game = Game::getSingleton();
+    game.started = false;
+    setState(PLAY);
+}
+#include "util.h"
+
+int iRandRange(int low, int high)
+{
+    return (rand() % (++high-low)) + low;
+}
+#include <iostream>
+#include "window.h"
+
+Window Window::s_wnd;
+void
+Window::init(const char* title, int w, int h)
+{
+    winW = w;
+    winH = h;
+    wnd = SDL_CreateWindow(
+            title,
+            SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+            winW, winH, SDL_WINDOW_OPENGL);
+    if(!wnd)
+    {
+        std::cerr << "SDL_CreateWindow: " << SDL_GetError() << std::endl;
+        SDL_Quit();
+        std::exit(1);
+    }
+
+    quitting = false;
+}
+
+void
+Window::getSize(int &w, int &h)
+{
+    w = winW;
+    h = winH;
+}

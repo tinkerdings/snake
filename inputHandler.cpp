@@ -84,19 +84,19 @@ InputHandler::inputCreate()
             {
             case(TWALL):
             {
-                map.setTile(e.button.x, e.button.y, TWALL);
+                map.setTile(mouseX, mouseY, TWALL);
 
                 break;
             }
             case(TP1START):
             {
-                map.setTile(e.button.x, e.button.y, TP1START);
+                map.setTile(mouseX, mouseY, TP1START);
 
                 break;
             }
             case(TP2START):
             {
-                map.setTile(e.button.x, e.button.y, TP2START);
+                map.setTile(mouseX, mouseY, TP2START);
 
                 break;
             }
@@ -104,7 +104,7 @@ InputHandler::inputCreate()
         }
         if(mouseDown(SDL_BUTTON_RIGHT))
         {
-            map.setTile(e.button.x, e.button.y, TEMPTY);
+            map.setTile(mouseX, mouseY, TEMPTY);
         }
     }
     else
