@@ -26,7 +26,6 @@ class Menu
 {
 public:
     std::vector<Button> buttons;
-    SDL_Texture* btnMenuBig, *btnMenuSmall, *btnEditor;
 
     Menu(const Menu&) = delete;
     static Menu& getSingleton()

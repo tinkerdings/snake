@@ -52,7 +52,6 @@ Render::init()
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
     previewFrame = createTexture("res/tile-preview.png");
-    menu.btnMenuBig = createTexture("res/ui-button-editor-base.png");
 }
 
 SDL_Texture*

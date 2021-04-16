@@ -196,7 +196,7 @@ StateHandler::stateCreate()
             std::bind(&Map::saveMap, &map, map.currentMapName), BRELEASE,
             "SAVE",
             705, 17, 190, 46,
-            5, false);
+            5, true);
 
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
