@@ -31,6 +31,8 @@ public:
     int mapNW = MAPW;
     int mapNH = MAPH;
     int mapBottom = 20;
+    std::vector<char> editorSaveName;
+    bool savingMap = false;
 
     int editorTileIndex = 0;
     std::vector<TileType> editorTiles = {
@@ -47,7 +49,7 @@ public:
     int editorP2TailStartX = -1;
     int editorP2HeadStartY = -1;
     int editorP2TailStartY = -1;
-    std::string currentMapName = "test";
+    std::string currentMapName;
 
     Map(const Map&) = delete;
     static Map& getSingleton()
@@ -58,6 +60,7 @@ public:
     void loadMap();
     void setTile(int xPos, int yPos, TileType val);
     void resetMap();
+    void inputMapName();
     void saveMap(std::string mapName);
     void nextEditorTile();
     void prevEditorTile();

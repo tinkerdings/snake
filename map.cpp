@@ -3,6 +3,8 @@
 #include <sstream>
 #include <fstream>
 #include "map.h"
+#include "inputHandler.h"
+#include "menu.h"
 #include "render.h"
 
 #define HERE std::cout << "here!" << std::endl
@@ -208,10 +210,28 @@ Map::resetMap()
 }
 
 void
+Map::inputMapName()
+{
+    Menu& menu = Menu::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    int w = 400;
+    int h = 100;
+
+    menu.setButtonColorTxt(0, 255, 64, 255);
+    menu.createButton(
+        NULL, BRELEASE,
+        "SAVE AS:",
+        mapX + (mapW/2) - (w/2), mapY + (mapH/2) - (h/2), w, h,
+        5, true);
+
+    savingMap = true;
+}
+
+void
 Map::saveMap(std::string mapName)
 {
     std::stringstream ss;
-    ss << mapName << ".map";
+    ss << "./maps/" << mapName << ".map";
     std::string filename = ss.str();
 
     std::ofstream file(filename);

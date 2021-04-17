@@ -44,6 +44,8 @@ public:
     void renderTilePreview();
     void renderScores();
     void renderBorders();
+    void renderLetter(char letter, int x, int y, int w, int h);
+    void renderMapNameInput();
     SDL_Texture* createTexture(const char* filename);
 
 private:
@@ -56,6 +58,8 @@ private:
 
     Window& wnd = Window::getSingleton();
     Map& map = Map::getSingleton();
+
+    void initAlphabet();
 };
 
 #endif // RENDER_H

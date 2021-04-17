@@ -39,7 +39,7 @@ Render::init()
             std::exit(1);
         }
         font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
-        fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 16);
+        fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 14);
         if(!font || !fontInput)
         {
             std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
@@ -52,6 +52,72 @@ Render::init()
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
     previewFrame = createTexture("res/tile-preview.png");
+    initAlphabet();
+}
+
+void
+Render::initAlphabet()
+{
+    SDL_Color color = {0, 0, 0, 255};
+    SDL_Surface *tmp;
+    char letter[2] = {0};
+    for(char i = 'a'; i <= 'z'; i++)
+    {
+        sprintf(letter, "%c", i);
+        tmp = TTF_RenderText_Solid(fontInput, letter, color);
+        if(!tmp)
+        {
+            std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
+            return;
+        }
+        alphabet[(int)(i - 'a')] = SDL_CreateTextureFromSurface(rend, tmp);
+        if(!alphabet[(int)(i - 'a')])
+        {
+            std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
+            SDL_FreeSurface(tmp);
+            return;
+        }
+        SDL_FreeSurface(tmp);
+    }
+}
+
+void
+Render::renderLetter(char letter, int x, int y, int w, int h)
+{
+    SDL_Rect rect = {x, y, w, h};
+
+    if((letter < 'a') || (letter > 'z'))
+    {
+        if((letter >= 'A') && (letter <= 'Z'))
+        {
+            letter ^= 0x20;
+        }
+        else
+        {
+            std::cerr << "renderLetter: '" << letter << "' is not a valid letter" << std::endl;
+            return;
+        }
+    }
+
+    SDL_RenderCopy(rend, alphabet[(int)(letter-'a')], NULL, &rect);
+}
+
+
+void
+Render::renderMapNameInput()
+{
+    Map& map = Map::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    auto btn = (menu.buttons.end() - 1);
+    int nLetters = map.editorSaveName.size();
+
+    for(int i = 0; i < nLetters; i++)
+    {
+        renderLetter(map.editorSaveName[i],
+                ((btn->rect.x + btn->rect.w/2) - ((nLetters - i) * 12) + ((nLetters * 12) / 2)),
+                (btn->rect.y + btn->rect.h/2),
+                10, 20);
+    }
 }
 
 SDL_Texture*

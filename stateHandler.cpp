@@ -61,7 +61,6 @@ StateHandler::stateMenu()
 
     wnd.getSize(ww, wh);
 
-
     if(!menu.buttons.size())
     {
         menu.setButtonColorTxt(0, 255, 64, 255);
@@ -190,14 +189,6 @@ StateHandler::stateCreate()
 
     if(!menu.buttons.size())
     {
-        menu.setButtonColorTxt(0, 255, 64, 255);
-
-        menu.createButton(
-            std::bind(&Map::saveMap, &map, map.currentMapName), BRELEASE,
-            "SAVE",
-            705, 17, 190, 46,
-            5, true);
-
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
@@ -211,9 +202,17 @@ StateHandler::stateCreate()
             "CLEAR",
             ww/2 - 95, 17, 190, 46,
             5, false);
+
+        menu.setButtonColorTxt(0, 255, 64, 255);
+        menu.createButton(
+            std::bind(&Map::inputMapName, &map), BRELEASE,
+            "SAVE",
+            705, 17, 190, 46,
+            5, false);
     }
 
     timeNow = SDL_GetTicks();
+    input.inputCreate();
     if((timeNow - timePrev) >= 1000/FPS)
     {
         timePrev = timeNow;
@@ -225,11 +224,14 @@ StateHandler::stateCreate()
         rend.renderMap();
         rend.renderTilePlacementBox();
         rend.renderButtons();
+        if(map.savingMap)
+        {
+            rend.renderMapNameInput();
+        }
 
         rend.show();
     }
 
-    input.inputCreate();
 }
 
 void

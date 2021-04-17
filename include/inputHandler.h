@@ -1,6 +1,7 @@
 #ifndef INPUTHANDLER_H
 #define INPUTHANDLER_H
 
+#include <string>
 #include <vector>
 #include <SDL.h>
 #include "window.h"
@@ -36,6 +37,7 @@ public:
     bool keyHold(int iKeyIndex);
     bool keyRelease(int sdlKeycode);
     void updateMouse();
+    void getInputLine(int maxChars);
     bool mousePress(int sdlMousecode);
     bool mouseDown(int sdlMousecode);
     bool mouseRelease(int sdlMousecode);

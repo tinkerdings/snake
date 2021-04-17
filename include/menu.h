@@ -32,17 +32,17 @@ public:
     {
         return s_Menu;
     }
-void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-void setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
-void createButton(
+    void setButtonColorTxt(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    void setButtonColorTint(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
+    void createButton(
         std::function<void()> callback, ButtonTrigger trigger,
         const char* txt,
         int x, int y, int w, int h,
         int emboss,
         bool isInputBox);
-Button* checkButtons();
-void buttonCallbackSetBG();
-void clearButtons();
+    Button* checkButtons();
+    void buttonCallbackSetBG();
+    void clearButtons();
 private:
     Menu(){};
     static Menu s_Menu;

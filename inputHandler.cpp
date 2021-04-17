@@ -126,6 +126,179 @@ InputHandler::inputCreate()
     {
         map.editorRotate();
     }
+    if(map.savingMap)
+    {
+        getInputLine(16);
+    }
+}
+
+void
+InputHandler::getInputLine(int maxChars)
+{
+    Map& map = Map::getSingleton();
+    Menu& menu = Menu::getSingleton();
+    Render& rend = Render::getSingleton();
+
+    static int inputted = 0;
+
+    if(keyPress(SDLK_RETURN))
+    {
+        if(inputted)
+        {
+            std::string name(map.editorSaveName.begin(), map.editorSaveName.end());
+            map.saveMap(name);
+            menu.buttons.pop_back();
+            map.savingMap = false;
+        }
+    }
+    if(keyPress(SDLK_ESCAPE))
+    {
+        menu.buttons.pop_back();
+        map.editorSaveName.clear();
+        inputted = 0;
+        map.savingMap = false;
+    }
+    if(keyPress(SDLK_BACKSPACE))
+    {
+        if(inputted > 0)
+        {
+            map.editorSaveName.clear();
+            inputted = 0;
+        }
+    }
+    if(inputted < maxChars)
+    {
+        if(keyPress(SDLK_a))
+        {
+            map.editorSaveName.push_back('a');
+            inputted++;
+        }
+        if(keyPress(SDLK_b))
+        {
+            map.editorSaveName.push_back('b');
+            inputted++;
+        }
+        if(keyPress(SDLK_c))
+        {
+            map.editorSaveName.push_back('c');
+            inputted++;
+        }
+        if(keyPress(SDLK_d))
+        {
+            map.editorSaveName.push_back('d');
+            inputted++;
+        }
+        if(keyPress(SDLK_e))
+        {
+            map.editorSaveName.push_back('e');
+            inputted++;
+        }
+        if(keyPress(SDLK_f))
+        {
+            map.editorSaveName.push_back('f');
+            inputted++;
+        }
+        if(keyPress(SDLK_g))
+        {
+            map.editorSaveName.push_back('g');
+            inputted++;
+        }
+        if(keyPress(SDLK_h))
+        {
+            map.editorSaveName.push_back('h');
+            inputted++;
+        }
+        if(keyPress(SDLK_i))
+        {
+            map.editorSaveName.push_back('i');
+            inputted++;
+        }
+        if(keyPress(SDLK_j))
+        {
+            map.editorSaveName.push_back('j');
+            inputted++;
+        }
+        if(keyPress(SDLK_k))
+        {
+            map.editorSaveName.push_back('k');
+            inputted++;
+        }
+        if(keyPress(SDLK_l))
+        {
+            map.editorSaveName.push_back('l');
+            inputted++;
+        }
+        if(keyPress(SDLK_m))
+        {
+            map.editorSaveName.push_back('m');
+            inputted++;
+        }
+        if(keyPress(SDLK_n))
+        {
+            map.editorSaveName.push_back('n');
+            inputted++;
+        }
+        if(keyPress(SDLK_o))
+        {
+            map.editorSaveName.push_back('o');
+            inputted++;
+        }
+        if(keyPress(SDLK_p))
+        {
+            map.editorSaveName.push_back('p');
+            inputted++;
+        }
+        if(keyPress(SDLK_q))
+        {
+            map.editorSaveName.push_back('q');
+            inputted++;
+        }
+        if(keyPress(SDLK_r))
+        {
+            map.editorSaveName.push_back('r');
+            inputted++;
+        }
+        if(keyPress(SDLK_s))
+        {
+            map.editorSaveName.push_back('s');
+            inputted++;
+        }
+        if(keyPress(SDLK_t))
+        {
+            map.editorSaveName.push_back('t');
+            inputted++;
+        }
+        if(keyPress(SDLK_u))
+        {
+            map.editorSaveName.push_back('u');
+            inputted++;
+        }
+        if(keyPress(SDLK_v))
+        {
+            map.editorSaveName.push_back('v');
+            inputted++;
+        }
+        if(keyPress(SDLK_w))
+        {
+            map.editorSaveName.push_back('w');
+            inputted++;
+        }
+        if(keyPress(SDLK_x))
+        {
+            map.editorSaveName.push_back('x');
+            inputted++;
+        }
+        if(keyPress(SDLK_y))
+        {
+            map.editorSaveName.push_back('y');
+            inputted++;
+        }
+        if(keyPress(SDLK_z))
+        {
+            map.editorSaveName.push_back('z');
+            inputted++;
+        }
+    }
 }
 
 void
@@ -155,7 +328,7 @@ InputHandler::inputButtons()
     }
     if(mouseRelease(SDL_BUTTON_LEFT))
     {
-        if((button = menu.checkButtons()) && button->active)
+        if((button = menu.checkButtons()) && button->clickFunction != NULL && button->active)
         {
             if(button->trigger == BRELEASE)
             {
