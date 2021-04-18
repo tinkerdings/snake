@@ -13,6 +13,7 @@ Render Render::s_Render;
 void
 Render::init()
 {
+    Map& map = Map::getSingleton();
     rend = SDL_CreateRenderer(wnd.getWindow(), -1, SDL_RENDERER_ACCELERATED);
     if(!rend)
     {
@@ -52,7 +53,25 @@ Render::init()
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
     previewFrame = createTexture("res/tile-preview.png");
+    map.bg              = createTexture("res/20x20-bg.png");
+    map.texWall         = createTexture("res/20x20-obstacle.png");
+    map.texWallCorner   = createTexture("res/20x20-0bstacle-2.png");
+    map.texP1Head       = createTexture("res/20x20-head.png");
+    map.texP1Tail       = createTexture("res/20x20-tail.png");
+    map.texP2Head       = createTexture("res/20x20-head-3.png");
+    map.texP2Tail       = createTexture("res/20x20-tail-3.png");
     initAlphabet();
+}
+
+void
+Render::freeAllTextures()
+{
+    for(int i = 0; i < allTextures.size(); i++)
+    {
+        SDL_DestroyTexture(allTextures[i]);
+        allTextures[i] = NULL;
+        allTextures.pop_back();
+    }
 }
 
 void
@@ -136,6 +155,7 @@ Render::createTexture(const char* filename)
         return NULL;
     }
 
+    allTextures.push_back(tex);
     return tex;
 }
 void

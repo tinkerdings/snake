@@ -48,6 +48,7 @@ main()
         state.run();
     }
     
+    rend.freeAllTextures();
     SDL_Quit();
     return 0;
 }

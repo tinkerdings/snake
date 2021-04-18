@@ -1,3 +1,10 @@
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dirent.h>
+#include <string.h>
+#endif
+
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -14,16 +21,53 @@ void
 Map::loadMap()
 {
     Render& rend = Render::getSingleton();
-    bg              = rend.createTexture("res/20x20-bg.png");
-    texWall         = rend.createTexture("res/20x20-obstacle.png");
-    texWallCorner   = rend.createTexture("res/20x20-0bstacle-2.png");
-    texP1Head       = rend.createTexture("res/20x20-head.png");
-    texP1Tail       = rend.createTexture("res/20x20-tail.png");
-    texP2Head       = rend.createTexture("res/20x20-head-3.png");
-    texP2Tail       = rend.createTexture("res/20x20-tail-3.png");
     pickups.clear();
     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
     pickups.push_back(pickup);
+}
+
+void
+Map::getMapFileNames(const char *path)
+{
+#ifdef _WIN32 // WINDOWS SPECIFIC CODE
+    WIN32_FIND_DATA FindFileData;
+    HANDLE hFind = FindFirstFile(path, &FindFileData);
+    if(hFind == INVALID_HANDLE_VALUE)
+    {
+        return;
+    } 
+    else do
+    {
+        if((strcmp(pdir->d_name, ".") != 0) && (strcmp(pdir->d_name, "..") != 0))
+        {
+            mapFileNames.push_back(pdir->d_name);
+        }
+    } while (FindNextFile(hFind, &FindFileData));
+    FindClose(hFind);
+#else         // UNIX BASED SPECIFIC CODE
+    DIR *dir;
+    dirent* pdir;
+
+    dir = opendir(path);
+
+    while(pdir = readdir(dir))
+    {
+        if((strcmp(pdir->d_name, ".") != 0) && (strcmp(pdir->d_name, "..") != 0))
+        {
+            mapFileNames.push_back(pdir->d_name);
+        }
+    }
+#endif
+}
+
+void
+Map::printMapNames()
+{
+    std::cout << "AVAIABLE MAPS:" << std::endl;
+    for(int i = 0; i < mapFileNames.size(); i++)
+    {
+        std::cout << mapFileNames[i] << std::endl;
+    }
 }
 
 void
@@ -222,7 +266,7 @@ Map::inputMapName()
         NULL, BRELEASE,
         "SAVE AS:",
         mapX + (mapW/2) - (w/2), mapY + (mapH/2) - (h/2), w, h,
-        5, true);
+        5, BTINPUT);
 
     savingMap = true;
 }

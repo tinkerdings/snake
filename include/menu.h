@@ -11,6 +11,11 @@ enum ButtonTrigger
     BPRESS, BRELEASE
 };
 
+enum ButtonType
+{
+    BTBUTTON, BTPREVIEW, BTINPUT
+};
+
 struct Button
 {
     std::function<void()> clickFunction;
@@ -19,6 +24,7 @@ struct Button
     SDL_Texture* tex;
     SDL_Color color;
     SDL_Color tint;
+    ButtonType type = BTBUTTON;
     bool active = false;
 };
 
@@ -26,6 +32,7 @@ class Menu
 {
 public:
     std::vector<Button> buttons;
+    std::vector<Button> mapPreviews;
 
     Menu(const Menu&) = delete;
     static Menu& getSingleton()
@@ -39,7 +46,7 @@ public:
         const char* txt,
         int x, int y, int w, int h,
         int emboss,
-        bool isInputBox);
+        ButtonType type);
     Button* checkButtons();
     void buttonCallbackSetBG();
     void clearButtons();

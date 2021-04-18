@@ -32,6 +32,7 @@ public:
     int mapNH = MAPH;
     int mapBottom = 20;
     std::vector<char> editorSaveName;
+    std::vector<std::string> mapFileNames;
     bool savingMap = false;
 
     int editorTileIndex = 0;
@@ -58,6 +59,8 @@ public:
     }
 
     void loadMap();
+    void getMapFileNames(const char *path);
+    void printMapNames();
     void setTile(int xPos, int yPos, TileType val);
     void resetMap();
     void inputMapName();

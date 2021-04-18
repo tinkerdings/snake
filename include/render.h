@@ -22,6 +22,7 @@ public:
     SDL_Texture *bgUI;
     SDL_Texture *logo;
     SDL_Texture *previewFrame;
+    std::vector<SDL_Texture *> allTextures;
 
     Render(const Render&) = delete;
     static Render& getSingleton()
@@ -29,6 +30,7 @@ public:
         return s_Render;
     }
     void init();
+    void freeAllTextures();
     void setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void clear();
     void renderBG(SDL_Texture *tex);

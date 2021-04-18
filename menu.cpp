@@ -31,7 +31,7 @@ Menu::createButton(
         const char* txt,
         int x, int y, int w, int h,
         int emboss,
-        bool isInputBox)
+        ButtonType type)
 {
     Render& rend = Render::getSingleton();
     if(!TTF_WasInit())
@@ -78,18 +78,27 @@ Menu::createButton(
     SDL_Surface *surfTxtBase;
     SDL_Surface *surfTxtShadow;
     SDL_Surface *surfTxtLight;
-    if(isInputBox)
+
+    switch(type)
     {
-        surfTxtBase = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtBase);
-        surfTxtShadow = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtShadow);
-        surfTxtLight = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtLight);
-    }
-    else
+    case(BTBUTTON):
     {
         surfTxtBase = TTF_RenderText_Solid(rend.font, txt, colorTxtBase);
         surfTxtShadow = TTF_RenderText_Solid(rend.font, txt, colorTxtShadow);
         surfTxtLight = TTF_RenderText_Solid(rend.font, txt, colorTxtLight);
+
+        break;
     }
+    case(BTINPUT):
+    {
+        surfTxtBase = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtBase);
+        surfTxtShadow = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtShadow);
+        surfTxtLight = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtLight);
+
+        break;
+    }
+    }
+
     if(!surfTxtBase || !surfTxtShadow || !surfTxtLight)
     {
         std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
@@ -107,24 +116,9 @@ Menu::createButton(
     SDL_Rect rectTxtLightDL;
     SDL_Rect rectTxtLightDR;
 
-    if(isInputBox)
+    switch(type)
     {
-        rectTxtBase.x = (button.rect.w/2)-(surfTxtBase->w/2);
-        rectTxtBase.y = (button.rect.h/5)-(surfTxtBase->h/2);
-        rectTxtBase.w = button.rect.w;
-        rectTxtBase.h = button.rect.h;
-
-        rectTxtShadowR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/5)-(surfTxtShadow->h/2), button.rect.w, button.rect.h};
-        rectTxtShadowU = {(button.rect.w/2)-(surfTxtShadow->w/2), (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
-        rectTxtShadowUR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
-        rectTxtShadowUL = {(button.rect.w/2)-(surfTxtShadow->w/2) - 2, (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
-
-        rectTxtLightL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/5)-(surfTxtLight->h/2), button.rect.w, button.rect.h};
-        rectTxtLightD = {(button.rect.w/2)-(surfTxtLight->w/2), (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
-        rectTxtLightDL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
-        rectTxtLightDR = {(button.rect.w/2)-(surfTxtLight->w/2) + 2, (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
-    }
-    else
+    case(BTBUTTON):
     {
         rectTxtBase.x = (button.rect.w/2)-(surfTxtBase->w/2);
         rectTxtBase.y = (button.rect.h/2)-(surfTxtBase->h/2);
@@ -140,6 +134,28 @@ Menu::createButton(
         rectTxtLightD = {(button.rect.w/2)-(surfTxtLight->w/2), (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
         rectTxtLightDL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
         rectTxtLightDR = {(button.rect.w/2)-(surfTxtLight->w/2) + 2, (button.rect.h/2)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+
+        break;
+    }
+    case(BTINPUT):
+    {
+        rectTxtBase.x = (button.rect.w/2)-(surfTxtBase->w/2);
+        rectTxtBase.y = (button.rect.h/5)-(surfTxtBase->h/2);
+        rectTxtBase.w = button.rect.w;
+        rectTxtBase.h = button.rect.h;
+
+        rectTxtShadowR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/5)-(surfTxtShadow->h/2), button.rect.w, button.rect.h};
+        rectTxtShadowU = {(button.rect.w/2)-(surfTxtShadow->w/2), (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+        rectTxtShadowUR = {(button.rect.w/2)-(surfTxtShadow->w/2) + 2, (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+        rectTxtShadowUL = {(button.rect.w/2)-(surfTxtShadow->w/2) - 2, (button.rect.h/5)-(surfTxtShadow->h/2) - 2, button.rect.w, button.rect.h};
+
+        rectTxtLightL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/5)-(surfTxtLight->h/2), button.rect.w, button.rect.h};
+        rectTxtLightD = {(button.rect.w/2)-(surfTxtLight->w/2), (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+        rectTxtLightDL = {(button.rect.w/2)-(surfTxtLight->w/2) - 2, (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+        rectTxtLightDR = {(button.rect.w/2)-(surfTxtLight->w/2) + 2, (button.rect.h/5)-(surfTxtLight->h/2) + 2, button.rect.w, button.rect.h};
+
+        break;
+    }
     }
 
     if(

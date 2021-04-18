@@ -9,8 +9,16 @@ void
 StateHandler::setState(State set)
 {
     Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
     InputHandler& input = InputHandler::getSingleton();
     menu.clearButtons();
+    if(set == CREATE)
+    {
+        if(!map.mapFileNames.size())
+        {
+            map.getMapFileNames("./maps");
+        }
+    }
     current = set;
 }
 
@@ -68,21 +76,21 @@ StateHandler::stateMenu()
             std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
             "PLAY",
             ww/2 - 200, 240, 400, 100,
-            10, false);
+            10, BTBUTTON);
 
         menu.setButtonColorTxt(64, 128, 255, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "CREATE",
             ww/2 - 200, 400, 400, 100,
-            10, false);
+            10, BTBUTTON);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Window::quit, &wnd), BRELEASE,
             "QUIT",
             ww/2 - 200, 560, 400, 100,
-            10, false);
+            10, BTBUTTON);
     }
 
     timeNow = SDL_GetTicks();
@@ -118,14 +126,14 @@ StateHandler::stateMenuCreate()
             std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
             "NEW",
             ww/2 - 200, 140, 400, 100,
-            10, false);
+            10, BTBUTTON);
 
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
             ww/2 - 200, 300, 400, 100,
-            10, false);
+            10, BTBUTTON);
     }
 
     timeNow = SDL_GetTicks();
@@ -194,21 +202,21 @@ StateHandler::stateCreate()
             std::bind(&StateHandler::setState, this, MENU_CREATE), BRELEASE,
             "MENU",
             65, 17, 190, 46,
-            5, false);
+            5, BTBUTTON);
 
         menu.setButtonColorTxt(255, 64, 64, 255);
         menu.createButton(
             std::bind(&Map::resetMap, &map), BRELEASE,
             "CLEAR",
             ww/2 - 95, 17, 190, 46,
-            5, false);
+            5, BTBUTTON);
 
         menu.setButtonColorTxt(0, 255, 64, 255);
         menu.createButton(
             std::bind(&Map::inputMapName, &map), BRELEASE,
             "SAVE",
             705, 17, 190, 46,
-            5, false);
+            5, BTBUTTON);
     }
 
     timeNow = SDL_GetTicks();
