@@ -305,6 +305,7 @@ void
 InputHandler::inputMenu()
 {
     inputButtons();
+    inputMapPreviews();
 }
 
 void
@@ -333,6 +334,37 @@ InputHandler::inputButtons()
             if(button->trigger == BRELEASE)
             {
                 button->clickFunction();
+            }
+        }
+    }
+}
+
+void
+InputHandler::inputMapPreviews()
+{
+    Menu& menu = Menu::getSingleton();
+    static Button *preview = NULL;
+    if(mousePress(SDL_BUTTON_LEFT))
+    {
+        if((preview = menu.checkMapPreviews()))
+        {
+            if(preview->trigger == BPRESS)
+            {
+                preview->clickFunction();
+            }
+            else
+            {
+                preview->active = true;
+            }
+        }
+    }
+    if(mouseRelease(SDL_BUTTON_LEFT))
+    {
+        if((preview = menu.checkMapPreviews()) && preview->clickFunction != NULL && preview->active)
+        {
+            if(preview->trigger == BRELEASE)
+            {
+                preview->clickFunction();
             }
         }
     }

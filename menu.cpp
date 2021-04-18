@@ -2,6 +2,8 @@
 #include <SDL.h>
 #include <SDL_ttf.h>
 #include <thread>
+#include <fstream>
+#include <sstream>
 #include "render.h"
 #include "inputHandler.h"
 
@@ -72,6 +74,29 @@ Menu::createButton(
         SDL_FillRect(surfButton, &lightR, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
     }
 
+    if(type == BTPREVIEW)
+    {
+        std::stringstream ss;
+        ss << "./maps/" << std::string(txt) << ".map";
+        std::string filename = ss.str();
+        std::ifstream file(filename);
+        if(!file)
+        {
+            std::cerr << "Failed to open file: " << filename << std::endl;
+            return;
+        }
+
+        char c;
+        while(!file.eof())
+        {
+            file.read(&c, 1);
+            if(c == 0)
+            {
+                std::cout << "empty!" << std::endl;
+            }
+        }
+    }
+
     SDL_Color colorTxtBase = colorTxt;
     SDL_Color colorTxtShadow = {21, 10, 36, 255};
     SDL_Color colorTxtLight = {90, 14, 194, 255};
@@ -89,6 +114,7 @@ Menu::createButton(
 
         break;
     }
+    case(BTPREVIEW): // FALLTHROUGH
     case(BTINPUT):
     {
         surfTxtBase = TTF_RenderText_Solid(rend.fontInput, txt, colorTxtBase);
@@ -137,6 +163,7 @@ Menu::createButton(
 
         break;
     }
+    case(BTPREVIEW): // FALLTHROUGH
     case(BTINPUT):
     {
         rectTxtBase.x = (button.rect.w/2)-(surfTxtBase->w/2);
@@ -189,7 +216,20 @@ Menu::createButton(
     SDL_FreeSurface(surfTxtLight);
     SDL_FreeSurface(surfTxtBase);
 
-    buttons.push_back(button);
+    switch(type)
+    {
+    case(BTBUTTON): // FALLTHROUGH
+    case(BTINPUT):
+    {
+        buttons.push_back(button);
+
+        break;
+    }
+    case(BTPREVIEW):
+    {
+        mapPreviews.push_back(button);
+    }
+    }
 }
 
 Button*
@@ -208,6 +248,27 @@ Menu::checkButtons()
         else
         {
             button->active = false;
+        }
+    }
+    return NULL;
+}
+
+Button*
+Menu::checkMapPreviews()
+{
+    InputHandler& input = InputHandler::getSingleton();
+    for(auto preview = mapPreviews.begin(); preview != mapPreviews.end(); preview++)
+    {
+        if(!mapPreviews.size())
+            break;
+        if(((input.e.button.x >= preview->rect.x)&&(input.e.button.x <= (preview->rect.x+preview->rect.w))) &&
+           ((input.e.button.y >= preview->rect.y)&&(input.e.button.y <= (preview->rect.y+preview->rect.h))))
+        {
+            return &(*preview);
+        }
+        else
+        {
+            preview->active = false;
         }
     }
     return NULL;

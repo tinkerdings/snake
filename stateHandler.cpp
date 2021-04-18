@@ -134,6 +134,13 @@ StateHandler::stateMenuCreate()
             "BACK",
             ww/2 - 200, 300, 400, 100,
             10, BTBUTTON);
+
+        menu.setButtonColorTxt(64, 64, 255, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, CREATE), BRELEASE,
+            "ok",
+            ww/2 - 200, 460, 200, 200,
+            10, BTPREVIEW);
     }
 
     timeNow = SDL_GetTicks();
@@ -144,6 +151,7 @@ StateHandler::stateMenuCreate()
         rend.renderBG(rend.bgUI);
 
         rend.renderButtons();
+        rend.renderMapPreviews();
 
         rend.show();
     }

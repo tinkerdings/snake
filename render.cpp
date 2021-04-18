@@ -158,6 +158,7 @@ Render::createTexture(const char* filename)
     allTextures.push_back(tex);
     return tex;
 }
+
 void
 Render::setClear(unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
@@ -240,6 +241,16 @@ Render::renderButtons()
     for(auto button : menu.buttons)
     {
         SDL_RenderCopy(rend, button.tex, NULL, &button.rect);
+    }
+}
+
+void
+Render::renderMapPreviews()
+{
+    Menu& menu = Menu::getSingleton();
+    for(auto preview : menu.mapPreviews)
+    {
+        SDL_RenderCopy(rend, preview.tex, NULL, &preview.rect);
     }
 }
 

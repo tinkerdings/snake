@@ -32,6 +32,7 @@ public:
     void inputMenu();
     void pollInput();
     void inputButtons();
+    void inputMapPreviews();
     // Key input
     bool keyPress(int sdlKeycode);
     bool keyHold(int iKeyIndex);

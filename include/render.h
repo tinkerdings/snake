@@ -41,6 +41,7 @@ public:
     void renderText(Text *tex, int x, int y, int w, int h);
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);
     void renderButtons();
+    void renderMapPreviews();
     void renderMap();
     void renderTilePlacementBox();
     void renderTilePreview();

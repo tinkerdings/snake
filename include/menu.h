@@ -48,6 +48,7 @@ public:
         int emboss,
         ButtonType type);
     Button* checkButtons();
+    Button* checkMapPreviews();
     void buttonCallbackSetBG();
     void clearButtons();
 private:
