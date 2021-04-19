@@ -87,7 +87,6 @@ InputHandler::inputCreate()
             {
             case(TWALL):
             {
-                std::cout << "place wall at row: " << (mouseY - map.mapY)/map.gridSize << " col: " << (mouseX - map.mapX)/map.gridSize << std::endl;
                 map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TWALL);
 
                 break;

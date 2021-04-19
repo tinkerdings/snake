@@ -18,7 +18,7 @@ Map Map::s_Map;
 void
 Map::loadMap(const char* mapName)
 {
-    std::cout << "loaded map" << std::endl;
+    std::cout << "loading map" << std::endl;
     Render& rend = Render::getSingleton();
     char mapData[MAPH*(MAPW+1)] = {0};
     clearMap();
@@ -31,7 +31,9 @@ Map::loadMap(const char* mapName)
             {
             case('0'):
             {
+                std::cout << "empty" << std::endl;
                 setTile(j, i, TEMPTY);
+                
                 break;
             }
             case('#'):
@@ -42,26 +44,35 @@ Map::loadMap(const char* mapName)
             case('H'):
             {
                 setTile(j, i, TP1HEAD);
+                editorP1HeadStartY = j;
+                editorP1HeadStartX = i;
                 break;
             }
             case('T'):
             {
                 setTile(j, i, TP1TAIL);
+                editorP1TailStartY = j;
+                editorP1TailStartX = i;
                 break;
             }
             case('h'):
             {
                 setTile(j, i, TP2HEAD);
+                editorP2HeadStartY = j;
+                editorP2HeadStartX = i;
                 break;
             }
             case('t'):
             {
                 setTile(j, i, TP2TAIL);
+                editorP2TailStartY = j;
+                editorP2TailStartX = i;
                 break;
             }
             }
         }
     }
+    std::cout << "loaded map" << std::endl;
 //     pickups.clear();
 //     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
 //     pickups.push_back(pickup);
@@ -85,6 +96,7 @@ Map::readMap(const char* mapName, char buffer[MAPH*(MAPW+1)])
     {
         file.read(buffer, MAPH*(MAPW+1));
     }
+    file.close();
 }
 
 void
@@ -152,7 +164,7 @@ Map::setTile(int row, int column, TileType val)
     }
 
     // in EDITOR
-    if((editorValidPlacement) && (getTile(column, row) != val))
+    if((editorValidPlacement) && (getTile(row, column) != val))
     {
         switch(val)
         {
@@ -165,8 +177,8 @@ Map::setTile(int row, int column, TileType val)
         {
             if(editorP1HeadStartX != -1) 
             {
-                map[editorP1HeadStartX][editorP1HeadStartY] = TEMPTY;
-                map[editorP1TailStartX][editorP1TailStartY] = TEMPTY;
+                map[editorP1HeadStartY][editorP1HeadStartX] = TEMPTY;
+                map[editorP1TailStartY][editorP1TailStartX] = TEMPTY;
             }
             switch(editorRotation)
             {
@@ -212,8 +224,8 @@ Map::setTile(int row, int column, TileType val)
         {
             if(editorP2HeadStartX != -1) 
             {
-                map[editorP2HeadStartX][editorP2HeadStartY] = TEMPTY;
-                map[editorP2TailStartX][editorP2TailStartY] = TEMPTY;
+                map[editorP2HeadStartY][editorP2HeadStartX] = TEMPTY;
+                map[editorP2TailStartY][editorP2TailStartX] = TEMPTY;
             }
             switch(editorRotation)
             {
@@ -295,6 +307,7 @@ Map::editorRotate()
 void
 Map::clearMap()
 {
+    std::cout << "clearMap called" << std::endl;
     for(int j = 0; j < MAPH; j++)
     {
         for(int i = 0; i < MAPW; i++)

@@ -48,7 +48,6 @@ StateHandler::setState(State set)
     {
         if(map.newMap)
         {
-            std::cout << "clear" << std::endl;
             map.clearMap();
         }
 
