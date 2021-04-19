@@ -39,8 +39,6 @@ main()
     game.init();
     // Set initial state.
     state.setState(MENU);
-    // Load Map.
-    map.loadMap();
 
     rend.setClear(32, 32, 32, 255);
     while(!wnd.shouldQuit())

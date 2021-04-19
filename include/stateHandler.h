@@ -6,7 +6,7 @@
 
 enum State
 {
-    MENU, MENU_CREATE, PLAY, CREATE, RESTART
+    MENU, MENU_CREATE, MENU_PLAY, PLAY, CREATE, RESTART
 };
 class StateHandler
 {
@@ -17,6 +17,8 @@ public:
         return s_StateHandler;
     }
     void setState(State set);
+    void setStateAndLoadMap(State set, const char* mapName);
+    void stateNewMap();
     void run();
 
 private:

@@ -14,16 +14,77 @@
 #include "menu.h"
 #include "render.h"
 
-#define HERE std::cout << "here!" << std::endl
-
 Map Map::s_Map;
 void
-Map::loadMap()
+Map::loadMap(const char* mapName)
 {
+    std::cout << "loaded map" << std::endl;
     Render& rend = Render::getSingleton();
-    pickups.clear();
-    Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
-    pickups.push_back(pickup);
+    char mapData[MAPH*(MAPW+1)] = {0};
+    clearMap();
+    readMap(mapName, mapData);
+    for(int j = 0; j < MAPH; j++)
+    {
+        for(int i = 0; i < MAPW; i++)
+        {
+            switch(mapData[(j*(MAPW+1))+i])
+            {
+            case('0'):
+            {
+                setTile(j, i, TEMPTY);
+                break;
+            }
+            case('#'):
+            {
+                setTile(j, i, TWALL);
+                break;
+            }
+            case('H'):
+            {
+                setTile(j, i, TP1HEAD);
+                break;
+            }
+            case('T'):
+            {
+                setTile(j, i, TP1TAIL);
+                break;
+            }
+            case('h'):
+            {
+                setTile(j, i, TP2HEAD);
+                break;
+            }
+            case('t'):
+            {
+                setTile(j, i, TP2TAIL);
+                break;
+            }
+            }
+        }
+    }
+//     pickups.clear();
+//     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
+//     pickups.push_back(pickup);
+}
+
+void
+Map::readMap(const char* mapName, char buffer[MAPH*(MAPW+1)])
+{
+    std::stringstream ss;
+    ss << "./maps/" << std::string(mapName);
+    std::string filename = ss.str();
+    std::ifstream file(filename);
+    if(!file)
+    {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
+    }
+
+    int mapSize = MAPH*MAPW;
+    while(!file.eof())
+    {
+        file.read(buffer, MAPH*(MAPW+1));
+    }
 }
 
 void
@@ -61,53 +122,43 @@ Map::getMapFileNames(const char *path)
 }
 
 void
-Map::printMapNames()
-{
-    std::cout << "AVAIABLE MAPS:" << std::endl;
-    for(int i = 0; i < mapFileNames.size(); i++)
-    {
-        std::cout << mapFileNames[i] << std::endl;
-    }
-}
-
-void
-Map::setTile(int xPos, int yPos, TileType val)
+Map::setTile(int row, int column, TileType val)
 {
     // in GAME
 
     // can only place one of each player.
     if(val == TEMPTY)
     {
-        if((((xPos - mapX)/gridSize) == editorP1HeadStartX) && (((yPos - mapY)/gridSize) == editorP1HeadStartY) ||
-            ((((xPos - mapX)/gridSize) == editorP1TailStartX) && (((yPos - mapY)/gridSize) == editorP1TailStartY)))
+        if((column == editorP1HeadStartX) && (row == editorP1HeadStartY) ||
+            ((column == editorP1TailStartX) && (row == editorP1TailStartY)))
         {
             map[editorP1HeadStartX][editorP1HeadStartY] = TEMPTY;
             map[editorP1TailStartX][editorP1TailStartY] = TEMPTY;
         }
-        else if((((xPos - mapX)/gridSize) == editorP2HeadStartX) && (((yPos - mapY)/gridSize) == editorP2HeadStartY) ||
-            ((((xPos - mapX)/gridSize) == editorP2TailStartX) && (((yPos - mapY)/gridSize) == editorP2TailStartY)))
+        else if((column == editorP2HeadStartX) && (row == editorP2HeadStartY) ||
+            ((column == editorP2TailStartX) && (row == editorP2TailStartY)))
         {
             map[editorP2HeadStartX][editorP2HeadStartY] = TEMPTY;
             map[editorP2TailStartX][editorP2TailStartY] = TEMPTY;
         }
         else
         {
-            map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
+            map[row][column] = val;
         }
     }
     if(val == TSNAKE)
     {
-        map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
+        map[row][column] = val;
     }
 
     // in EDITOR
-    if((editorValidPlacement) && (getTile(xPos, yPos) != val))
+    if((editorValidPlacement) && (getTile(column, row) != val))
     {
         switch(val)
         {
         case(TWALL):
         {
-            map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = val;
+            map[row][column] = val;
             break;
         }
         case(TP1START):
@@ -121,40 +172,40 @@ Map::setTile(int xPos, int yPos, TileType val)
             {
             case(0):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
-                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) + 1] = TP1TAIL;
-                editorP1TailStartX = ((xPos - mapX)/gridSize);
-                editorP1TailStartY = ((yPos - mapY)/gridSize) + 1;
+                map[row][column] = TP1HEAD;
+                map[row + 1][column] = TP1TAIL;
+                editorP1TailStartX = column;
+                editorP1TailStartY = row + 1;
                 break;
             }
             case(90):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
-                map[((xPos - mapX)/gridSize) - 1][(yPos - mapY)/gridSize] = TP1TAIL;
-                editorP1TailStartX = ((xPos - mapX)/gridSize) - 1;
-                editorP1TailStartY = ((yPos - mapY)/gridSize);
+                map[row][column] = TP1HEAD;
+                map[row][column - 1] = TP1TAIL;
+                editorP1TailStartX = column - 1;
+                editorP1TailStartY = row;
                 break;
             }
             case(180):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
-                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) - 1] = TP1TAIL;
-                editorP1TailStartX = ((xPos - mapX)/gridSize);
-                editorP1TailStartY = ((yPos - mapY)/gridSize) - 1;
+                map[row][column] = TP1HEAD;
+                map[row - 1][column] = TP1TAIL;
+                editorP1TailStartX = column;
+                editorP1TailStartY = row - 1;
                 break;
             }
             case(270):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP1HEAD;
-                map[((xPos - mapX)/gridSize) + 1][(yPos - mapY)/gridSize] = TP1TAIL;
-                editorP1TailStartX = ((xPos - mapX)/gridSize) + 1;
-                editorP1TailStartY = ((yPos - mapY)/gridSize);
+                map[row][column] = TP1HEAD;
+                map[row][column + 1] = TP1TAIL;
+                editorP1TailStartX = column + 1;
+                editorP1TailStartY = row;
                 break;
             }
             }
 
-            editorP1HeadStartX = ((xPos - mapX)/gridSize);
-            editorP1HeadStartY = ((yPos - mapY)/gridSize);
+            editorP1HeadStartX = column;
+            editorP1HeadStartY = row;
             break;
         }
         case(TP2START):
@@ -168,40 +219,40 @@ Map::setTile(int xPos, int yPos, TileType val)
             {
             case(0):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
-                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) + 1] = TP2TAIL;
-                editorP2TailStartX = ((xPos - mapX)/gridSize);
-                editorP2TailStartY = ((yPos - mapY)/gridSize) + 1;
+                map[row][column] = TP2HEAD;
+                map[row + 1][column] = TP2TAIL;
+                editorP2TailStartX = column;
+                editorP2TailStartY = row + 1;
                 break;
             }
             case(90):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
-                map[((xPos - mapX)/gridSize) - 1][(yPos - mapY)/gridSize] = TP2TAIL;
-                editorP2TailStartX = ((xPos - mapX)/gridSize) - 1;
-                editorP2TailStartY = ((yPos - mapY)/gridSize);
+                map[row][column] = TP2HEAD;
+                map[row][column - 1] = TP2TAIL;
+                editorP2TailStartX = column - 1;
+                editorP2TailStartY = row;
                 break;
             }
             case(180):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
-                map[(xPos - mapX)/gridSize][((yPos - mapY)/gridSize) - 1] = TP2TAIL;
-                editorP2TailStartX = ((xPos - mapX)/gridSize);
-                editorP2TailStartY = ((yPos - mapY)/gridSize) - 1;
+                map[row][column] = TP2HEAD;
+                map[row - 1][column] = TP2TAIL;
+                editorP2TailStartX = column;
+                editorP2TailStartY = row - 1;
                 break;
             }
             case(270):
             {
-                map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize] = TP2HEAD;
-                map[((xPos - mapX)/gridSize) + 1][(yPos - mapY)/gridSize] = TP2TAIL;
-                editorP2TailStartX = ((xPos - mapX)/gridSize) + 1;
-                editorP2TailStartY = ((yPos - mapY)/gridSize);
+                map[row][column] = TP2HEAD;
+                map[row][column + 1] = TP2TAIL;
+                editorP2TailStartX = column + 1;
+                editorP2TailStartY = row;
                 break;
             }
             }
 
-            editorP2HeadStartX = ((xPos - mapX)/gridSize);
-            editorP2HeadStartY = ((yPos - mapY)/gridSize);
+            editorP2HeadStartX = column;
+            editorP2HeadStartY = row;
             break;
         }
         }
@@ -209,9 +260,9 @@ Map::setTile(int xPos, int yPos, TileType val)
 }
 
 TileType
-Map::getTile(int xPos, int yPos)
+Map::getTile(int row, int column)
 {
-    return map[(xPos - mapX)/gridSize][(yPos - mapY)/gridSize];
+    return map[row][column];
 }
 
 void
@@ -242,11 +293,11 @@ Map::editorRotate()
 }
 
 void
-Map::resetMap()
+Map::clearMap()
 {
-    for(int i = 0; i < MAPH; i++)
+    for(int j = 0; j < MAPH; j++)
     {
-        for(int j = 0; j < MAPW; j++)
+        for(int i = 0; i < MAPW; i++)
         {
             map[j][i] = TEMPTY;
         }
@@ -275,7 +326,7 @@ void
 Map::saveMap(std::string mapName)
 {
     std::stringstream ss;
-    ss << "./maps/" << mapName << ".map";
+    ss << "./maps/" << mapName;
     std::string filename = ss.str();
 
     std::ofstream file(filename);
@@ -286,9 +337,9 @@ Map::saveMap(std::string mapName)
     }
 
     std::stringstream saveStream;
-    for(int i = 0; i < MAPH; i++)
+    for(int j = 0; j < MAPH; j++)
     {
-        for(int j = 0; j < MAPW; j++)
+        for(int i = 0; i < MAPW; i++)
         {
             switch(map[j][i])
             {

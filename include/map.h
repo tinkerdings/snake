@@ -20,7 +20,7 @@ class Map
 public:
     std::vector<Pickup> pickups;
     int gridSize = GRIDSIZE;
-    TileType map[MAPW][MAPH] = {TEMPTY};
+    TileType map[MAPH][MAPW] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
     SDL_Texture *texP1Head, *texP1Tail, *texP2Head, *texP2Tail;
@@ -34,6 +34,7 @@ public:
     std::vector<char> editorSaveName;
     std::vector<std::string> mapFileNames;
     bool savingMap = false;
+    bool newMap = true;
 
     int editorTileIndex = 0;
     std::vector<TileType> editorTiles = {
@@ -58,11 +59,11 @@ public:
         return s_Map;
     }
 
-    void loadMap();
+    void loadMap(const char* mapName);
+    void readMap(const char* mapName, char buffer[MAPH*(MAPW+1)]);
     void getMapFileNames(const char *path);
-    void printMapNames();
     void setTile(int xPos, int yPos, TileType val);
-    void resetMap();
+    void clearMap();
     void inputMapName();
     void saveMap(std::string mapName);
     void nextEditorTile();

@@ -15,7 +15,6 @@ Game::init()
     snakes.clear();
     Snake player1;
     snakes.push_back(player1);
-    map.loadMap();
     started = true;
 }
 

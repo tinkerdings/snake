@@ -36,6 +36,7 @@ Menu::createButton(
         ButtonType type)
 {
     Render& rend = Render::getSingleton();
+    Map& map = Map::getSingleton();
     if(!TTF_WasInit())
     {
         if(TTF_Init() == -1)
@@ -45,7 +46,7 @@ Menu::createButton(
             std::exit(1);
         }
         rend.font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
-        rend.fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 16);
+        rend.fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 18);
         if(!rend.font || !rend.fontInput)
         {
             std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
@@ -76,23 +77,55 @@ Menu::createButton(
 
     if(type == BTPREVIEW)
     {
-        std::stringstream ss;
-        ss << "./maps/" << std::string(txt) << ".map";
-        std::string filename = ss.str();
-        std::ifstream file(filename);
-        if(!file)
+        int previewEmboss = emboss/2;
+        int previewOffsetX = 20;
+        int previewOffsetY = 60;
+        int previewTileSize = 4;
+        int previewW = previewTileSize * MAPW + previewEmboss;
+        int previewH = previewTileSize * MAPH + previewEmboss;
+        for(int i = 0; i < previewEmboss; i++)
         {
-            std::cerr << "Failed to open file: " << filename << std::endl;
-            return;
+            SDL_Rect shadowT = {previewOffsetX - previewEmboss + i, previewOffsetY - previewEmboss + i, previewW - i, 1};
+            SDL_Rect shadowR = {previewOffsetX + previewW + i - previewEmboss, previewOffsetY - previewEmboss, 1, previewH + i};
+            SDL_Rect lightB = {previewOffsetX - previewEmboss, previewOffsetY + previewH + i - previewEmboss, previewW + i, 1};
+            SDL_Rect lightL = {previewOffsetX - previewEmboss + i, previewOffsetY - previewEmboss + i, 1, previewH - i};
+            SDL_FillRect(surfButton, &shadowT, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+            SDL_FillRect(surfButton, &shadowR, SDL_MapRGBA(surfButton->format, 32, 32, 32, 255));
+            SDL_FillRect(surfButton, &lightB, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
+            SDL_FillRect(surfButton, &lightL, SDL_MapRGBA(surfButton->format, 196, 196, 196, 255));
         }
 
-        char c;
-        while(!file.eof())
+        char mapData[MAPH*(MAPW+1)] = {0};
+        map.readMap(txt, mapData);
+
+        for(int j = 0; j < MAPH; j++)
         {
-            file.read(&c, 1);
-            if(c == 0)
+            for(int i = 0; i < MAPW+1; i++)
             {
-                std::cout << "empty!" << std::endl;
+                int previewTileX = previewOffsetX + (i*previewTileSize);
+                int previewTileY = previewOffsetY + (j*previewTileSize);
+                SDL_Rect previewRect = {previewTileX, previewTileY, previewTileSize, previewTileSize};
+                switch(mapData[(j*(MAPW+1))+i])
+                {
+                case('0'):
+                {
+                    SDL_FillRect(surfButton, &previewRect, SDL_MapRGBA(surfButton->format, 20, 14, 16, 255));
+                    break;
+                }
+                case('#'):
+                {
+                    SDL_FillRect(surfButton, &previewRect, SDL_MapRGBA(surfButton->format, 90, 14, 194, 255));
+                    break;
+                }
+                case('H'): // FALLTHROUGH
+                case('T'): // FALLTHROUGH
+                case('h'): // FALLTHROUGH
+                case('t'):
+                {
+                    SDL_FillRect(surfButton, &previewRect, SDL_MapRGBA(surfButton->format, 64, 255, 64, 255));
+                    break;
+                }
+                }
             }
         }
     }
@@ -262,7 +295,7 @@ Menu::checkMapPreviews()
         if(!mapPreviews.size())
             break;
         if(((input.e.button.x >= preview->rect.x)&&(input.e.button.x <= (preview->rect.x+preview->rect.w))) &&
-           ((input.e.button.y >= preview->rect.y)&&(input.e.button.y <= (preview->rect.y+preview->rect.h))))
+           ((input.e.button.y >= preview->rect.y - mapPreviewScrollOffset)&&(input.e.button.y <= (preview->rect.y+preview->rect.h - mapPreviewScrollOffset))))
         {
             return &(*preview);
         }
@@ -286,4 +319,22 @@ Menu::clearButtons()
         }
         buttons.clear();
     }
+    if(mapPreviews.size())
+    {
+        for(auto preview = mapPreviews.begin(); preview != mapPreviews.end(); preview++)
+        {
+            SDL_DestroyTexture(preview->tex);
+            preview->clickFunction = NULL;
+        }
+        mapPreviews.clear();
+    }
+}
+void
+Menu::movePreviews(int moveY)
+{
+    mapPreviewScrollOffset += moveY;
+    if(mapPreviewScrollOffset < 0)
+        mapPreviewScrollOffset = 0;
+    if(mapPreviewScrollOffset > (((mapPreviews.size()*(mapPreviewH+mapPreviewSpacing))) / 3) - (2*mapPreviewH) + mapPreviewSpacing)
+        mapPreviewScrollOffset = (((mapPreviews.size()*(mapPreviewH+mapPreviewSpacing))) / 3) - (2*mapPreviewH) + mapPreviewSpacing;
 }

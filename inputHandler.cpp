@@ -87,19 +87,20 @@ InputHandler::inputCreate()
             {
             case(TWALL):
             {
-                map.setTile(mouseX, mouseY, TWALL);
+                std::cout << "place wall at row: " << (mouseY - map.mapY)/map.gridSize << " col: " << (mouseX - map.mapX)/map.gridSize << std::endl;
+                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TWALL);
 
                 break;
             }
             case(TP1START):
             {
-                map.setTile(mouseX, mouseY, TP1START);
+                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TP1START);
 
                 break;
             }
             case(TP2START):
             {
-                map.setTile(mouseX, mouseY, TP2START);
+                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TP2START);
 
                 break;
             }
@@ -107,7 +108,7 @@ InputHandler::inputCreate()
         }
         if(mouseDown(SDL_BUTTON_RIGHT))
         {
-            map.setTile(mouseX, mouseY, TEMPTY);
+            map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TEMPTY);
         }
     }
     else

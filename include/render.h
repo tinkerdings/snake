@@ -19,6 +19,8 @@ public:
     TTF_Font *fontInput = NULL;
     SDL_Texture *alphabet[26];
     SDL_Texture *bgUIFramed;
+    SDL_Texture *bgUIMapSelect;
+    SDL_Texture *fgUIMapSelect;
     SDL_Texture *bgUI;
     SDL_Texture *logo;
     SDL_Texture *previewFrame;

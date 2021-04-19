@@ -40,7 +40,7 @@ Render::init()
             std::exit(1);
         }
         font = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 24);
-        fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 14);
+        fontInput = TTF_OpenFont("res/PxPlus_IBM_VGA8.ttf", 17);
         if(!font || !fontInput)
         {
             std::cerr << "TTF_OpenFont: " << TTF_GetError() << std::endl;
@@ -52,6 +52,8 @@ Render::init()
     logo = createTexture("res/logo.png");
     bgUI = createTexture("res/ui-bg-brick.png");
     bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
+    bgUIMapSelect = createTexture("res/ui-bg-mapselect-brick.png");
+    fgUIMapSelect = createTexture("res/ui-fg-mapselect-brick.png");
     previewFrame = createTexture("res/tile-preview.png");
     map.bg              = createTexture("res/20x20-bg.png");
     map.texWall         = createTexture("res/20x20-obstacle.png");
@@ -250,7 +252,9 @@ Render::renderMapPreviews()
     Menu& menu = Menu::getSingleton();
     for(auto preview : menu.mapPreviews)
     {
-        SDL_RenderCopy(rend, preview.tex, NULL, &preview.rect);
+        SDL_Rect rect = preview.rect;
+        rect.y -= menu.mapPreviewScrollOffset;
+        SDL_RenderCopy(rend, preview.tex, NULL, &rect);
     }
 }
 
@@ -305,12 +309,12 @@ Render::renderMap()
     SDL_Rect rect;
     SDL_QueryTexture(map.texWall, NULL, NULL, &rect.w, &rect.h);
 
-    for(int i = 0; i < MAPH; i++)
+    for(int j = 0; j < MAPH; j++)
     {
-        for(int j = 0; j < MAPW; j++)
+        for(int i = 0; i < MAPW; i++)
         {
-            rect.x = (j * map.gridSize) + map.mapX;
-            rect.y = (i * map.gridSize) + map.mapY;
+            rect.x = (i * map.gridSize) + map.mapX;
+            rect.y = (j * map.gridSize) + map.mapY;
             switch(map.map[j][i])
             {
             case(TWALL):
@@ -334,25 +338,25 @@ Render::renderMap()
             }
             case(TP1HEAD):
             {
-                if(map.editorP1TailStartX < map.editorP1HeadStartX)
+                if(map.map[j][i-1] == TP1TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
                     rect.x -= map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP1TailStartX > map.editorP1HeadStartX)
+                else if(map.map[j][i+1] == TP1TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
                     rect.x += map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP1TailStartY > map.editorP1HeadStartY)
+                else if(map.map[j+1][i] == TP1TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
                     rect.y += map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP1TailStartY < map.editorP1HeadStartY)
+                else if(map.map[j-1][i] == TP1TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
                     rect.y -= map.gridSize;
@@ -363,31 +367,30 @@ Render::renderMap()
             }
             case(TP2HEAD):
             {
-                if(map.editorP2TailStartX < map.editorP2HeadStartX)
+                if(map.map[j][i-1] == TP2TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
                     rect.x -= map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP2TailStartX > map.editorP2HeadStartX)
+                else if(map.map[j][i+1] == TP2TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
                     rect.x += map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP2TailStartY > map.editorP2HeadStartY)
+                else if(map.map[j+1][i] == TP2TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
                     rect.y += map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
                 }
-                else if(map.editorP2TailStartY < map.editorP2HeadStartY)
+                else if(map.map[j-1][i] == TP2TAIL)
                 {
                     SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
                     rect.y -= map.gridSize;
                     SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
                 }
-
                 break;
             }
             }

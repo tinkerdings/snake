@@ -398,6 +398,6 @@ Snake::checkCrash()
     if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)
     {
         state.setState(RESTART);
-        map.resetMap();
+        map.clearMap();
     }
 }

@@ -33,6 +33,10 @@ class Menu
 public:
     std::vector<Button> buttons;
     std::vector<Button> mapPreviews;
+    int mapPreviewW = 200;
+    int mapPreviewH = 200;
+    int mapPreviewSpacing = 20;
+    int mapPreviewScrollOffset = 0;
 
     Menu(const Menu&) = delete;
     static Menu& getSingleton()
@@ -51,6 +55,7 @@ public:
     Button* checkMapPreviews();
     void buttonCallbackSetBG();
     void clearButtons();
+    void movePreviews(int moveY);
 private:
     Menu(){};
     static Menu s_Menu;
