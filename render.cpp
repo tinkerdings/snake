@@ -378,24 +378,76 @@ Render::renderMap()
             {
                 if((map.getTile(j-1, i) == TP1BODY) || (map.getTile(j-1, i) == TP1HEAD))
                 {
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
                 }
                 else if((map.getTile(j+1, i) == TP1BODY) || (map.getTile(j+1, i) == TP1HEAD))
                 {
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
                 }
                 else if((map.getTile(j, i-1) == TP1BODY) || (map.getTile(j, i-1) == TP1HEAD))
                 {
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
                 }
                 else if((map.getTile(j, i+1) == TP1BODY) || (map.getTile(j, i+1) == TP1HEAD))
                 {
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
                 }
-                else
+//                 else
+//                 {
+//                     map.setTile(j, i, TEMPTY);
+//                 }
+
+                break;
+            }
+            case(TP2HEAD):
+            {
+                if((map.getTile(j-1, i) == TP2BODY) || (map.getTile(j-1, i) == TP2TAIL))
                 {
-                    map.setTile(j, i, TEMPTY);
+                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
                 }
+                else if((map.getTile(j+1, i) == TP2BODY) || (map.getTile(j+1, i) == TP2TAIL))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                }
+                else if((map.getTile(j, i-1) == TP2BODY) || (map.getTile(j, i-1) == TP2TAIL))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                }
+                else if((map.getTile(j, i+1) == TP2BODY) || (map.getTile(j, i+1) == TP2TAIL))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                }
+
+                break;
+            }
+            case(TP2BODY):
+            {
+                SDL_RenderCopyEx(rend, map.texP2Body, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+
+                break;
+            }
+            case(TP2TAIL):
+            {
+                if((map.getTile(j-1, i) == TP1BODY) || (map.getTile(j-1, i) == TP2HEAD))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                }
+                else if((map.getTile(j+1, i) == TP2BODY) || (map.getTile(j+1, i) == TP2HEAD))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                }
+                else if((map.getTile(j, i-1) == TP2BODY) || (map.getTile(j, i-1) == TP2HEAD))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                }
+                else if((map.getTile(j, i+1) == TP2BODY) || (map.getTile(j, i+1) == TP2HEAD))
+                {
+                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                }
+//                 else
+//                 {
+//                     map.setTile(j, i, TEMPTY);
+//                 }
 
                 break;
             }

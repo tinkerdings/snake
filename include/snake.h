@@ -42,8 +42,6 @@ public:
     void initTextures(int snakeNr);
 
 private:
-    int intervals = 4;
-    int speedup = 5;
     int player = 0;
     Map& map = Map::getSingleton();
     Window& wnd = Window::getSingleton();

@@ -85,6 +85,7 @@ void
 StateHandler::setStateAndLoadMap(State set, const char* mapName)
 {
     Map& map = Map::getSingleton();
+    map.currentMapName = mapName;
     map.loadMap(mapName);
     map.newMap = false;
     setState(set);
@@ -365,6 +366,7 @@ StateHandler::statePlay()
     }
 
     game.update();
+//     map.printMap();
 
     timeNow = SDL_GetTicks();
     if((timeNow - timePrev) >= 1000/FPS)

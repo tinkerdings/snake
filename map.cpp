@@ -72,11 +72,64 @@ Map::readMap(const char* mapName, char buffer[MAPH*(MAPW+1)])
 }
 
 void
+Map::printMap()
+{
+    for(int j = 0; j < MAPH; j++)
+    {
+        for(int i = 0; i < MAPW; i++)
+        {
+            switch(map[j][i])
+            {
+            case(TEMPTY):
+            {
+                std::cout << "0";
+
+                break;
+            }
+            case(TWALL):
+            {
+                std::cout << "#";
+
+                break;
+            }
+            case(TP1HEAD):
+            {
+                std::cout << "H";
+                
+                break;
+            }
+            case(TP1TAIL):
+            {
+                std::cout << "T";
+
+                break;
+            }
+            case(TP2HEAD):
+            {
+                std::cout << "h";
+
+                break;
+            }
+            case(TP2TAIL):
+            {
+                std::cout << "t";
+
+                break;
+            }
+            }
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+}
+
+void
 Map::loadMap(const char* mapName)
 {
     Render& rend = Render::getSingleton();
     char mapData[MAPH*(MAPW+1)] = {0};
     newMap = false;
+    currentMapName = mapName;
     clearMap();
     readMap(mapName, mapData);
     for(int j = 0; j < MAPH; j++)

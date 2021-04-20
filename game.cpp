@@ -11,7 +11,9 @@ Game::init()
 {
     Menu& menu = Menu::getSingleton();
     Render& rend = Render::getSingleton();
+
     snakes.clear();
+
     Snake player1;
     snakes.push_back(player1);
     if(players == 2)

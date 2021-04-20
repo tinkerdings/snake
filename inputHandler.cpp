@@ -29,6 +29,7 @@ InputHandler::inputPlay()
     if(keyPress(SDLK_ESCAPE))
     {
         state.setState(MENU);
+        game.started = false;
         return;
     }
 

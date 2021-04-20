@@ -19,6 +19,8 @@ Snake::Snake()
         player = 0;
         addSegment(map.P1HeadRow, map.P1HeadColumn);
         addSegment(map.P1TailRow, map.P1TailColumn);
+        addSegment(map.P1TailRow+1, map.P1TailColumn);
+        addSegment(map.P1TailRow+2, map.P1TailColumn);
         initTextures(player);
     }
     else
@@ -40,8 +42,18 @@ Snake::addSegment(int row, int column)
     segments.push_back(segment);
     if(segments.size() > 2)
     {
-        map.setTile(row, column, TP1TAIL);
-        map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1BODY);
+        if(player == 0)
+        {
+            map.setTile(row, column, TWALL);
+            std::cout << "addSegment" << std::endl;
+            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TWALL);
+        }
+        else
+        {
+            map.setTile(row, column, TP2TAIL);
+            std::cout << "addSegment" << std::endl;
+            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP2BODY);
+        }
     }
 }
 
@@ -94,6 +106,7 @@ Snake::update()
 {
     Game& game = Game::getSingleton();
     Map& map = Map::getSingleton();
+    StateHandler& state = StateHandler::getSingleton();
 
     TileType snakeHeadTile = map.getTile(segments[0].row, segments[0].column);
     if(moveDirection != DIR_NONE)
@@ -164,35 +177,40 @@ Snake::update()
             segment->column = newColumn;
             spawnPickup();
             score++;
+            if(score % 3)
+            {
+                stepDelay -= 2;
+                if(stepDelay < 40)
+                    stepDelay = 40;
+            }
             int beforeTailRow = (segments.end()-2)->row;
             int beforeTailColumn = (segments.end()-2)->column;
             
             if(beforeTailRow < tailRow)
             {
                 addSegment(tailRow, tailColumn);
-                std::cout << "tailRow+1: " << tailRow << std::endl;
             }
             else if(beforeTailRow > tailRow)
             {
                 addSegment(tailRow, tailColumn);
-                std::cout << "tailRow-1: " << tailRow << std::endl;
             }
             else if(beforeTailColumn < tailColumn)
             {
                 addSegment(tailRow, tailColumn);
-                std::cout << "tailColumn+1: " << tailColumn << std::endl;
             }
             else if(beforeTailColumn > tailRow)
             {
                 addSegment(tailRow, tailColumn);
-                std::cout << "tailColumn-1: " << tailColumn << std::endl;
             }
 
             break;
         }
-        default:
+        case(TWALL):
         {
-            game.restart();
+            game.started = false;
+            state.setStateAndLoadMap(PLAY, map.currentMapName.c_str());
+
+            break;
         }
         }
 

@@ -25,6 +25,7 @@ public:
     SDL_Texture *texP1Head, *texP1Body, *texP1Tail, *texP2Head, *texP2Body, *texP2Tail;
     int mapW = MAPW * GRIDSIZE;
     int mapH = MAPH * GRIDSIZE;
+    
     int mapX = 80;
     int mapY = 100;
     int mapNW = MAPW;
@@ -60,6 +61,7 @@ public:
 
     void loadMap(const char* mapName);
     void readMap(const char* mapName, char buffer[MAPH*(MAPW+1)]);
+    void printMap();
     void getMapFileNames(const char *path);
     void setTile(int xPos, int yPos, TileType val);
     void clearMap();
