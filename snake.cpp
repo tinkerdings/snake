@@ -16,25 +16,33 @@ Snake::Snake()
 
     if(!game.snakes.size())
     {
+        player = 0;
         addSegment(map.P1HeadRow, map.P1HeadColumn);
         addSegment(map.P1TailRow, map.P1TailColumn);
-        initTextures(0);
+        initTextures(player);
     }
     else
     {
+        player = 1;
         addSegment(map.P2HeadRow, map.P2HeadColumn);
         addSegment(map.P2TailRow, map.P2TailColumn);
-        initTextures(1);
+        initTextures(player);
     }
 }
 
 void
 Snake::addSegment(int row, int column)
 {
+    Map& map = Map::getSingleton();
     SnakeSegment segment;
     segment.row = row;
     segment.column = column;
     segments.push_back(segment);
+    if(segments.size() > 2)
+    {
+        map.setTile(row, column, TP1TAIL);
+        map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1BODY);
+    }
 }
 
 void
@@ -84,6 +92,7 @@ Snake::setDir(Dir dir)
 void
 Snake::update()
 {
+    Game& game = Game::getSingleton();
     Map& map = Map::getSingleton();
 
     TileType snakeHeadTile = map.getTile(segments[0].row, segments[0].column);
@@ -160,22 +169,30 @@ Snake::update()
             
             if(beforeTailRow < tailRow)
             {
-                addSegment(((segments.end()-1)->row)+1, (segments.end()-1)->column);
+                addSegment(tailRow, tailColumn);
+                std::cout << "tailRow+1: " << tailRow << std::endl;
             }
-            else if((segments.end()-2)->row > ((segments.end()-1)->row))
+            else if(beforeTailRow > tailRow)
             {
-                addSegment(((segments.end()-1)->row)-1, (segments.end()-1)->column);
+                addSegment(tailRow, tailColumn);
+                std::cout << "tailRow-1: " << tailRow << std::endl;
             }
-            else if((segments.end()-2)->column < ((segments.end()-1)->column))
+            else if(beforeTailColumn < tailColumn)
             {
-                addSegment((segments.end()-1)->row, ((segments.end()-1)->column)+1);
+                addSegment(tailRow, tailColumn);
+                std::cout << "tailColumn+1: " << tailColumn << std::endl;
             }
-            else if((segments.end()-2)->column > ((segments.end()-1)->column))
+            else if(beforeTailColumn > tailRow)
             {
-                addSegment((segments.end()-1)->row, ((segments.end()-1)->column)-1);
+                addSegment(tailRow, tailColumn);
+                std::cout << "tailColumn-1: " << tailColumn << std::endl;
             }
 
             break;
+        }
+        default:
+        {
+            game.restart();
         }
         }
 

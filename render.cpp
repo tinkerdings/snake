@@ -59,8 +59,10 @@ Render::init()
     map.texWall         = createTexture("res/20x20-obstacle.png");
     map.texWallCorner   = createTexture("res/20x20-0bstacle-2.png");
     map.texP1Head       = createTexture("res/20x20-head.png");
+    map.texP1Body       = createTexture("res/20x20-body.png");
     map.texP1Tail       = createTexture("res/20x20-tail.png");
     map.texP2Head       = createTexture("res/20x20-head-3.png");
+    map.texP2Body       = createTexture("res/20x20-body-3.png");
     map.texP2Tail       = createTexture("res/20x20-tail-3.png");
     pickup              = createTexture("res/20x20-powerup.png");
     initAlphabet();
@@ -347,59 +349,20 @@ Render::renderMap()
             }
             case(TP1HEAD):
             {
-                if(map.map[j][i-1] == TP1TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
-                    rect.x -= map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j][i+1] == TP1TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
-                    rect.x += map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j+1][i] == TP1TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-                    rect.y += map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j-1][i] == TP1TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
-                    rect.y -= map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
-                }
+                SDL_RenderCopyEx(rend, map.texP1Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
 
                 break;
             }
-            case(TP2HEAD):
+            case(TP1BODY):
             {
-                if(map.map[j][i-1] == TP2TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
-                    rect.x -= map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j][i+1] == TP2TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
-                    rect.x += map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j+1][i] == TP2TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-                    rect.y += map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
-                }
-                else if(map.map[j-1][i] == TP2TAIL)
-                {
-                    SDL_RenderCopyEx(rend, map.texP2Head, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
-                    rect.y -= map.gridSize;
-                    SDL_RenderCopyEx(rend, map.texP2Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
-                }
+                SDL_RenderCopyEx(rend, map.texP1Body, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+
+                break;
+            }
+            case(TP1TAIL):
+            {
+                SDL_RenderCopyEx(rend, map.texP1Tail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+
                 break;
             }
             }

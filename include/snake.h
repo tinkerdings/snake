@@ -32,7 +32,7 @@ class Snake
 public:
     std::vector<SnakeSegment> segments;
     int score = 0;
-    int stepDelay = 300;
+    int stepDelay = 100;
     Dir moveDirection = DIR_NONE;
 
     Snake();
@@ -44,6 +44,7 @@ public:
 private:
     int intervals = 4;
     int speedup = 5;
+    int player = 0;
     Map& map = Map::getSingleton();
     Window& wnd = Window::getSingleton();
     StateHandler& state = StateHandler::getSingleton();

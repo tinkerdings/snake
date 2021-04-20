@@ -12,7 +12,7 @@
 
 enum TileType
 {
-    TEMPTY, TPICKUP, TWALL, TSNAKE, TP1START, TP2START, TP1HEAD, TP1TAIL, TP2HEAD, TP2TAIL
+    TEMPTY, TPICKUP, TWALL, TSNAKE, TP1START, TP2START, TP1HEAD, TP1BODY, TP1TAIL, TP2HEAD, TP2BODY, TP2TAIL
 };
 
 class Map
@@ -22,7 +22,7 @@ public:
     TileType map[MAPH][MAPW] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
-    SDL_Texture *texP1Head, *texP1Tail, *texP2Head, *texP2Tail;
+    SDL_Texture *texP1Head, *texP1Body, *texP1Tail, *texP2Head, *texP2Body, *texP2Tail;
     int mapW = MAPW * GRIDSIZE;
     int mapH = MAPH * GRIDSIZE;
     int mapX = 80;
