@@ -46,7 +46,6 @@ public:
     void setDirection(Dir dir);
     bool dirAvailable(Dir dir);
     void addSegment();
-    void addMultipleSegments(int amount);
     void update();
     void initTextures(int snakeNr);
     void updateNeighbors();

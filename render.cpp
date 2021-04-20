@@ -295,15 +295,22 @@ void
 Render::renderScores()
 {
     Game& game = Game::getSingleton();
-    if(!textP1Name.tex)
-        initText(&textP1Name, "P1 SCORE: ", 255, 128, 32, 255);
-    char p1Score[100] = {0};
-    sprintf(p1Score, "%d", game.snakes[0].score);
-//     if(textP1Score.tex)
-//         SDL_DestroyTexture(textP1Score.tex);
-    initText(&textP1Score, p1Score, 255, 255, 0, 255);
-    renderText(&textP1Name, 30, 20, textP1Name.w, textP1Name.h);
-    renderText(&textP1Score, textP1Name.out.x + textP1Name.w, textP1Name.out.y, textP1Score.w, textP1Name.h);
+    if(game.snakes.size())
+    {
+        if(!textP1Name.tex)
+            initText(&textP1Name, "P1 SCORE: ", 255, 128, 32, 255);
+        char p1Score[100] = {0};
+        sprintf(p1Score, "%d", game.snakes[0].score);
+    //     if(textP1Score.tex)
+    //         SDL_DestroyTexture(textP1Score.tex);
+        initText(&textP1Score, p1Score, 255, 255, 0, 255);
+        renderText(&textP1Name, 30, 20, textP1Name.w, textP1Name.h);
+        renderText(&textP1Score, textP1Name.out.x + textP1Name.w, textP1Name.out.y, textP1Score.w, textP1Name.h);
+    }
+    if(game.snakes.size() == 2)
+    {
+
+    }
 }
 
 void

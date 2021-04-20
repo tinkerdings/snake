@@ -99,31 +99,31 @@ Map::loadMap(const char* mapName)
             case('H'):
             {
                 setTile(j, i, TP1HEAD);
-                editorP1HeadStartX = i;
-                editorP1HeadStartY = j;
+                P1HeadStartX = i;
+                P1HeadStartY = j;
                 
                 break;
             }
             case('T'):
             {
                 setTile(j, i, TP1TAIL);
-                editorP1TailStartX = i;
-                editorP1TailStartY = j;
+                P1TailStartX = i;
+                P1TailStartY = j;
 
                 break;
             }
             case('h'):
             {
                 setTile(j, i, TP2HEAD);
-                editorP2HeadStartX = i;
-                editorP2HeadStartY = j;
+                P2HeadStartX = i;
+                P2HeadStartY = j;
                 break;
             }
             case('t'):
             {
                 setTile(j, i, TP2TAIL);
-                editorP2TailStartX = i;
-                editorP2TailStartY = j;
+                P2TailStartX = i;
+                P2TailStartY = j;
                 break;
             }
             }
@@ -152,25 +152,25 @@ Map::setTile(int row, int column, TileType val)
     }
     case(TEMPTY):
     {
-        if((column == editorP1HeadStartX) && (row == editorP1HeadStartY) ||
-            ((column == editorP1TailStartX) && (row == editorP1TailStartY)))
+        if((column == P1HeadStartX) && (row == P1HeadStartY) ||
+            ((column == P1TailStartX) && (row == P1TailStartY)))
         {
-            map[editorP1HeadStartX][editorP1HeadStartY] = TEMPTY;
-            map[editorP1TailStartX][editorP1TailStartY] = TEMPTY;
-            editorP1HeadStartX = -1;
-            editorP1HeadStartY = -1;
-            editorP1TailStartX = -1;
-            editorP1TailStartY = -1;
+            map[P1HeadStartX][P1HeadStartY] = TEMPTY;
+            map[P1TailStartX][P1TailStartY] = TEMPTY;
+            P1HeadStartX = -1;
+            P1HeadStartY = -1;
+            P1TailStartX = -1;
+            P1TailStartY = -1;
         }
-        else if((column == editorP2HeadStartX) && (row == editorP2HeadStartY) ||
-            ((column == editorP2TailStartX) && (row == editorP2TailStartY)))
+        else if((column == P2HeadStartX) && (row == P2HeadStartY) ||
+            ((column == P2TailStartX) && (row == P2TailStartY)))
         {
-            map[editorP2HeadStartX][editorP2HeadStartY] = TEMPTY;
-            map[editorP2TailStartX][editorP2TailStartY] = TEMPTY;
-            editorP2HeadStartX = -1;
-            editorP2HeadStartY = -1;
-            editorP2TailStartX = -1;
-            editorP2TailStartY = -1;
+            map[P2HeadStartX][P2HeadStartY] = TEMPTY;
+            map[P2TailStartX][P2TailStartY] = TEMPTY;
+            P2HeadStartX = -1;
+            P2HeadStartY = -1;
+            P2TailStartX = -1;
+            P2TailStartY = -1;
         }
         else
         {
@@ -183,10 +183,10 @@ Map::setTile(int row, int column, TileType val)
     {
         if(editorValidPlacement)
         {
-            if(editorP1HeadStartX != -1) 
+            if(P1HeadStartX != -1) 
             {
-                map[editorP1HeadStartY][editorP1HeadStartX] = TEMPTY;
-                map[editorP1TailStartY][editorP1TailStartX] = TEMPTY;
+                map[P1HeadStartY][P1HeadStartX] = TEMPTY;
+                map[P1TailStartY][P1TailStartX] = TEMPTY;
             }
             switch(editorRotation)
             {
@@ -194,38 +194,38 @@ Map::setTile(int row, int column, TileType val)
             {
                 map[row][column] = TP1HEAD;
                 map[row + 1][column] = TP1TAIL;
-                editorP1TailStartX = column;
-                editorP1TailStartY = row + 1;
+                P1TailStartX = column;
+                P1TailStartY = row + 1;
                 break;
             }
             case(90):
             {
                 map[row][column] = TP1HEAD;
                 map[row][column - 1] = TP1TAIL;
-                editorP1TailStartX = column - 1;
-                editorP1TailStartY = row;
+                P1TailStartX = column - 1;
+                P1TailStartY = row;
                 break;
             }
             case(180):
             {
                 map[row][column] = TP1HEAD;
                 map[row - 1][column] = TP1TAIL;
-                editorP1TailStartX = column;
-                editorP1TailStartY = row - 1;
+                P1TailStartX = column;
+                P1TailStartY = row - 1;
                 break;
             }
             case(270):
             {
                 map[row][column] = TP1HEAD;
                 map[row][column + 1] = TP1TAIL;
-                editorP1TailStartX = column + 1;
-                editorP1TailStartY = row;
+                P1TailStartX = column + 1;
+                P1TailStartY = row;
                 break;
             }
             }
 
-            editorP1HeadStartX = column;
-            editorP1HeadStartY = row;
+            P1HeadStartX = column;
+            P1HeadStartY = row;
         }
 
         break;
@@ -234,10 +234,10 @@ Map::setTile(int row, int column, TileType val)
     {
         if(editorValidPlacement)
         {
-            if(editorP2HeadStartX != -1) 
+            if(P2HeadStartX != -1) 
             {
-                map[editorP2HeadStartY][editorP2HeadStartX] = TEMPTY;
-                map[editorP2TailStartY][editorP2TailStartX] = TEMPTY;
+                map[P2HeadStartY][P2HeadStartX] = TEMPTY;
+                map[P2TailStartY][P2TailStartX] = TEMPTY;
             }
             switch(editorRotation)
             {
@@ -245,38 +245,38 @@ Map::setTile(int row, int column, TileType val)
             {
                 map[row][column] = TP2HEAD;
                 map[row + 1][column] = TP2TAIL;
-                editorP2TailStartX = column;
-                editorP2TailStartY = row + 1;
+                P2TailStartX = column;
+                P2TailStartY = row + 1;
                 break;
             }
             case(90):
             {
                 map[row][column] = TP2HEAD;
                 map[row][column - 1] = TP2TAIL;
-                editorP2TailStartX = column - 1;
-                editorP2TailStartY = row;
+                P2TailStartX = column - 1;
+                P2TailStartY = row;
                 break;
             }
             case(180):
             {
                 map[row][column] = TP2HEAD;
                 map[row - 1][column] = TP2TAIL;
-                editorP2TailStartX = column;
-                editorP2TailStartY = row - 1;
+                P2TailStartX = column;
+                P2TailStartY = row - 1;
                 break;
             }
             case(270):
             {
                 map[row][column] = TP2HEAD;
                 map[row][column + 1] = TP2TAIL;
-                editorP2TailStartX = column + 1;
-                editorP2TailStartY = row;
+                P2TailStartX = column + 1;
+                P2TailStartY = row;
                 break;
             }
             }
 
-            editorP2HeadStartX = column;
-            editorP2HeadStartY = row;
+            P2HeadStartX = column;
+            P2HeadStartY = row;
         }
 
         break;

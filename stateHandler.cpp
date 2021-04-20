@@ -11,17 +11,42 @@ StateHandler::setState(State set)
     Menu& menu = Menu::getSingleton();
     Map& map = Map::getSingleton();
     InputHandler& input = InputHandler::getSingleton();
+    menu.mapPreviewScrollOffset = 0;
+    map.mapFileNames.clear();
+    map.getMapFileNames("./maps");
+    int posX = 0;
+    int posY = 0;
+
     menu.clearButtons();
+
     switch(set)
     {
-    case(MENU_PLAY_MAPSELECT): // FALLTHROUGH
+    case(MENU_PLAY_MAPSELECT):
+    {
+        for(int i = 0; i < map.mapFileNames.size(); i++)
+        {
+            menu.setButtonColorTxt(255, 64, 64, 255);
+            menu.createButton(
+                std::bind(&StateHandler::setStateAndLoadMap, this, PLAY, map.mapFileNames[i].c_str()), BRELEASE,
+                map.mapFileNames[i].c_str(),
+                130 + (posX*200) + (posX*50), 70+(posY*220), 200, 200,
+                5, BTPREVIEW);
+
+            if(!((i+1)%3))
+            {
+                posX = 0;
+                posY++;
+            }
+            else
+            {
+                posX++;
+            }
+        }
+
+        break;
+    }
     case(MENU_CREATE):
     {
-        menu.mapPreviewScrollOffset = 0;
-        map.mapFileNames.clear();
-        map.getMapFileNames("./maps");
-        int posX = 0;
-        int posY = 0;
         for(int i = 0; i < map.mapFileNames.size(); i++)
         {
             menu.setButtonColorTxt(255, 64, 64, 255);
@@ -186,7 +211,6 @@ StateHandler::stateMenuPlayPlayers()
 
     wnd.getSize(ww, wh);
 
-    std::cout << "player select" << std::endl;
     if(!menu.buttons.size())
     {
         menu.setButtonColorTxt(0, 255, 64, 255);
@@ -334,10 +358,12 @@ StateHandler::statePlay()
     InputHandler& input = InputHandler::getSingleton();
     Menu& menu = Menu::getSingleton();
     Map& map = Map::getSingleton();
-
-    if(!game.started)
-		game.init();
     
+    if(!game.started)
+    {
+        game.init();
+    }
+
     game.update();
 
     timeNow = SDL_GetTicks();
@@ -347,8 +373,9 @@ StateHandler::statePlay()
 
         rend.renderBG(map.bg);
 
+        rend.renderMap();
         rend.renderSnakes();
-        rend.renderPickups();
+//         rend.renderPickups();
         rend.renderBorders();
         rend.renderScores();
 

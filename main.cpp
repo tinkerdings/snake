@@ -62,8 +62,6 @@ main()
     wnd.init("Snake!", WINW, WINH);
     // Oppretter her en rendering context for SDL.
     rend.init();
-    // Setter opp spillebrettet og slangene.
-    game.init();
     // Set initial state.
     state.setState(MENU);
 

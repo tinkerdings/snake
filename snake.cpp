@@ -3,18 +3,36 @@
 #include <cstdio>
 #include <iterator>
 #include "snake.h"
+#include "game.h"
 #include "render.h"
 #include "util.h"
 
 Snake::Snake()
 {
     Map& map = Map::getSingleton();
-    startX = map.mapX + (map.mapW/2);
-    startY = map.mapY + (map.mapH/2);
-    initTextures(0);
-    addMultipleSegments(2);
-    dirX = DIR_NONE;
-    dirY = DIR_NONE;
+    Game& game = Game::getSingleton();
+
+    if(game.snakes.size())
+    {
+        startX = map.P2HeadStartX;
+        startY = map.P2HeadStartY;
+        addSegment();
+        addSegment();
+        initTextures(1);
+        dirX = DIR_NONE;
+        dirY = DIR_NONE;
+    }
+    else
+    {
+        std::cout << map.P1HeadStartX << " " << map.P1HeadStartY << std::endl;
+        startX = map.P1HeadStartX;
+        startY = map.P1HeadStartY;
+        addSegment();
+        addSegment();
+        initTextures(0);
+        dirX = DIR_NONE;
+        dirY = DIR_NONE;
+    }
 }
 
 void
@@ -22,17 +40,19 @@ Snake::addSegment()
 {
     Map& map = Map::getSingleton();
     SnakeSegment segment;
-    auto currentTail = segments.end()-1;
     if(!segments.size())
     {
         segment.rect = {startX, startY, map.gridSize, map.gridSize};
         segment.tex = texHead;
         segment.dirX = 0;
         segment.dirY = -1;
+        std::cout << "here" << std::endl;
         segments.push_back(segment);
+        std::cout << "here" << std::endl;
     }
     else
     {
+        auto currentTail = segments.end()-1;
         segment.rect = {
             currentTail->rect.x - (currentTail->dirX * map.gridSize),
             currentTail->rect.y - (currentTail->dirY * map.gridSize),
@@ -40,21 +60,19 @@ Snake::addSegment()
         segment.tex = texTail;
         if(segments.size() > 1)
             currentTail->tex = texBody;
+        std::cout << "here" << std::endl;
+        std::cout << "here" << std::endl;
         segments.push_back(segment);
     }
-//     map.setTile(segment.rect.x, segment.rect.y, TSNAKE);
-}
-
-void
-Snake::addMultipleSegments(int amount)
-{
-    for(int i = 0; i < amount; i++)
-        addSegment();
+    std::cout << "here" << std::endl;
+    map.setTile(segment.rect.y, segment.rect.x, TSNAKE);
+    std::cout << "here" << std::endl;
 }
 
 void
 Snake::update()
 {
+    int i = 0;
     Map& map = Map::getSingleton();
     int prevHeadX, prevHeadY, prevTailX, prevTailY;
     if(dirX + dirY)
@@ -73,14 +91,14 @@ Snake::update()
         }
         segments[0].rect.x += dirX * map.gridSize;
         segments[0].rect.y += dirY * map.gridSize;
-        map.setTile(prevHeadX, prevHeadY, TSNAKE);
-        map.setTile(prevTailX, prevTailY, TEMPTY);
+        map.setTile(prevHeadY, prevHeadX, TSNAKE);
+        map.setTile(prevTailY, prevTailX, TEMPTY);
     }
     std::thread t_collision(&Snake::checkCollision, this);
     t_collision.join();
     updateNeighbors();
     updateTextures();
-//     changedDir = false;
+    changedDir = false;
 }
 
 void
@@ -395,7 +413,7 @@ Snake::checkCrash()
     if (segments[0].rect.y >= (map.mapY + map.mapH))
         segments[0].rect.y = map.mapY;
 
-    if(map.getTile(segments[0].rect.x, segments[0].rect.y) > TPICKUP)
+    if(map.getTile(segments[0].rect.y, segments[0].rect.x) > TPICKUP)
     {
         state.setState(RESTART);
         map.clearMap();

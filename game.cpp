@@ -10,8 +10,6 @@ Game::init()
 {
     Menu& menu = Menu::getSingleton();
     Render& rend = Render::getSingleton();
-    int ww, wh;
-    wnd.getSize(ww, wh);
     snakes.clear();
     Snake player1;
     snakes.push_back(player1);
@@ -37,7 +35,5 @@ Game::update()
             snake->update();
             lastTime = currentTime;
         }
-//         snake->updateNeighbors();
-//         snake->updateTextures();
     }
 }
