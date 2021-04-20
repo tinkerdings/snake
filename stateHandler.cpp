@@ -14,7 +14,7 @@ StateHandler::setState(State set)
     menu.clearButtons();
     switch(set)
     {
-    case(MENU_PLAY): // FALLTHROUGH
+    case(MENU_PLAY_MAPSELECT): // FALLTHROUGH
     case(MENU_CREATE):
     {
         menu.mapPreviewScrollOffset = 0;
@@ -90,6 +90,16 @@ StateHandler::run()
         stateMenuCreate();
         break;
     }
+    case(MENU_PLAY_PLAYERS):
+    {
+        stateMenuPlayPlayers();
+        break;
+    }
+    case(MENU_PLAY_MAPSELECT):
+    {
+        stateMenuPlayMapSelect();
+        break;
+    }
     case(PLAY):
     {
         statePlay();
@@ -123,7 +133,7 @@ StateHandler::stateMenu()
     {
         menu.setButtonColorTxt(0, 255, 64, 255);
         menu.createButton(
-            std::bind(&StateHandler::setState, this, PLAY), BRELEASE,
+            std::bind(&StateHandler::setState, this, MENU_PLAY_PLAYERS), BRELEASE,
             "PLAY",
             ww/2 - 200, 240, 400, 100,
             10, BTBUTTON);
@@ -158,6 +168,111 @@ StateHandler::stateMenu()
 }
 
 void
+StateHandler::setPlayersAndMapSelect(int players)
+{
+    Game& game = Game::getSingleton();
+    game.players = players;
+    setState(MENU_PLAY_MAPSELECT);
+}
+
+void
+StateHandler::stateMenuPlayPlayers()
+{
+    Menu& menu = Menu::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Render& rend = Render::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+
+    wnd.getSize(ww, wh);
+
+    std::cout << "player select" << std::endl;
+    if(!menu.buttons.size())
+    {
+        menu.setButtonColorTxt(0, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setPlayersAndMapSelect, this, 1), BRELEASE,
+            "1 PLAYER",
+            ww/2 - 200, 240, 400, 100,
+            10, BTBUTTON);
+
+        menu.setButtonColorTxt(64, 128, 255, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setPlayersAndMapSelect, this, 2), BRELEASE,
+            "2 PLAYERS",
+            ww/2 - 200, 400, 400, 100,
+            10, BTBUTTON);
+
+        menu.setButtonColorTxt(255, 64, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU), BRELEASE,
+            "BACK",
+            ww/2 - 200, 560, 400, 100,
+            10, BTBUTTON);
+    }
+
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
+
+        rend.renderBG(rend.bgUI);
+        rend.renderLogo();
+        rend.renderButtons();
+        rend.show();
+    }
+
+    input.inputMenu();
+}
+
+void
+StateHandler::stateMenuPlayMapSelect()
+{
+    Menu& menu = Menu::getSingleton();
+    Map& map = Map::getSingleton();
+    Render& rend = Render::getSingleton();
+    InputHandler& input = InputHandler::getSingleton();
+    Window& wnd = Window::getSingleton();
+    int ww, wh;
+    wnd.getSize(ww, wh);
+
+
+    if(!menu.buttons.size())
+    {
+        menu.setButtonColorTxt(255, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::setState, this, MENU_PLAY_PLAYERS), BRELEASE,
+            "BACK",
+            65, 625, 382, 78,
+            10, BTBUTTON);
+    }
+
+    timeNow = SDL_GetTicks();
+    if((timeNow - timePrev) >= 1000/FPS)
+    {
+        timePrev = timeNow;
+
+        rend.renderBG(rend.bgUIMapSelect);
+
+        rend.renderMapPreviews();
+        rend.renderBG(rend.fgUIMapSelect);
+        rend.renderButtons();
+
+        rend.show();
+    }
+
+    input.inputMenu();
+    if(input.mouseScroll(SCROLLDOWN))
+    {
+        menu.movePreviews(20);
+    }
+    if(input.mouseScroll(SCROLLUP))
+    {
+        menu.movePreviews(-20);
+    }
+}
+
+void
 StateHandler::stateMenuCreate()
 {
     Menu& menu = Menu::getSingleton();
@@ -171,21 +286,19 @@ StateHandler::stateMenuCreate()
 
     if(!menu.buttons.size())
     {
-        menu.setButtonColorTxt(0, 255, 64, 255);
-
-        menu.createButton(
-            std::bind(&StateHandler::stateNewMap, this), BRELEASE,
-            "NEW",
-            65, 625, 382, 78,
-            10, BTBUTTON);
-
         menu.setButtonColorTxt(255, 255, 64, 255);
         menu.createButton(
             std::bind(&StateHandler::setState, this, MENU), BRELEASE,
             "BACK",
-            513, 625, 382, 78,
+            65, 625, 382, 78,
             10, BTBUTTON);
 
+        menu.setButtonColorTxt(0, 255, 64, 255);
+        menu.createButton(
+            std::bind(&StateHandler::stateNewMap, this), BRELEASE,
+            "NEW",
+            513, 625, 382, 78,
+            10, BTBUTTON);
     }
 
     timeNow = SDL_GetTicks();

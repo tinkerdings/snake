@@ -83,26 +83,9 @@ InputHandler::inputCreate()
 
         if(mouseDown(SDL_BUTTON_LEFT))
         {
-            switch(map.editorActiveTile)
+            if(map.getTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize) != map.editorActiveTile)
             {
-            case(TWALL):
-            {
-                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TWALL);
-
-                break;
-            }
-            case(TP1START):
-            {
-                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TP1START);
-
-                break;
-            }
-            case(TP2START):
-            {
-                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, TP2START);
-
-                break;
-            }
+                map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, map.editorActiveTile);
             }
         }
         if(mouseDown(SDL_BUTTON_RIGHT))

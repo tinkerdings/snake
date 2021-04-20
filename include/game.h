@@ -20,6 +20,7 @@ public:
     }
 
     bool started = false;
+    int players = 1;
     void init();
     void restart();
     void update();

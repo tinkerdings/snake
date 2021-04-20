@@ -15,89 +15,6 @@
 #include "render.h"
 
 Map Map::s_Map;
-void
-Map::loadMap(const char* mapName)
-{
-    std::cout << "loading map" << std::endl;
-    Render& rend = Render::getSingleton();
-    char mapData[MAPH*(MAPW+1)] = {0};
-    clearMap();
-    readMap(mapName, mapData);
-    for(int j = 0; j < MAPH; j++)
-    {
-        for(int i = 0; i < MAPW; i++)
-        {
-            switch(mapData[(j*(MAPW+1))+i])
-            {
-            case('0'):
-            {
-                std::cout << "empty" << std::endl;
-                setTile(j, i, TEMPTY);
-                
-                break;
-            }
-            case('#'):
-            {
-                setTile(j, i, TWALL);
-                break;
-            }
-            case('H'):
-            {
-                setTile(j, i, TP1HEAD);
-                editorP1HeadStartY = j;
-                editorP1HeadStartX = i;
-                break;
-            }
-            case('T'):
-            {
-                setTile(j, i, TP1TAIL);
-                editorP1TailStartY = j;
-                editorP1TailStartX = i;
-                break;
-            }
-            case('h'):
-            {
-                setTile(j, i, TP2HEAD);
-                editorP2HeadStartY = j;
-                editorP2HeadStartX = i;
-                break;
-            }
-            case('t'):
-            {
-                setTile(j, i, TP2TAIL);
-                editorP2TailStartY = j;
-                editorP2TailStartX = i;
-                break;
-            }
-            }
-        }
-    }
-    std::cout << "loaded map" << std::endl;
-//     pickups.clear();
-//     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
-//     pickups.push_back(pickup);
-}
-
-void
-Map::readMap(const char* mapName, char buffer[MAPH*(MAPW+1)])
-{
-    std::stringstream ss;
-    ss << "./maps/" << std::string(mapName);
-    std::string filename = ss.str();
-    std::ifstream file(filename);
-    if(!file)
-    {
-        std::cerr << "Failed to open file: " << filename << std::endl;
-        return;
-    }
-
-    int mapSize = MAPH*MAPW;
-    while(!file.eof())
-    {
-        file.read(buffer, MAPH*(MAPW+1));
-    }
-    file.close();
-}
 
 void
 Map::getMapFileNames(const char *path)
@@ -134,138 +51,240 @@ Map::getMapFileNames(const char *path)
 }
 
 void
+Map::readMap(const char* mapName, char buffer[MAPH*(MAPW+1)])
+{
+    std::stringstream ss;
+    ss << "./maps/" << std::string(mapName);
+    std::string filename = ss.str();
+    std::ifstream file(filename);
+    if(!file)
+    {
+        std::cerr << "Failed to open file: " << filename << std::endl;
+        return;
+    }
+
+    int mapSize = MAPH*MAPW;
+    while(!file.eof())
+    {
+        file.read(buffer, MAPH*(MAPW+1));
+    }
+    file.close();
+}
+
+void
+Map::loadMap(const char* mapName)
+{
+    Render& rend = Render::getSingleton();
+    char mapData[MAPH*(MAPW+1)] = {0};
+    newMap = false;
+    clearMap();
+    readMap(mapName, mapData);
+    for(int j = 0; j < MAPH; j++)
+    {
+        for(int i = 0; i < MAPW; i++)
+        {
+            switch(mapData[(j*(MAPW+1))+i])
+            {
+            case('0'):
+            {
+                setTile(j, i, TEMPTY);
+                
+                break;
+            }
+            case('#'):
+            {
+                setTile(j, i, TWALL);
+                break;
+            }
+            case('H'):
+            {
+                setTile(j, i, TP1HEAD);
+                editorP1HeadStartX = i;
+                editorP1HeadStartY = j;
+                
+                break;
+            }
+            case('T'):
+            {
+                setTile(j, i, TP1TAIL);
+                editorP1TailStartX = i;
+                editorP1TailStartY = j;
+
+                break;
+            }
+            case('h'):
+            {
+                setTile(j, i, TP2HEAD);
+                editorP2HeadStartX = i;
+                editorP2HeadStartY = j;
+                break;
+            }
+            case('t'):
+            {
+                setTile(j, i, TP2TAIL);
+                editorP2TailStartX = i;
+                editorP2TailStartY = j;
+                break;
+            }
+            }
+        }
+    }
+//     pickups.clear();
+//     Pickup pickup(mapX + (mapW/2), mapY + (mapH/2) - (3*gridSize), gridSize, gridSize);
+//     pickups.push_back(pickup);
+}
+
+void
 Map::setTile(int row, int column, TileType val)
 {
-    // in GAME
-
-    // can only place one of each player.
-    if(val == TEMPTY)
+    InputHandler& input = InputHandler::getSingleton();
+    switch(val)
+    {
+    case(TP1HEAD):
+    case(TP1TAIL):
+    case(TP2HEAD):
+    case(TP2TAIL):
+    case(TSNAKE):
+    case(TWALL):
+    {
+        map[row][column] = val;
+        break;
+    }
+    case(TEMPTY):
     {
         if((column == editorP1HeadStartX) && (row == editorP1HeadStartY) ||
             ((column == editorP1TailStartX) && (row == editorP1TailStartY)))
         {
             map[editorP1HeadStartX][editorP1HeadStartY] = TEMPTY;
             map[editorP1TailStartX][editorP1TailStartY] = TEMPTY;
+            editorP1HeadStartX = -1;
+            editorP1HeadStartY = -1;
+            editorP1TailStartX = -1;
+            editorP1TailStartY = -1;
         }
         else if((column == editorP2HeadStartX) && (row == editorP2HeadStartY) ||
             ((column == editorP2TailStartX) && (row == editorP2TailStartY)))
         {
             map[editorP2HeadStartX][editorP2HeadStartY] = TEMPTY;
             map[editorP2TailStartX][editorP2TailStartY] = TEMPTY;
+            editorP2HeadStartX = -1;
+            editorP2HeadStartY = -1;
+            editorP2TailStartX = -1;
+            editorP2TailStartY = -1;
         }
         else
         {
             map[row][column] = val;
         }
-    }
-    if(val == TSNAKE)
-    {
-        map[row][column] = val;
-    }
 
-    switch(val)
-    {
-    case(TWALL):
-    {
-        map[row][column] = val;
         break;
     }
     case(TP1START):
     {
-        if(editorP1HeadStartX != -1) 
+        if(editorValidPlacement)
         {
-            map[editorP1HeadStartY][editorP1HeadStartX] = TEMPTY;
-            map[editorP1TailStartY][editorP1TailStartX] = TEMPTY;
-        }
-        switch(editorRotation)
-        {
-        case(0):
-        {
-            map[row][column] = TP1HEAD;
-            map[row + 1][column] = TP1TAIL;
-            editorP1TailStartX = column;
-            editorP1TailStartY = row + 1;
-            break;
-        }
-        case(90):
-        {
-            map[row][column] = TP1HEAD;
-            map[row][column - 1] = TP1TAIL;
-            editorP1TailStartX = column - 1;
-            editorP1TailStartY = row;
-            break;
-        }
-        case(180):
-        {
-            map[row][column] = TP1HEAD;
-            map[row - 1][column] = TP1TAIL;
-            editorP1TailStartX = column;
-            editorP1TailStartY = row - 1;
-            break;
-        }
-        case(270):
-        {
-            map[row][column] = TP1HEAD;
-            map[row][column + 1] = TP1TAIL;
-            editorP1TailStartX = column + 1;
-            editorP1TailStartY = row;
-            break;
-        }
+            if(editorP1HeadStartX != -1) 
+            {
+                map[editorP1HeadStartY][editorP1HeadStartX] = TEMPTY;
+                map[editorP1TailStartY][editorP1TailStartX] = TEMPTY;
+            }
+            switch(editorRotation)
+            {
+            case(0):
+            {
+                map[row][column] = TP1HEAD;
+                map[row + 1][column] = TP1TAIL;
+                editorP1TailStartX = column;
+                editorP1TailStartY = row + 1;
+                break;
+            }
+            case(90):
+            {
+                map[row][column] = TP1HEAD;
+                map[row][column - 1] = TP1TAIL;
+                editorP1TailStartX = column - 1;
+                editorP1TailStartY = row;
+                break;
+            }
+            case(180):
+            {
+                map[row][column] = TP1HEAD;
+                map[row - 1][column] = TP1TAIL;
+                editorP1TailStartX = column;
+                editorP1TailStartY = row - 1;
+                break;
+            }
+            case(270):
+            {
+                map[row][column] = TP1HEAD;
+                map[row][column + 1] = TP1TAIL;
+                editorP1TailStartX = column + 1;
+                editorP1TailStartY = row;
+                break;
+            }
+            }
+
+            editorP1HeadStartX = column;
+            editorP1HeadStartY = row;
         }
 
-        editorP1HeadStartX = column;
-        editorP1HeadStartY = row;
         break;
     }
     case(TP2START):
     {
-        if(editorP2HeadStartX != -1) 
+        if(editorValidPlacement)
         {
-            map[editorP2HeadStartY][editorP2HeadStartX] = TEMPTY;
-            map[editorP2TailStartY][editorP2TailStartX] = TEMPTY;
-        }
-        switch(editorRotation)
-        {
-        case(0):
-        {
-            map[row][column] = TP2HEAD;
-            map[row + 1][column] = TP2TAIL;
-            editorP2TailStartX = column;
-            editorP2TailStartY = row + 1;
-            break;
-        }
-        case(90):
-        {
-            map[row][column] = TP2HEAD;
-            map[row][column - 1] = TP2TAIL;
-            editorP2TailStartX = column - 1;
-            editorP2TailStartY = row;
-            break;
-        }
-        case(180):
-        {
-            map[row][column] = TP2HEAD;
-            map[row - 1][column] = TP2TAIL;
-            editorP2TailStartX = column;
-            editorP2TailStartY = row - 1;
-            break;
-        }
-        case(270):
-        {
-            map[row][column] = TP2HEAD;
-            map[row][column + 1] = TP2TAIL;
-            editorP2TailStartX = column + 1;
-            editorP2TailStartY = row;
-            break;
-        }
+            if(editorP2HeadStartX != -1) 
+            {
+                map[editorP2HeadStartY][editorP2HeadStartX] = TEMPTY;
+                map[editorP2TailStartY][editorP2TailStartX] = TEMPTY;
+            }
+            switch(editorRotation)
+            {
+            case(0):
+            {
+                map[row][column] = TP2HEAD;
+                map[row + 1][column] = TP2TAIL;
+                editorP2TailStartX = column;
+                editorP2TailStartY = row + 1;
+                break;
+            }
+            case(90):
+            {
+                map[row][column] = TP2HEAD;
+                map[row][column - 1] = TP2TAIL;
+                editorP2TailStartX = column - 1;
+                editorP2TailStartY = row;
+                break;
+            }
+            case(180):
+            {
+                map[row][column] = TP2HEAD;
+                map[row - 1][column] = TP2TAIL;
+                editorP2TailStartX = column;
+                editorP2TailStartY = row - 1;
+                break;
+            }
+            case(270):
+            {
+                map[row][column] = TP2HEAD;
+                map[row][column + 1] = TP2TAIL;
+                editorP2TailStartX = column + 1;
+                editorP2TailStartY = row;
+                break;
+            }
+            }
+
+            editorP2HeadStartX = column;
+            editorP2HeadStartY = row;
         }
 
-        editorP2HeadStartX = column;
-        editorP2HeadStartY = row;
         break;
     }
     }
 }
+
+
 
 TileType
 Map::getTile(int row, int column)
@@ -303,7 +322,6 @@ Map::editorRotate()
 void
 Map::clearMap()
 {
-    std::cout << "clearMap called" << std::endl;
     for(int j = 0; j < MAPH; j++)
     {
         for(int i = 0; i < MAPW; i++)
