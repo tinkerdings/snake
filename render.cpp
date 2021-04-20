@@ -327,7 +327,7 @@ Render::renderMap()
     {
         for(int i = 0; i < MAPW; i++)
         {
-            std::cout << map.map[j][i];
+//             std::cout << map.map[j][i];
             rect.x = (i * map.gridSize) + map.mapX;
             rect.y = (j * map.gridSize) + map.mapY;
             switch(map.map[j][i])
