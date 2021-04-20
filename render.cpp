@@ -49,12 +49,12 @@ Render::init()
 
     Menu& menu = Menu::getSingleton();
 
-    logo = createTexture("res/logo.png");
-    bgUI = createTexture("res/ui-bg-brick.png");
-    bgUIFramed = createTexture("res/ui-bg-brick-framed.png");
-    bgUIMapSelect = createTexture("res/ui-bg-mapselect-brick.png");
-    fgUIMapSelect = createTexture("res/ui-fg-mapselect-brick.png");
-    previewFrame = createTexture("res/tile-preview.png");
+    logo                = createTexture("res/logo.png");
+    bgUI                = createTexture("res/ui-bg-brick.png");
+    bgUIFramed          = createTexture("res/ui-bg-brick-framed.png");
+    bgUIMapSelect       = createTexture("res/ui-bg-mapselect-brick.png");
+    fgUIMapSelect       = createTexture("res/ui-fg-mapselect-brick.png");
+    previewFrame        = createTexture("res/tile-preview.png");
     map.bg              = createTexture("res/20x20-bg.png");
     map.texWall         = createTexture("res/20x20-obstacle.png");
     map.texWallCorner   = createTexture("res/20x20-0bstacle-2.png");
@@ -157,6 +157,8 @@ Render::createTexture(const char* filename)
         return NULL;
     }
 
+    SDL_FreeSurface(tmp);
+
     allTextures.push_back(tex);
     return tex;
 }
@@ -231,7 +233,19 @@ Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, u
 {
     SDL_Color color = {r, g, b, a};
     SDL_Surface *surface = TTF_RenderText_Solid(font, txt, color); 
+    if(!surface)
+    {
+        std::cerr << "TTF_RenderText_Solid: " << TTF_GetError() << std::endl;
+        return;
+    }
     tex->tex = SDL_CreateTextureFromSurface(rend, surface);
+    if(!tex->tex)
+    {
+        std::cerr << "SDL_CreateTextureFromSurface: " << SDL_GetError() << std::endl;
+        SDL_FreeSurface(surface);
+        return;
+    }
+    allTextures.push_back(tex->tex);
     SDL_QueryTexture(tex->tex, NULL, NULL, &tex->w, &tex->h);
     SDL_FreeSurface(surface);
 }
@@ -285,8 +299,8 @@ Render::renderScores()
         initText(&textP1Name, "P1 SCORE: ", 255, 128, 32, 255);
     char p1Score[100] = {0};
     sprintf(p1Score, "%d", game.snakes[0].score);
-    if(textP1Score.tex)
-        SDL_DestroyTexture(textP1Score.tex);
+//     if(textP1Score.tex)
+//         SDL_DestroyTexture(textP1Score.tex);
     initText(&textP1Score, p1Score, 255, 255, 0, 255);
     renderText(&textP1Name, 30, 20, textP1Name.w, textP1Name.h);
     renderText(&textP1Score, textP1Name.out.x + textP1Name.w, textP1Name.out.y, textP1Score.w, textP1Name.h);
@@ -321,13 +335,16 @@ Render::renderMap()
             case(TWALL):
             {
                 bool corner = false;
-                if(
-                    ((map.map[j-1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
-                    ((map.map[j-1][i] == TWALL) && (map.map[j][i+1] == TWALL)) ||
-                    ((map.map[j+1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
-                    ((map.map[j+1][i] == TWALL) && (map.map[j][i+1] == TWALL)))
+                if((j > 0) && (j < (MAPH-1)) && (i > 0) && (i < (MAPW-1)))
                 {
-                    corner = true;
+                    if(
+                        ((map.map[j-1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                        ((map.map[j-1][i] == TWALL) && (map.map[j][i+1] == TWALL)) ||
+                        ((map.map[j+1][i] == TWALL) && (map.map[j][i-1] == TWALL)) ||
+                        ((map.map[j+1][i] == TWALL) && (map.map[j][i+1] == TWALL)))
+                    {
+                        corner = true;
+                    }
                 }
 
                 if(corner)
