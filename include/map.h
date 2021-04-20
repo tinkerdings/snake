@@ -43,14 +43,14 @@ public:
     TileType editorActiveTile = editorTiles[editorTileIndex];
     int editorRotation = 0;
     bool editorValidPlacement = true;
-    int P1HeadStartX = -1;
-    int P1TailStartX = -1;
-    int P1HeadStartY = -1;
-    int P1TailStartY = -1;
-    int P2HeadStartX = -1;
-    int P2TailStartX = -1;
-    int P2HeadStartY = -1;
-    int P2TailStartY = -1;
+    int P1HeadRow       = -1;
+    int P1HeadColumn    = -1;
+    int P1TailRow       = -1;
+    int P1TailColumn    = -1;
+    int P2HeadRow       = -1;
+    int P2HeadColumn    = -1;
+    int P2TailRow       = -1;
+    int P2TailColumn    = -1;
     std::string currentMapName;
 
     Map(const Map&) = delete;

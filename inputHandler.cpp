@@ -37,49 +37,40 @@ InputHandler::inputPlay()
     {
         if(keyPress(SDLK_UP))
         {
-            if(game.snakes[0].dirAvailable(DIR_UP))
-                game.snakes[0].setDirection(DIR_UP);
+            game.setSnakeDir(0, DIR_UP);
         }
         if(keyPress(SDLK_DOWN))
         {
-            if(game.snakes[0].dirAvailable(DIR_DOWN))
-                game.snakes[0].setDirection(DIR_DOWN);
+            game.setSnakeDir(0, DIR_DOWN);
         }
         if(keyPress(SDLK_LEFT))
         {
-            if(game.snakes[0].dirAvailable(DIR_LEFT))
-                game.snakes[0].setDirection(DIR_LEFT);
+            game.setSnakeDir(0, DIR_LEFT);
         }
         if(keyPress(SDLK_RIGHT))
         {
-            if(game.snakes[0].dirAvailable(DIR_RIGHT))
-                game.snakes[0].setDirection(DIR_RIGHT);
+            game.setSnakeDir(0, DIR_RIGHT);
         }
     }
-//     // PLAYER 2
-//     if(game.snakes.size() == 2)
-//     {
-//         if(keyPress(SDLK_w))
-//         {
-//             if(game.snakes[1].dirAvailable(DIR_UP))
-//                 game.snakes[1].setDirection(DIR_UP);
-//         }
-//         if(keyPress(SDLK_s))
-//         {
-//             if(game.snakes[1].dirAvailable(DIR_DOWN))
-//                 game.snakes[1].setDirection(DIR_DOWN);
-//         }
-//         if(keyPress(SDLK_a))
-//         {
-//             if(game.snakes[1].dirAvailable(DIR_LEFT))
-//                 game.snakes[1].setDirection(DIR_LEFT);
-//         }
-//         if(keyPress(SDLK_d))
-//         {
-//             if(game.snakes[1].dirAvailable(DIR_RIGHT))
-//                 game.snakes[1].setDirection(DIR_RIGHT);
-//         }
-//     }
+    if(game.snakes.size() > 1)
+    {
+        if(keyPress(SDLK_w))
+        {
+            game.setSnakeDir(1, DIR_UP);
+        }
+        if(keyPress(SDLK_s))
+        {
+            game.setSnakeDir(1, DIR_DOWN);
+        }
+        if(keyPress(SDLK_a))
+        {
+            game.setSnakeDir(1, DIR_LEFT);
+        }
+        if(keyPress(SDLK_d))
+        {
+            game.setSnakeDir(1, DIR_RIGHT);
+        }
+    }
 }
 
 void

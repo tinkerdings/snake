@@ -207,19 +207,6 @@ Render::renderLogo()
 }
 
 void
-Render::renderSnakes()
-{
-    Game& game = Game::getSingleton();
-    for(auto snake : game.snakes)
-    {
-        for(auto segment = snake.segments.begin(); segment != snake.segments.end(); segment++)
-        {
-            SDL_RenderCopyEx(rend, segment->tex, NULL, &segment->rect, segment->rotation, NULL, segment->flip);
-        }
-    }
-}
-
-void
 Render::renderPickups()
 {
     for(auto pickup : map.pickups)

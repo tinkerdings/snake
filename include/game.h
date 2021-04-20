@@ -22,6 +22,7 @@ public:
     bool started = false;
     int players = 1;
     void init();
+    void setSnakeDir(int playerNum, Dir dir);
     void restart();
     void update();
 private:

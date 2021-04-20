@@ -13,6 +13,11 @@ Game::init()
     snakes.clear();
     Snake player1;
     snakes.push_back(player1);
+    if(players == 2)
+    {
+        Snake player2;
+        snakes.push_back(player2);
+    }
     started = true;
 }
 
@@ -36,4 +41,10 @@ Game::update()
             lastTime = currentTime;
         }
     }
+}
+
+void
+Game::setSnakeDir(int playerNum, Dir dir)
+{
+    snakes[playerNum].setDir(dir);
 }

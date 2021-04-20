@@ -24,44 +24,30 @@ enum SnakeKeyIndex
 
 struct SnakeSegment
 {
-    SDL_Rect rect;
-    SDL_Texture* tex;
-    int rotation = 0;
-    int dirX = 0;
-    int dirY = 0;
-    SDL_RendererFlip flip = SDL_FLIP_NONE;
-    unsigned char neighbors = 0;
+    int row, column;
 };
 
 class Snake
 {
 public:
-    bool isPlayer;
     std::vector<SnakeSegment> segments;
     int score = 0;
     int stepDelay = 100;
+    Dir moveDirection = DIR_NONE;
 
     Snake();
-    void snakeSetInputKey(SnakeKeyIndex, int sdlKeyCode);
-    void setDirection(Dir dir);
-    bool dirAvailable(Dir dir);
-    void addSegment();
+    void addSegment(int row, int column);
+    void setDir(Dir dir);
     void update();
     void initTextures(int snakeNr);
-    void updateNeighbors();
-    void updateTextures();
 
-    int dirX, dirY;
 private:
-    int snakeKeyMap[_PKI_N];
-    int startX, startY;
     int intervals = 4;
     int speedup = 5;
     Map& map = Map::getSingleton();
     Window& wnd = Window::getSingleton();
     StateHandler& state = StateHandler::getSingleton();
     SDL_Texture* texHead, *texTail, *texBody, *texCorner;
-    bool changedDir = false;
 
     void checkCollision();
     void checkCrash();

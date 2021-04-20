@@ -7,324 +7,96 @@
 #include "render.h"
 #include "util.h"
 
+
 Snake::Snake()
 {
     Map& map = Map::getSingleton();
     Game& game = Game::getSingleton();
 
-    if(game.snakes.size())
+    if(!game.snakes.size())
     {
-        startX = map.P2HeadStartX;
-        startY = map.P2HeadStartY;
-        addSegment();
-        addSegment();
-        initTextures(1);
-        dirX = DIR_NONE;
-        dirY = DIR_NONE;
-    }
-    else
-    {
-        std::cout << map.P1HeadStartX << " " << map.P1HeadStartY << std::endl;
-        startX = map.P1HeadStartX;
-        startY = map.P1HeadStartY;
-        addSegment();
-        addSegment();
+        addSegment(map.P1HeadRow, map.P1HeadColumn);
+        addSegment(map.P1TailRow, map.P1TailColumn);
         initTextures(0);
-        dirX = DIR_NONE;
-        dirY = DIR_NONE;
-    }
-}
-
-void
-Snake::addSegment()
-{
-    Map& map = Map::getSingleton();
-    SnakeSegment segment;
-    if(!segments.size())
-    {
-        segment.rect = {startX, startY, map.gridSize, map.gridSize};
-        segment.tex = texHead;
-        segment.dirX = 0;
-        segment.dirY = -1;
-        std::cout << "here" << std::endl;
-        segments.push_back(segment);
-        std::cout << "here" << std::endl;
     }
     else
     {
-        auto currentTail = segments.end()-1;
-        segment.rect = {
-            currentTail->rect.x - (currentTail->dirX * map.gridSize),
-            currentTail->rect.y - (currentTail->dirY * map.gridSize),
-            map.gridSize, map.gridSize};
-        segment.tex = texTail;
-        if(segments.size() > 1)
-            currentTail->tex = texBody;
-        std::cout << "here" << std::endl;
-        std::cout << "here" << std::endl;
-        segments.push_back(segment);
-    }
-    std::cout << "here" << std::endl;
-    map.setTile(segment.rect.y, segment.rect.x, TSNAKE);
-    std::cout << "here" << std::endl;
-}
-
-void
-Snake::update()
-{
-    int i = 0;
-    Map& map = Map::getSingleton();
-    int prevHeadX, prevHeadY, prevTailX, prevTailY;
-    if(dirX + dirY)
-    {
-        auto head = (segments.begin());
-        prevHeadX = segments[0].rect.x;
-        prevHeadY = segments[0].rect.y;
-        prevTailX = (segments.end()-1)->rect.x;
-        prevTailY = (segments.end()-1)->rect.y;
-        for(auto segment = (segments.end()-1); segment != head; segment--)
-        {
-            auto prev = (segment-1);
-            segment->rect = prev->rect;
-            segment->dirX = prev->dirX;
-            segment->dirY = prev->dirY;
-        }
-        segments[0].rect.x += dirX * map.gridSize;
-        segments[0].rect.y += dirY * map.gridSize;
-        map.setTile(prevHeadY, prevHeadX, TSNAKE);
-        map.setTile(prevTailY, prevTailX, TEMPTY);
-    }
-    std::thread t_collision(&Snake::checkCollision, this);
-    t_collision.join();
-    updateNeighbors();
-    updateTextures();
-    changedDir = false;
-}
-
-void
-Snake::updateNeighbors()
-{
-    auto segment = segments.begin();
-    segment->neighbors = 0;
-    if((segment+1)->rect.y < segment->rect.y)
-        segment->neighbors |= NB_UP;
-    if((segment+1)->rect.y > segment->rect.y)
-        segment->neighbors |= NB_DOWN;
-    if((segment+1)->rect.x < segment->rect.x)
-        segment->neighbors |= NB_LEFT;
-    if((segment+1)->rect.x > segment->rect.x)
-        segment->neighbors |= NB_RIGHT;
-    segment++;
-    for(; segment < (segments.end()-1) ; segment++)
-    {
-        segment->neighbors = 0;
-        if(((segment-1)->rect.y < segment->rect.y) || ((segment+1)->rect.y < segment->rect.y))
-            segment->neighbors |= NB_UP;
-        if(((segment-1)->rect.y > segment->rect.y) || ((segment+1)->rect.y > segment->rect.y))
-            segment->neighbors |= NB_DOWN;
-        if(((segment-1)->rect.x < segment->rect.x) || ((segment+1)->rect.x < segment->rect.x))
-            segment->neighbors |= NB_LEFT;
-        if(((segment-1)->rect.x > segment->rect.x) || ((segment+1)->rect.x > segment->rect.x))
-            segment->neighbors |= NB_RIGHT;
-    }
-    segment = (segments.end()-1);
-    segment->neighbors = 0;
-    if((segment-1)->rect.y < segment->rect.y)
-        segment->neighbors |= NB_UP;
-    if((segment-1)->rect.y > segment->rect.y)
-        segment->neighbors |= NB_DOWN;
-    if((segment-1)->rect.x < segment->rect.x)
-        segment->neighbors |= NB_LEFT;
-    if((segment-1)->rect.x > segment->rect.x)
-        segment->neighbors |= NB_RIGHT;
-}
-
-void
-Snake::updateTextures()
-{
-    auto segment = segments.begin();
-    segment->tex = texHead;
-    switch(segment->neighbors)
-    {
-    case(NB_UP):
-    {
-        segment->rotation = 180;
-        break;
-    }
-    case(NB_DOWN):
-    {
-        segment->rotation = 0;
-        break;
-    }
-    case(NB_LEFT):
-    {
-        segment->rotation = 90;
-        break;
-    }
-    case(NB_RIGHT):
-    {
-        segment->rotation = 270;
-        break;
-    }
-    }
-    segment++;
-    for(; segment < (segments.end()-1); segment++)
-    {
-        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_DOWN)))
-        {
-            segment->tex = texBody;
-            segment->rotation = 0;
-            continue;
-        }
-        if(segment->neighbors == (segment->neighbors & (NB_LEFT | NB_RIGHT)))
-        {
-            segment->tex = texBody;
-            segment->rotation = 90;
-            continue;
-        }
-        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_LEFT)))
-        {
-            segment->tex = texCorner;
-            segment->rotation = 90;
-            continue;
-        }
-        if(segment->neighbors == (segment->neighbors & (NB_UP | NB_RIGHT)))
-        {
-            segment->tex = texCorner;
-            segment->rotation = 180;
-            continue;
-        }
-        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_LEFT)))
-        {
-            segment->tex = texCorner;
-            segment->rotation = 0;
-            continue;
-        }
-        if(segment->neighbors == (segment->neighbors & (NB_DOWN | NB_RIGHT)))
-        {
-            segment->tex = texCorner;
-            segment->rotation = 270;
-            continue;
-        }
-    }
-
-    segment = (segments.end()-1);
-    segment->tex = texTail;
-    switch(segment->neighbors)
-    {
-    case(NB_UP):
-    {
-        segment->rotation = 0;
-        break;
-    }
-    case(NB_DOWN):
-    {
-        segment->rotation = 180;
-        break;
-    }
-    case(NB_LEFT):
-    {
-        segment->rotation = 270;
-        break;
-    }
-    case(NB_RIGHT):
-    {
-        segment->rotation = 90;
-        break;
-    }
+        addSegment(map.P2HeadRow, map.P2HeadColumn);
+        addSegment(map.P2TailRow, map.P2TailColumn);
+        initTextures(1);
     }
 }
 
 void
-Snake::setDirection(Dir dir)
+Snake::addSegment(int row, int column)
 {
-    auto head = segments.begin();
+    SnakeSegment segment;
+    segment.row = row;
+    segment.column = column;
+    segments.push_back(segment);
+}
+
+void
+Snake::setDir(Dir dir)
+{
     switch(dir)
     {
-    case(DIR_NONE):
-    {
-        dirX = 0;
-        dirY = 0;
-        head->dirX = 0;
-        head->dirY = 0;
-        break;
-    }
     case(DIR_UP):
     {
-        dirX = 0;
-        dirY = -1;
-        head->dirX = 0;
-        head->dirY = -1;
+        if(segments[1].row >= segments[0].row)
+        {
+            moveDirection = dir;
+            std::cout << "moving up" << std::endl;
+        }
+
         break;
     }
     case(DIR_DOWN):
     {
-        dirX = 0;
-        dirY = 1;
-        head->dirX = 0;
-        head->dirY = 1;
+        if(segments[1].row <= segments[0].row)
+        {
+            moveDirection = dir;
+            std::cout << "moving down" << std::endl;
+        }
+
         break;
     }
     case(DIR_LEFT):
     {
-        dirX = -1;
-        dirY = 0;
-        head->dirX = -1;
-        head->dirY = 0;
+        if(segments[1].column >= segments[0].column)
+        {
+            moveDirection = dir;
+            std::cout << "moving left" << std::endl;
+        }
+
+
         break;
     }
     case(DIR_RIGHT):
     {
-        dirX = 1;
-        dirY = 0;
-        head->dirX = 1;
-        head->dirY = 0;
+        if(segments[1].column <= segments[0].column)
+        {
+            moveDirection = dir;
+            std::cout << "moving right" << std::endl;
+        }
+
         break;
     }
     }
 }
-
-bool
-Snake::dirAvailable(Dir dir)
+void
+Snake::update()
 {
-    switch (dir)
-    {
-	case(DIR_UP):
-	{
-        int newY = segments[0].rect.y - map.gridSize;
-        if (segments[1].rect.y == newY)
-            return false;
-        return true;
-        break;
-	}
-	case(DIR_DOWN):
-	{
-        int newY = segments[0].rect.y + map.gridSize;
-        if (segments[1].rect.y == newY)
-            return false;
-        return true;
-        break;
-	}
-	case(DIR_LEFT):
-	{
-        int newX = segments[0].rect.x - map.gridSize;
-        if (segments[1].rect.x == newX)
-            return false;
-        return true;
-        break;
-	}
-	case(DIR_RIGHT):
-	{
-        int newX = segments[0].rect.x + map.gridSize;
-        if (segments[1].rect.x == newX)
-            return false;
-        return true;
-        break;
-	}
-    }
-    return false;
-}
+    Map& map = Map::getSingleton();
 
+    if(moveDirection != DIR_NONE)
+    {
+        for(auto segment = segments.end()-1; segment != segments.begin(); segment--)
+        {
+            map.setTile((segment-1)->row, (segment-1)->column, map.getTile(segment->row, segment->column));
+        }
+    }
+}
 
 void
 Snake::initTextures(int snakeNr)
@@ -372,26 +144,7 @@ Snake::checkCollision()
 void
 Snake::checkPickup()
 {
-    for(auto pickup = map.pickups.begin(); pickup != map.pickups.end(); pickup++)
-    {
-        if((pickup->rect.x == segments[0].rect.x) && (pickup->rect.y == segments[0].rect.y))
-        {
-            int x = (iRandRange(0, map.mapNW - 1) * map.gridSize) + map.mapX; 
-            int y = (iRandRange(0, map.mapNH - 1) * map.gridSize) + map.mapY; 
-            pickup->setPosition(x, y);
-            addSegment();
 
-            if(!(score % intervals))
-            {
-                if(stepDelay > 30)
-					stepDelay -= speedup;
-                if (score % 8 && speedup > 2)
-                    speedup--;
-            }
-
-            score++;
-        }
-    }
 }
 
 // TODO fix positions according to map offset
@@ -401,21 +154,4 @@ Snake::checkCrash()
     Map& map = Map::getSingleton();
     int ww, wh;
     wnd.getSize(ww, wh);
-
-    // Screenwrap.
-    if (segments[0].rect.x <= (map.mapX - map.gridSize))
-        segments[0].rect.x = (map.mapX + map.mapW - map.gridSize);
-    if (segments[0].rect.x >= (map.mapX + map.mapW))
-        segments[0].rect.x = map.mapX;
-
-    if (segments[0].rect.y <= (map.mapY - map.gridSize))
-        segments[0].rect.y = (map.mapY + map.mapH - map.gridSize);
-    if (segments[0].rect.y >= (map.mapY + map.mapH))
-        segments[0].rect.y = map.mapY;
-
-    if(map.getTile(segments[0].rect.y, segments[0].rect.x) > TPICKUP)
-    {
-        state.setState(RESTART);
-        map.clearMap();
-    }
 }
