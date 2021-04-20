@@ -103,7 +103,8 @@ InputHandler::inputCreate()
 
         if(mouseDown(SDL_BUTTON_LEFT))
         {
-            if(map.getTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize) != map.editorActiveTile)
+            TileType tileAt = map.getTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize);
+            if(tileAt != map.editorActiveTile)
             {
                 map.setTile((mouseY - map.mapY)/map.gridSize, (mouseX - map.mapX)/map.gridSize, map.editorActiveTile);
             }
