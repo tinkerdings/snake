@@ -374,7 +374,6 @@ StateHandler::statePlay()
         rend.renderBG(map.bg);
 
         rend.renderMap();
-//         rend.renderPickups();
         rend.renderBorders();
         rend.renderScores();
 

@@ -144,7 +144,7 @@ Map::setTile(int row, int column, TileType val)
     case(TP1TAIL):
     case(TP2HEAD):
     case(TP2TAIL):
-    case(TSNAKE):
+    case(TPICKUP):
     case(TWALL):
     {
         map[row][column] = val;

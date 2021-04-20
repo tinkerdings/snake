@@ -62,6 +62,7 @@ Render::init()
     map.texP1Tail       = createTexture("res/20x20-tail.png");
     map.texP2Head       = createTexture("res/20x20-head-3.png");
     map.texP2Tail       = createTexture("res/20x20-tail-3.png");
+    pickup              = createTexture("res/20x20-powerup.png");
     initAlphabet();
 }
 
@@ -207,15 +208,6 @@ Render::renderLogo()
 }
 
 void
-Render::renderPickups()
-{
-    for(auto pickup : map.pickups)
-    {
-        SDL_RenderCopy(rend, pickup.tex, NULL, &pickup.rect);
-    }
-}
-
-void
 Render::initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a)
 {
     SDL_Color color = {r, g, b, a};
@@ -344,6 +336,12 @@ Render::renderMap()
                     SDL_RenderCopy(rend, map.texWallCorner, NULL, &rect);
                 else
                     SDL_RenderCopy(rend, map.texWall, NULL, &rect);
+
+                break;
+            }
+            case(TPICKUP):
+            {
+                SDL_RenderCopy(rend, pickup, NULL, &rect);
 
                 break;
             }

@@ -19,6 +19,7 @@ public:
     TTF_Font *fontInput = NULL;
     SDL_Texture *alphabet[26];
     SDL_Texture *bgUIFramed;
+    SDL_Texture *pickup;
     SDL_Texture *bgUIMapSelect;
     SDL_Texture *fgUIMapSelect;
     SDL_Texture *bgUI;
@@ -37,7 +38,6 @@ public:
     void clear();
     void renderBG(SDL_Texture *tex);
     void renderLogo();
-    void renderPickups();
     void show();
     void renderText(Text *tex, int x, int y, int w, int h);
     void initText(Text *tex, const char* txt, unsigned char r, unsigned char g, unsigned char b, unsigned char a);

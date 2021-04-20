@@ -18,7 +18,6 @@ enum TileType
 class Map
 {
 public:
-    std::vector<Pickup> pickups;
     int gridSize = GRIDSIZE;
     TileType map[MAPH][MAPW] = {TEMPTY};
     SDL_Texture *bg;

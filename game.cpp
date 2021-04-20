@@ -3,6 +3,7 @@
 #include <functional>
 #include "menu.h"
 #include "render.h"
+#include "pickup.h"
 
 Game Game::s_Game;
 void
@@ -19,6 +20,7 @@ Game::init()
         snakes.push_back(player2);
     }
     started = true;
+    spawnPickup();
 }
 
 void

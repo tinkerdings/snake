@@ -32,7 +32,7 @@ class Snake
 public:
     std::vector<SnakeSegment> segments;
     int score = 0;
-    int stepDelay = 100;
+    int stepDelay = 300;
     Dir moveDirection = DIR_NONE;
 
     Snake();

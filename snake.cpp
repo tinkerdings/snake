@@ -4,6 +4,7 @@
 #include <iterator>
 #include "snake.h"
 #include "game.h"
+#include "pickup.h"
 #include "render.h"
 #include "util.h"
 
@@ -46,7 +47,6 @@ Snake::setDir(Dir dir)
         if(segments[1].row >= segments[0].row)
         {
             moveDirection = dir;
-            std::cout << "moving up" << std::endl;
         }
 
         break;
@@ -56,7 +56,6 @@ Snake::setDir(Dir dir)
         if(segments[1].row <= segments[0].row)
         {
             moveDirection = dir;
-            std::cout << "moving down" << std::endl;
         }
 
         break;
@@ -66,7 +65,6 @@ Snake::setDir(Dir dir)
         if(segments[1].column >= segments[0].column)
         {
             moveDirection = dir;
-            std::cout << "moving left" << std::endl;
         }
 
 
@@ -77,7 +75,6 @@ Snake::setDir(Dir dir)
         if(segments[1].column <= segments[0].column)
         {
             moveDirection = dir;
-            std::cout << "moving right" << std::endl;
         }
 
         break;
@@ -89,12 +86,99 @@ Snake::update()
 {
     Map& map = Map::getSingleton();
 
+    TileType snakeHeadTile = map.getTile(segments[0].row, segments[0].column);
     if(moveDirection != DIR_NONE)
     {
-        for(auto segment = segments.end()-1; segment != segments.begin(); segment--)
+        auto segment = segments.end()-1;
+        auto tailRow = (segments.end()-1)->row;
+        auto tailColumn = (segments.end()-1)->column;
+        for(; segment != segments.begin(); segment--)
         {
             map.setTile((segment-1)->row, (segment-1)->column, map.getTile(segment->row, segment->column));
+            segment->row = (segment-1)->row;
+            segment->column = (segment-1)->column;
         }
+        map.setTile(tailRow, tailColumn, TEMPTY);
+
+        int newRow = segment->row;
+        int newColumn = segment->column;
+
+        switch(moveDirection)
+        {
+        case(DIR_UP):
+        {
+            newRow = (segment->row)-1;
+            if(!(newRow >= 0))
+                newRow = MAPH-1;
+
+            break;
+        }
+        case(DIR_DOWN):
+        {
+            newRow = (segment->row)+1;
+            if(!(newRow <= MAPH-1))
+                newRow = 0;
+
+            break;
+        }
+        case(DIR_LEFT):
+        {
+            newColumn = (segment->column)-1;
+            if(!(newColumn >= 0))
+                newColumn = MAPW-1;
+
+            break;
+        }
+        case(DIR_RIGHT):
+        {
+            newColumn = (segment->column)+1;
+            if(!(newColumn <= (MAPW-1)))
+                newColumn = 0;
+            break;
+        }
+        }
+
+        switch(map.getTile(newRow, newColumn))
+        {
+        case(TEMPTY):
+        {
+            map.setTile(newRow, newColumn, snakeHeadTile);
+            segment->row = newRow;
+            segment->column = newColumn;
+
+            break;
+        }
+        case(TPICKUP):
+        {
+            map.setTile(newRow, newColumn, snakeHeadTile);
+            segment->row = newRow;
+            segment->column = newColumn;
+            spawnPickup();
+            score++;
+            int beforeTailRow = (segments.end()-2)->row;
+            int beforeTailColumn = (segments.end()-2)->column;
+            
+            if(beforeTailRow < tailRow)
+            {
+                addSegment(((segments.end()-1)->row)+1, (segments.end()-1)->column);
+            }
+            else if((segments.end()-2)->row > ((segments.end()-1)->row))
+            {
+                addSegment(((segments.end()-1)->row)-1, (segments.end()-1)->column);
+            }
+            else if((segments.end()-2)->column < ((segments.end()-1)->column))
+            {
+                addSegment((segments.end()-1)->row, ((segments.end()-1)->column)+1);
+            }
+            else if((segments.end()-2)->column > ((segments.end()-1)->column))
+            {
+                addSegment((segments.end()-1)->row, ((segments.end()-1)->column)-1);
+            }
+
+            break;
+        }
+        }
+
     }
 }
 

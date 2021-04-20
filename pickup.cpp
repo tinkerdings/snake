@@ -1,23 +1,14 @@
-#include "util.h"
+#include <iostream>
 #include "pickup.h"
-#include "render.h"
-#include "game.h"
 #include "map.h"
-
-Pickup::Pickup(int x, int y, int w, int h)
-{
-    Render& rend = Render::getSingleton();
-    rect.x = x;
-    rect.y = y;
-    rect.w = w;
-    rect.h = h;
-    tex = rend.createTexture("res/20x20-powerup.png");
-}
+#include "util.h"
 
 void
-Pickup::setPosition(int x, int y)
+spawnPickup()
 {
     Map& map = Map::getSingleton();
-    rect.x = x;
-    rect.y = y;
+    int row, column;
+    while(map.getTile((row = iRandRange(0, MAPH-1)), (column = iRandRange(0, MAPW-1))) != TEMPTY)
+        ;
+    map.setTile(row, column, TPICKUP);
 }
