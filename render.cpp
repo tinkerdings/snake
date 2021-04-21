@@ -8,6 +8,11 @@
 #include "snake.h"
 #include "menu.h"
 
+#define NB_UP       0x01
+#define NB_DOWN     0x02
+#define NB_LEFT     0x04
+#define NB_RIGHT    0x08
+
 Render Render::s_Render;
 
 void
@@ -60,9 +65,11 @@ Render::init()
     map.texWallCorner   = createTexture("res/20x20-0bstacle-2.png");
     map.texP1Head       = createTexture("res/20x20-head.png");
     map.texP1Body       = createTexture("res/20x20-body.png");
+    map.texP1Corner     = createTexture("res/20x20-turn.png");
     map.texP1Tail       = createTexture("res/20x20-tail.png");
     map.texP2Head       = createTexture("res/20x20-head-3.png");
     map.texP2Body       = createTexture("res/20x20-body-3.png");
+    map.texP2Corner     = createTexture("res/20x20-turn-3.png");
     map.texP2Tail       = createTexture("res/20x20-tail-3.png");
     pickup              = createTexture("res/20x20-powerup.png");
     initAlphabet();
@@ -467,13 +474,187 @@ Render::renderSnakes()
     Map& map = Map::getSingleton();
     SDL_Rect rect;
     SDL_QueryTexture(map.texWall, NULL, NULL, &rect.w, &rect.h);
+    int playernum = -1;
+    SDL_Texture *texHead, *texTail, *texBody, *texCorner;
     for(auto snake = game.snakes.begin(); snake != game.snakes.end(); snake++)
     {
+        playernum++;
+        switch(playernum)
+        {
+        case(0):
+        {
+            texHead = map.texP1Head;
+            texTail = map.texP1Tail;
+            texBody = map.texP1Body;
+            texCorner = map.texP1Corner;
+
+            break;
+        }
+        case(1):
+        {
+            texHead = map.texP2Head;
+            texTail = map.texP2Tail;
+            texBody = map.texP2Body;
+            texCorner = map.texP2Corner;
+
+            break;
+        }
+        }
         for(auto segment = snake->segments.begin(); segment != snake->segments.end(); segment++)
         {
             rect.x = map.mapX + ((segment->column) * map.gridSize);
             rect.y = map.mapY + ((segment->row) * map.gridSize);
-            SDL_RenderCopyEx(rend, map.texWall, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+
+            int neighbors = 0;
+            if(segment == snake->segments.begin())
+            {
+                if(((segment+1)->row < segment->row))
+                {
+                    neighbors |= NB_UP;
+                }
+                if(((segment+1)->row > segment->row))
+                {
+                    neighbors |= NB_DOWN;
+                }
+                if(((segment+1)->column < segment->column))
+                {
+                    neighbors |= NB_LEFT;
+                }
+                if(((segment+1)->column > segment->column))
+                {
+                    neighbors |= NB_RIGHT;
+                }
+            }
+            else if(segment == (snake->segments.end()-1))
+            {
+                if(((segment-1)->row < segment->row))
+                {
+                    neighbors |= NB_UP;
+                }
+                if(((segment-1)->row > segment->row))
+                {
+                    neighbors |= NB_DOWN;
+                }
+                if(((segment-1)->column < segment->column))
+                {
+                    neighbors |= NB_LEFT;
+                }
+                if(((segment-1)->column > segment->column))
+                {
+                    neighbors |= NB_RIGHT;
+                }
+            }
+            else
+            {
+                if(((segment-1)->row < segment->row) || ((segment+1)->row < segment->row))
+                {
+                    neighbors |= NB_UP;
+                }
+                if(((segment-1)->row > segment->row) || ((segment+1)->row > segment->row))
+                {
+                    neighbors |= NB_DOWN;
+                }
+                if(((segment-1)->column < segment->column) || ((segment+1)->column < segment->column))
+                {
+                    neighbors |= NB_LEFT;
+                }
+                if(((segment-1)->column > segment->column) || ((segment+1)->column > segment->column))
+                {
+                    neighbors |= NB_RIGHT;
+                }
+            }
+
+            switch(neighbors)
+            {
+                case(NB_UP):
+                {
+                    if(segment == (snake->segments.end()-1))
+                    {
+                        SDL_RenderCopyEx(rend, texTail, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                    }
+                    else
+                    {
+                        SDL_RenderCopyEx(rend, texHead, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                    }
+
+                    break;
+                }
+                case(NB_DOWN):
+                {
+                    if(segment == (snake->segments.end()-1))
+                    {
+                        SDL_RenderCopyEx(rend, texTail, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+                    }
+                    else
+                    {
+                        SDL_RenderCopyEx(rend, texHead, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+                    }
+
+                    break;
+                }
+                case(NB_LEFT):
+                {
+                    if(segment == (snake->segments.end()-1))
+                    {
+                        SDL_RenderCopyEx(rend, texTail, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                    }
+                    else
+                    {
+                        SDL_RenderCopyEx(rend, texHead, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                    }
+
+                    break;
+                }
+                case(NB_RIGHT):
+                {
+                    if(segment == (snake->segments.end()-1))
+                    {
+                        SDL_RenderCopyEx(rend, texTail, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+                    }
+                    else
+                    {
+                        SDL_RenderCopyEx(rend, texHead, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+                    }
+
+                    break;
+                }
+                case(NB_UP | NB_DOWN):
+                {
+                    SDL_RenderCopyEx(rend, texBody, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+                case(NB_LEFT | NB_RIGHT):
+                {
+                    SDL_RenderCopyEx(rend, texBody, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+                case(NB_UP | NB_LEFT):
+                {
+                    SDL_RenderCopyEx(rend, texCorner, NULL, &rect, 90, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+                case(NB_UP | NB_RIGHT):
+                {
+                    SDL_RenderCopyEx(rend, texCorner, NULL, &rect, 180, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+                case(NB_DOWN | NB_LEFT):
+                {
+                    SDL_RenderCopyEx(rend, texCorner, NULL, &rect, 0, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+                case(NB_DOWN | NB_RIGHT):
+                {
+                    SDL_RenderCopyEx(rend, texCorner, NULL, &rect, 270, NULL, SDL_FLIP_NONE);
+
+                    break;
+                }
+            }
         }
     }
 }

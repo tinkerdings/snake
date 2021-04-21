@@ -40,18 +40,16 @@ Snake::addSegment(int row, int column)
     segments.push_back(segment);
     if(segments.size() > 2)
     {
-        if(player == 0)
-        {
-            map.setTile(row, column, TP1HEAD);
-            std::cout << "addSegment" << std::endl;
-            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1HEAD);
-        }
-        else
-        {
-            map.setTile(row, column, TP2TAIL);
-            std::cout << "addSegment" << std::endl;
-            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP2BODY);
-        }
+//         if(player == 0)
+//         {
+//             map.setTile(row, column, TP1TAIL);
+//             map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1HEAD);
+//         }
+//         else
+//         {
+//             map.setTile(row, column, TP2TAIL);
+//             map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP2BODY);
+//         }
     }
 }
 

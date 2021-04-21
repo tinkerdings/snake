@@ -22,7 +22,7 @@ public:
     TileType map[MAPH][MAPW] = {TEMPTY};
     SDL_Texture *bg;
     SDL_Texture *texWall, *texWallCorner;
-    SDL_Texture *texP1Head, *texP1Body, *texP1Tail, *texP2Head, *texP2Body, *texP2Tail;
+    SDL_Texture *texP1Head, *texP1Body, *texP1Corner, *texP1Tail, *texP2Head, *texP2Body, *texP2Corner, *texP2Tail;
     int mapW = MAPW * GRIDSIZE;
     int mapH = MAPH * GRIDSIZE;
     

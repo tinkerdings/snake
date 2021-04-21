@@ -1,10 +1,6 @@
 #ifndef SNAKE_H
 #define SNAKE_H
 
-#define NB_UP       0x01
-#define NB_DOWN     0x02
-#define NB_LEFT     0x04
-#define NB_RIGHT    0x08
 
 #include <vector>
 #include <thread>
