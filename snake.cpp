@@ -38,19 +38,6 @@ Snake::addSegment(int row, int column)
     segment.row = row;
     segment.column = column;
     segments.push_back(segment);
-    if(segments.size() > 2)
-    {
-//         if(player == 0)
-//         {
-//             map.setTile(row, column, TP1TAIL);
-//             map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1HEAD);
-//         }
-//         else
-//         {
-//             map.setTile(row, column, TP2TAIL);
-//             map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP2BODY);
-//         }
-    }
 }
 
 void
@@ -173,9 +160,9 @@ Snake::update()
             segment->column = newColumn;
             spawnPickup();
             score++;
-            if(score % 3)
+            if(score % 2)
             {
-                stepDelay -= 2;
+                stepDelay -= 4;
                 if(stepDelay < 40)
                     stepDelay = 40;
             }
@@ -201,6 +188,12 @@ Snake::update()
 
             break;
         }
+        case(TP1HEAD):
+        case(TP1TAIL):
+        case(TP1BODY):
+        case(TP2HEAD):
+        case(TP2TAIL):
+        case(TP2BODY):
         case(TWALL):
         {
             game.started = false;

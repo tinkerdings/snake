@@ -22,11 +22,10 @@ Game::init()
         Snake player2;
         snakes.push_back(player2);
     }
-    else
-    {
-        map.setTile(map.P2HeadRow, map.P2HeadColumn, TEMPTY);
-        map.setTile(map.P2TailRow, map.P2TailColumn, TEMPTY);
-    }
+    map.setTile(map.P1HeadRow, map.P1HeadColumn, TEMPTY);
+    map.setTile(map.P1TailRow, map.P1TailColumn, TEMPTY);
+    map.setTile(map.P2HeadRow, map.P2HeadColumn, TEMPTY);
+    map.setTile(map.P2TailRow, map.P2TailColumn, TEMPTY);
     started = true;
     spawnPickup();
 }
