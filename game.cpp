@@ -11,6 +11,7 @@ Game::init()
 {
     Menu& menu = Menu::getSingleton();
     Render& rend = Render::getSingleton();
+    Map& map = Map::getSingleton();
 
     snakes.clear();
 
@@ -20,6 +21,11 @@ Game::init()
     {
         Snake player2;
         snakes.push_back(player2);
+    }
+    else
+    {
+        map.setTile(map.P2HeadRow, map.P2HeadColumn, TEMPTY);
+        map.setTile(map.P2TailRow, map.P2TailColumn, TEMPTY);
     }
     started = true;
     spawnPickup();

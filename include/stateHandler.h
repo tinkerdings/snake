@@ -16,6 +16,7 @@ public:
     {
         return s_StateHandler;
     }
+    State current;
     void setState(State set);
     void setPlayersAndMapSelect(int players);
     void setStateAndLoadMap(State set, const char* mapName);
@@ -23,7 +24,6 @@ public:
     void run();
 
 private:
-    State current;
     unsigned int timePrev = 0;
     unsigned int timeNow;
 

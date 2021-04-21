@@ -376,6 +376,7 @@ StateHandler::statePlay()
         rend.renderBG(map.bg);
 
         rend.renderMap();
+        rend.renderSnakes();
         rend.renderBorders();
         rend.renderScores();
 

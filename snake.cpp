@@ -19,8 +19,6 @@ Snake::Snake()
         player = 0;
         addSegment(map.P1HeadRow, map.P1HeadColumn);
         addSegment(map.P1TailRow, map.P1TailColumn);
-        addSegment(map.P1TailRow+1, map.P1TailColumn);
-        addSegment(map.P1TailRow+2, map.P1TailColumn);
         initTextures(player);
     }
     else
@@ -44,9 +42,9 @@ Snake::addSegment(int row, int column)
     {
         if(player == 0)
         {
-            map.setTile(row, column, TWALL);
+            map.setTile(row, column, TP1HEAD);
             std::cout << "addSegment" << std::endl;
-            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TWALL);
+            map.setTile((segments.end()-2)->row, (segments.end()-2)->column, TP1HEAD);
         }
         else
         {

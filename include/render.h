@@ -47,6 +47,7 @@ public:
     void renderTilePlacementBox();
     void renderTilePreview();
     void renderScores();
+    void renderSnakes();
     void renderBorders();
     void renderLetter(char letter, int x, int y, int w, int h);
     void renderMapNameInput();
