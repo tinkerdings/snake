@@ -1,0 +1,13 @@
+bool find_files(){
+  WIN32_FIND_DATA FindFileData;
+  string img = "C:\\opencvAssets/detected/BioID_*.pgm";
+  HANDLE hFind = FindFirstFile(img.c_str(), &FindFileData);
+  if(hFind == INVALID_HANDLE_VALUE){
+    return false;
+  } 
+  else do{
+    cout<<FindFileData.cFileName<<endl;
+  } while (FindNextFile(hFind, &FindFileData));
+  FindClose(hFind);
+  return true;
+}
